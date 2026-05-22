@@ -84,7 +84,7 @@ func IsPnpmStorePackageJSON(path string) (ok bool, projectPath, name, version st
 	}
 	// Cross-check name parity, but trust the on-disk directory name.
 	_ = name2
-	projectPath = strings.Join(parts[:pnpmIdx-1], "/")
+	projectPath = filepath.FromSlash(strings.Join(parts[:pnpmIdx-1], "/"))
 	if projectPath == "" {
 		// Relative-rooted layout (e.g. "node_modules/.pnpm/..."). Use "." as
 		// the relative-root marker rather than the absolute "/".

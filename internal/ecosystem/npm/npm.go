@@ -111,7 +111,7 @@ func IsNodeModulesPackageJSON(path string) (bool, string) {
 	default:
 		return false, ""
 	}
-	projectPath := strings.Join(parts[:nmIdx], "/")
+	projectPath := filepath.FromSlash(strings.Join(parts[:nmIdx], "/"))
 	if projectPath == "" {
 		// The lockfile lives at a relative path like "node_modules/foo/package.json"
 		// (no parent segments). Reporting the absolute root "/" would be

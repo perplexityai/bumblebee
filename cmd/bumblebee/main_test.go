@@ -90,8 +90,8 @@ func TestIsBroadHomeRoot(t *testing.T) {
 // profile's curated defaults do not include developer/project trees —
 // those belong to the project profile.
 func TestResolveRootsBaselineExcludesProjectTrees(t *testing.T) {
-	if runtime.GOOS != "darwin" && runtime.GOOS != "linux" {
-		t.Skipf("profile defaults are darwin/linux specific")
+	if runtime.GOOS != "darwin" && runtime.GOOS != "linux" && runtime.GOOS != "windows" {
+		t.Skipf("profile defaults are darwin/linux/windows specific")
 	}
 	home := t.TempDir()
 	t.Setenv("HOME", home)
@@ -155,6 +155,46 @@ func TestResolveRootsBaselineIncludesUserLocalPython(t *testing.T) {
 	}
 	if !found {
 		t.Fatalf("baseline profile did not include user-local Python root %q, got %v", pyRoot, roots)
+	}
+}
+
+func TestResolveRootsWindowsBaselineIncludesNativeRoots(t *testing.T) {
+	if runtime.GOOS != "windows" {
+		t.Skip("windows root layout asserted here")
+	}
+	home := t.TempDir()
+	roaming := filepath.Join(home, "AppData", "Roaming")
+	local := filepath.Join(home, "AppData", "Local")
+	t.Setenv("HOME", home)
+	t.Setenv("APPDATA", roaming)
+	t.Setenv("LOCALAPPDATA", local)
+
+	want := map[string]string{
+		filepath.Join(roaming, "npm", "node_modules"):                                  model.RootKindUserPackage,
+		filepath.Join(local, "Programs", "Python", "Python312"):                        model.RootKindUserPackage,
+		filepath.Join(roaming, "Claude"):                                               model.RootKindMCPConfig,
+		filepath.Join(local, "Google", "Chrome", "User Data", "Default", "Extensions"): model.RootKindBrowserExtension,
+		filepath.Join(roaming, "Mozilla", "Firefox", "Profiles"):                       model.RootKindBrowserExtension,
+		filepath.Join(home, ".vscode", "extensions"):                                   model.RootKindEditorExtension,
+	}
+	for p := range want {
+		if err := os.MkdirAll(p, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	roots, _, err := resolveRoots(model.ProfileBaseline, nil, rootsOpts{})
+	if err != nil {
+		t.Fatalf("resolveRoots baseline: %v", err)
+	}
+	got := map[string]string{}
+	for _, r := range roots {
+		got[r.Path] = r.Kind
+	}
+	for p, kind := range want {
+		if got[p] != kind {
+			t.Errorf("root %q kind = %q, want %q (roots=%v)", p, got[p], kind, roots)
+		}
 	}
 }
 
