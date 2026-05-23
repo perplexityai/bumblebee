@@ -3,6 +3,9 @@
 // The walker visits directories under configured roots, applying:
 //   - exclude-directory matching by name
 //   - symlink-loop protection via visited-inode tracking
+//   - symlink entries are never surfaced to the visitor (neither
+//     directory-typed nor file-typed) so the walker never crosses into
+//     an unrelated subtree by indirection
 //   - bounded recursion: it does not descend into node_modules subtrees
 //     beyond what targeted scanners need (those scanners walk their own
 //     bounded depth)
@@ -209,13 +212,6 @@ func walkOne(root string, excludes map[string]struct{}, seen map[string]struct{}
 			if isExcluded(path, d.Name(), excludes) {
 				return filepath.SkipDir
 			}
-			// Directory symlinks are never descended into. filepath.WalkDir
-			// does not follow them on its own, and we explicitly skip any
-			// directory-shaped symlink we encounter so the walker never
-			// crosses into an unrelated subtree by indirection.
-			if info, lerr := os.Lstat(path); lerr == nil && info.Mode()&os.ModeSymlink != 0 {
-				return filepath.SkipDir
-			}
 			// Symlink-loop guard via device+inode.
 			if key, ok := dirKey(path); ok {
 				if _, dup := seen[key]; dup {
@@ -223,6 +219,22 @@ func walkOne(root string, excludes map[string]struct{}, seen map[string]struct{}
 				}
 				seen[key] = struct{}{}
 			}
+		}
+		// Symlink entries — directory-typed or file-typed — are never
+		// surfaced to the visitor. filepath.WalkDir does not descend
+		// into directory symlinks on its own, but it does report
+		// file-typed symlinks as regular entries to the callback, and
+		// scanners open files through os.Open which follows the link.
+		// Without this guard, an attacker who can plant one symlink
+		// inside a scan root (e.g. via a malicious package's postinstall
+		// hook placing node_modules/<pkg>/package.json -> some other
+		// JSON config under the user's home) can have the walker parse
+		// that out-of-tree file and emit its fields under an unrelated
+		// ecosystem — leaking the target file's contents through the
+		// configured records sink. Skip every symlink-typed entry to
+		// keep the "walker never crosses by indirection" invariant.
+		if d.Type()&os.ModeSymlink != 0 {
+			return nil
 		}
 		if verr := visit(path, d); verr != nil {
 			if errors.Is(verr, filepath.SkipDir) {

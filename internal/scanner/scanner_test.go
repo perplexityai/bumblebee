@@ -283,6 +283,80 @@ func TestMissingRootIsInfoLevelDiagnostic(t *testing.T) {
 	}
 }
 
+// TestFileSymlinkDoesNotExfiltrateOutOfScope verifies that a file-typed
+// symlink planted inside a scan root (the supply-chain attack shape: a
+// malicious package's postinstall hook drops a symlink at
+// node_modules/<pkg>/package.json pointing at an unrelated JSON config
+// outside the scan root) does NOT cause the target file's fields to be
+// emitted under the npm ecosystem. The walker must skip the symlink so
+// the parser never sees it; before the fix, the scanner read through
+// the link and emitted a record carrying the target's name/version,
+// effectively exfiltrating fields from out-of-tree files via the
+// configured records sink.
+func TestFileSymlinkDoesNotExfiltrateOutOfScope(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("symlinks require admin on Windows")
+	}
+	root := t.TempDir()
+
+	// Legitimate in-scope package whose record we still want to see.
+	proj := filepath.Join(root, "proj")
+	writeFile(t, filepath.Join(proj, "node_modules", "good", "package.json"),
+		`{"name":"good","version":"1.0.0"}`)
+
+	// Attacker-controlled out-of-scope JSON file. Field shape matches
+	// the parser's expectations so a successful exfil would be obvious.
+	outOfScope := filepath.Join(root, "elsewhere", "stolen.json")
+	writeFile(t, outOfScope, `{"name":"SHOULD-NOT-LEAK","version":"v-leaked"}`)
+
+	// Plant the symlink under the scan root.
+	symlinkPath := filepath.Join(proj, "node_modules", "evil", "package.json")
+	if err := os.MkdirAll(filepath.Dir(symlinkPath), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(outOfScope, symlinkPath); err != nil {
+		t.Skipf("symlink unsupported: %v", err)
+	}
+
+	stdout := &bytes.Buffer{}
+	em := output.New(stdout, &bytes.Buffer{}, "r")
+	_, err := Run(context.Background(), Config{
+		Roots:       []Root{{Path: proj, Kind: model.RootKindProject}},
+		Profile:     model.ProfileProject,
+		MaxFileSize: 1 << 20,
+		MaxDuration: 5 * time.Second,
+		Concurrency: 2,
+		Emitter:     em,
+	})
+	if err != nil {
+		t.Fatalf("Run: %v", err)
+	}
+
+	for _, line := range bytes.Split(bytes.TrimRight(stdout.Bytes(), "\n"), []byte{'\n'}) {
+		if len(line) == 0 {
+			continue
+		}
+		var r model.Record
+		if jerr := json.Unmarshal(line, &r); jerr != nil {
+			continue
+		}
+		if r.RecordType != model.RecordTypePackage {
+			continue
+		}
+		if r.PackageName == "SHOULD-NOT-LEAK" || r.Version == "v-leaked" {
+			t.Errorf("out-of-scope field leaked via file symlink: name=%q version=%q source_file=%q",
+				r.PackageName, r.Version, r.SourceFile)
+		}
+		if strings.Contains(r.SourceFile, "/evil/") {
+			t.Errorf("symlink path was surfaced as source_file: %q", r.SourceFile)
+		}
+	}
+
+	if em.RecordsEmitted < 1 {
+		t.Errorf("expected at least 1 record from the legitimate package, got %d", em.RecordsEmitted)
+	}
+}
+
 func TestSymlinkLoopSafety(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("symlinks require admin on Windows")
