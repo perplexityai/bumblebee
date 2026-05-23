@@ -141,7 +141,11 @@ func classifyRoot(path, profile string) string {
 		strings.HasSuffix(p, "/.config/Claude Code") ||
 		strings.HasSuffix(p, "/.continue"):
 		return model.RootKindMCPConfig
-	case p == "/opt/homebrew/lib" || p == "/usr/local/lib" || strings.HasSuffix(p, "/Library/Python"):
+	case p == "/opt/homebrew/lib" ||
+		p == "/usr/local/lib" ||
+		strings.HasSuffix(p, "/Cellar") ||
+		strings.HasSuffix(p, "/Caskroom") ||
+		strings.HasSuffix(p, "/Library/Python"):
 		return model.RootKindHomebrew
 	case isBroadHomeRoot(path):
 		return model.RootKindDeepHome
@@ -289,13 +293,22 @@ func projectHomeCandidates(home string) []scanner.Root {
 func systemRoots() []scanner.Root {
 	switch runtime.GOOS {
 	case "darwin":
-		return []scanner.Root{
+		roots := []scanner.Root{
+			{Path: "/opt/homebrew/Cellar", Kind: model.RootKindHomebrew},
+			{Path: "/opt/homebrew/Caskroom", Kind: model.RootKindHomebrew},
 			{Path: "/opt/homebrew/lib", Kind: model.RootKindHomebrew},
+			{Path: "/usr/local/Cellar", Kind: model.RootKindHomebrew},
+			{Path: "/usr/local/Caskroom", Kind: model.RootKindHomebrew},
 			{Path: "/usr/local/lib", Kind: model.RootKindHomebrew},
 			{Path: "/Library/Python", Kind: model.RootKindHomebrew},
 		}
+		return roots
 	case "linux":
-		roots := []scanner.Root{{Path: "/usr/local/lib", Kind: model.RootKindGlobalPackage}}
+		roots := []scanner.Root{
+			{Path: "/usr/local/lib", Kind: model.RootKindGlobalPackage},
+			{Path: "/home/linuxbrew/.linuxbrew/Cellar", Kind: model.RootKindHomebrew},
+			{Path: "/home/linuxbrew/.linuxbrew/Caskroom", Kind: model.RootKindHomebrew},
+		}
 		for _, pattern := range []string{"/usr/lib/python*"} {
 			for _, p := range globExisting(pattern) {
 				roots = append(roots, scanner.Root{Path: p, Kind: model.RootKindGlobalPackage})

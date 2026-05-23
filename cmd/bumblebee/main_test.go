@@ -326,6 +326,23 @@ func TestClassifyRootEditorExtension(t *testing.T) {
 	}
 }
 
+func TestClassifyRootHomebrewCellarAndCaskroom(t *testing.T) {
+	for _, p := range []string{
+		"/opt/homebrew/Cellar",
+		"/opt/homebrew/Caskroom",
+		"/usr/local/Cellar",
+		"/usr/local/Caskroom",
+		"/home/linuxbrew/.linuxbrew/Cellar",
+		"/home/linuxbrew/.linuxbrew/Caskroom",
+		"/custom/prefix/Cellar",
+		"/custom/prefix/Caskroom",
+	} {
+		if got := classifyRoot(p, model.ProfileBaseline); got != model.RootKindHomebrew {
+			t.Errorf("classifyRoot(%q) = %q, want %q", p, got, model.RootKindHomebrew)
+		}
+	}
+}
+
 func TestIsLikelyUserHomeName(t *testing.T) {
 	keep := []string{"alice", "bob", "Alice", "user1", "first.last"}
 	drop := []string{"", ".", "..", ".DS_Store", ".localized", "Shared", "shared", "Guest", "guest", "root", "Deleted Users"}

@@ -43,6 +43,7 @@ const (
 	EcosystemMCP              = "mcp"
 	EcosystemEditorExtension  = "editor-extension"
 	EcosystemBrowserExtension = "browser-extension"
+	EcosystemHomebrew         = "homebrew"
 )
 
 var supportedEcosystems = map[string]struct{}{
@@ -54,6 +55,7 @@ var supportedEcosystems = map[string]struct{}{
 	EcosystemMCP:              {},
 	EcosystemEditorExtension:  {},
 	EcosystemBrowserExtension: {},
+	EcosystemHomebrew:         {},
 }
 
 var supportedEcosystemOrder = []string{
@@ -65,6 +67,7 @@ var supportedEcosystemOrder = []string{
 	EcosystemMCP,
 	EcosystemEditorExtension,
 	EcosystemBrowserExtension,
+	EcosystemHomebrew,
 }
 
 // SupportedEcosystems returns the emitted ecosystem values supported by v0.1.

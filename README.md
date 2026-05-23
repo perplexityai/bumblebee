@@ -46,6 +46,7 @@ know what they are looking for.
 | MCP | `mcp` | JSON host configs: `mcp.json`, `.mcp.json`, `claude_desktop_config.json`, `mcp_config.json`, `mcp_settings.json`, `cline_mcp_settings.json`, plus `~/.gemini/settings.json` (Gemini CLI / Code Assist). Non-JSON configs (Codex `config.toml`, Continue YAML) are not parsed in v0.1. |
 | Editor extensions | `editor-extension` | VS Code, Cursor, Windsurf, VSCodium manifests |
 | Browser extensions | `browser-extension` | Chromium-family (`manifest.json`) and Firefox (`extensions.json`) per profile |
+| Homebrew | `homebrew` | Formula `INSTALL_RECEIPT.json` files and cask `.metadata` install markers |
 
 Per-ecosystem detail: [docs/inventory-sources.md](docs/inventory-sources.md).
 

@@ -23,6 +23,7 @@ import (
 	"github.com/perplexityai/bumblebee/internal/ecosystem/composer"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/editorext"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/gomod"
+	"github.com/perplexityai/bumblebee/internal/ecosystem/homebrew"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/mcp"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/npm"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/pnpm"
@@ -249,6 +250,7 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 	mcpS := &mcp.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 	extS := &editorext.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 	bxS := &browserext.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
+	hbS := &homebrew.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 
 	type job struct {
 		kind        string
@@ -314,6 +316,10 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 					err = bxS.ScanChromiumExtension(j.path, j.extra1, j.extra2, j.projectPath, cfg.BaseRecord)
 				case "firefox-ext":
 					err = bxS.ScanFirefoxExtensions(j.path, cfg.BaseRecord)
+				case "homebrew-formula":
+					err = hbS.ScanFormulaReceipt(j.path, j.extra1, j.extra2, j.projectPath, cfg.BaseRecord)
+				case "homebrew-cask":
+					err = hbS.ScanCaskMetadata(j.path, j.extra1, j.extra2, j.projectPath, cfg.BaseRecord)
 				}
 				if err != nil {
 					cfg.Emitter.Diag("error", j.path, err.Error())
@@ -427,6 +433,19 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 		case enabled(model.EcosystemBrowserExtension) && base == "extensions.json":
 			if browserext.IsFirefoxExtensionsJSON(path) {
 				send(job{kind: "firefox-ext", path: path})
+			}
+		case enabled(model.EcosystemHomebrew) && base == "INSTALL_RECEIPT.json":
+			if ok, name, version, cellarDir := homebrew.IsFormulaReceipt(path); ok {
+				send(job{kind: "homebrew-formula", path: path, projectPath: cellarDir, extra1: name, extra2: version})
+			}
+		case enabled(model.EcosystemHomebrew) && homebrew.LooksLikeCaskMetadataMarker(path):
+			// This one intentionally does a tiny sibling check in the walker
+			// so a cask with .internal.json, .json, and .rb markers emits only
+			// Homebrew's preferred installed-cask snapshot. That adds serial
+			// I/O to cask marker dispatch, but typical Caskroom cardinality is
+			// small and avoiding duplicate records keeps downstream state clean.
+			if ok, token, version, caskroomDir := homebrew.IsCaskMetadataMarker(path); ok {
+				send(job{kind: "homebrew-cask", path: path, projectPath: caskroomDir, extra1: token, extra2: version})
 			}
 		case base == "package.json":
 			// Prefer extension match over node_modules.
