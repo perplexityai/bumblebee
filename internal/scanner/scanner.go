@@ -260,10 +260,8 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 	jobs := make(chan job, 256)
 
 	var wg sync.WaitGroup
-	for i := 0; i < cfg.Concurrency; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+	for range cfg.Concurrency {
+		wg.Go(func() {
 			for j := range jobs {
 				select {
 				case <-ctx.Done():
@@ -319,7 +317,7 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 					cfg.Emitter.Diag("error", j.path, err.Error())
 				}
 			}
-		}()
+		})
 	}
 
 	var filesConsidered int
