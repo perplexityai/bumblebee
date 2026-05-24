@@ -1,0 +1,712 @@
+{
+  "schema_version": "0.1.0",
+  "_comment": "TrapDoor Crypto Stealer cross-ecosystem credential/wallet stealer across npm, PyPI, and Cargo/Crates.io; see https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates. Source CSV: 384 versions / 34 packages (npm 21/368, pypi 7/10, cargo 6/6). Entries[] covers npm and PyPI; the 6 Cargo packages are under _cargo_packages because the v0.1 schema enum has no 'cargo' value.",
+  "_indicators": {
+    "campaign_marker": "P-2024-001",
+    "payload_filename": "trap-core.js",
+    "github_pages_host": "ddjidd564.github.io",
+    "npm_user": "asdxzxc",
+    "pypi_users": ["asdmini67", "dae5411"]
+  },
+  "_cargo_packages": {
+    "_comment": "Cargo packages from the same campaign; not in entries[] because the v0.1 schema enum does not include 'cargo'.",
+    "packages": [
+      {
+        "package": "move-analyzer-build",
+        "versions": [
+          "0.1.0"
+        ]
+      },
+      {
+        "package": "move-compiler-tools",
+        "versions": [
+          "0.1.0"
+        ]
+      },
+      {
+        "package": "move-project-builder",
+        "versions": [
+          "0.1.0"
+        ]
+      },
+      {
+        "package": "sui-framework-helpers",
+        "versions": [
+          "0.1.0"
+        ]
+      },
+      {
+        "package": "sui-move-build-helper",
+        "versions": [
+          "0.1.1"
+        ]
+      },
+      {
+        "package": "sui-sdk-build-utils",
+        "versions": [
+          "0.1.0"
+        ]
+      }
+    ]
+  },
+  "entries": [
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-async-pipeline-builder",
+      "name": "async-pipeline-builder (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "async-pipeline-builder",
+      "versions": [
+        "1.5.1",
+        "1.5.0",
+        "1.4.0",
+        "1.3.0",
+        "1.2.0",
+        "1.1.0",
+        "1.0.14",
+        "1.0.13",
+        "1.0.12",
+        "1.0.11",
+        "1.0.10",
+        "1.0.9",
+        "1.0.8",
+        "1.0.6",
+        "1.0.5",
+        "1.0.4",
+        "1.0.3",
+        "1.0.1",
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-build-scripts-utils",
+      "name": "build-scripts-utils (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "build-scripts-utils",
+      "versions": [
+        "1.5.1",
+        "1.5.0",
+        "1.4.0",
+        "1.3.0",
+        "1.2.0",
+        "1.1.0",
+        "1.0.14",
+        "1.0.13",
+        "1.0.12",
+        "1.0.11",
+        "1.0.10",
+        "1.0.9",
+        "1.0.8",
+        "1.0.6",
+        "1.0.5",
+        "1.0.4",
+        "1.0.3",
+        "1.0.2",
+        "1.0.1",
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-chain-key-validator",
+      "name": "chain-key-validator (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "chain-key-validator",
+      "versions": [
+        "4.0.0",
+        "1.3.9",
+        "1.3.8",
+        "1.3.7",
+        "1.3.5",
+        "1.3.4",
+        "1.3.3",
+        "1.3.2",
+        "1.3.1",
+        "1.3.0",
+        "1.2.3",
+        "1.2.2",
+        "1.2.1",
+        "1.2.0",
+        "0.2.4",
+        "0.2.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-crypto-credential-scanner",
+      "name": "crypto-credential-scanner (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "crypto-credential-scanner",
+      "versions": [
+        "4.0.0",
+        "3.1.9",
+        "3.1.8",
+        "3.1.7",
+        "3.1.5",
+        "3.1.4",
+        "3.1.3",
+        "3.1.2",
+        "3.1.1",
+        "3.1.0",
+        "3.0.3",
+        "3.0.2",
+        "3.0.1",
+        "3.0.0",
+        "2.0.3",
+        "2.0.2",
+        "2.0.1",
+        "2.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-defi-env-auditor",
+      "name": "defi-env-auditor (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "defi-env-auditor",
+      "versions": [
+        "4.0.0",
+        "1.4.9",
+        "1.4.8",
+        "1.4.7",
+        "1.4.5",
+        "1.4.4",
+        "1.4.3",
+        "1.4.2",
+        "1.4.1",
+        "1.4.0",
+        "1.3.3",
+        "1.3.2",
+        "1.3.1",
+        "1.3.0",
+        "0.3.3",
+        "0.3.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-defi-threat-scanner",
+      "name": "defi-threat-scanner (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "defi-threat-scanner",
+      "versions": [
+        "4.0.0",
+        "3.2.8",
+        "3.2.7",
+        "3.2.5",
+        "3.2.4",
+        "3.2.3",
+        "3.2.2",
+        "3.2.1",
+        "3.2.0",
+        "3.1.3",
+        "3.1.2",
+        "3.1.1",
+        "3.1.0",
+        "2.1.3",
+        "2.1.2",
+        "2.1.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-deployment-key-auditor",
+      "name": "deployment-key-auditor (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "deployment-key-auditor",
+      "versions": [
+        "4.0.0",
+        "1.8.9",
+        "1.8.8",
+        "1.8.7",
+        "1.8.5",
+        "1.8.4",
+        "1.8.3",
+        "1.8.2",
+        "1.8.1",
+        "1.8.0",
+        "1.7.3",
+        "1.7.2",
+        "1.7.1",
+        "1.7.0",
+        "0.7.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-dev-env-bootstrapper",
+      "name": "dev-env-bootstrapper (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "dev-env-bootstrapper",
+      "versions": [
+        "1.5.2",
+        "1.5.0",
+        "1.4.0",
+        "1.3.0",
+        "1.2.0",
+        "1.1.0",
+        "1.0.14",
+        "1.0.13",
+        "1.0.12",
+        "1.0.11",
+        "1.0.10",
+        "1.0.9",
+        "1.0.8",
+        "1.0.7",
+        "1.0.6",
+        "1.0.5",
+        "1.0.4",
+        "1.0.3",
+        "1.0.2",
+        "1.0.1",
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-eth-wallet-sentinel",
+      "name": "eth-wallet-sentinel (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "eth-wallet-sentinel",
+      "versions": [
+        "4.0.0",
+        "2.1.9",
+        "2.1.8",
+        "2.1.5",
+        "2.1.4",
+        "2.1.3",
+        "2.1.2",
+        "2.1.1",
+        "2.1.0",
+        "2.0.3",
+        "2.0.2",
+        "2.0.1",
+        "2.0.0",
+        "1.0.10",
+        "1.0.9"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-llm-context-compressor",
+      "name": "llm-context-compressor (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "llm-context-compressor",
+      "versions": [
+        "1.5.1",
+        "1.5.0",
+        "1.4.0",
+        "1.3.0",
+        "1.2.0",
+        "1.1.0",
+        "1.0.14",
+        "1.0.13",
+        "1.0.12",
+        "1.0.11",
+        "1.0.10",
+        "1.0.9",
+        "1.0.8",
+        "1.0.7",
+        "1.0.6",
+        "1.0.5",
+        "1.0.4",
+        "1.0.3",
+        "1.0.1",
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-mnemonic-safety-check",
+      "name": "mnemonic-safety-check (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "mnemonic-safety-check",
+      "versions": [
+        "4.0.0",
+        "1.6.9",
+        "1.6.8",
+        "1.6.7",
+        "1.6.5",
+        "1.6.4",
+        "1.6.3",
+        "1.6.2",
+        "1.6.1",
+        "1.6.0",
+        "1.5.3",
+        "1.5.2",
+        "1.5.1",
+        "1.5.0",
+        "0.5.3",
+        "0.5.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-model-switch-router",
+      "name": "model-switch-router (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "model-switch-router",
+      "versions": [
+        "1.5.1",
+        "1.5.0",
+        "1.4.0",
+        "1.3.0",
+        "1.2.0",
+        "1.1.0",
+        "1.0.14",
+        "1.0.13",
+        "1.0.12",
+        "1.0.11",
+        "1.0.10",
+        "1.0.9",
+        "1.0.8",
+        "1.0.6",
+        "1.0.5",
+        "1.0.4",
+        "1.0.3",
+        "1.0.1",
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-node-setup-helpers",
+      "name": "node-setup-helpers (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "node-setup-helpers",
+      "versions": [
+        "1.5.1",
+        "1.5.0",
+        "1.4.0",
+        "1.3.0",
+        "1.2.0",
+        "1.1.0",
+        "1.0.14",
+        "1.0.13",
+        "1.0.12",
+        "1.0.11",
+        "1.0.10",
+        "1.0.9",
+        "1.0.8",
+        "1.0.6",
+        "1.0.5",
+        "1.0.4",
+        "1.0.3",
+        "1.0.2",
+        "1.0.1",
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-project-init-tools",
+      "name": "project-init-tools (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "project-init-tools",
+      "versions": [
+        "1.5.1",
+        "1.5.0",
+        "1.4.0",
+        "1.3.0",
+        "1.2.0",
+        "1.1.0",
+        "1.0.14",
+        "1.0.13",
+        "1.0.12",
+        "1.0.11",
+        "1.0.10",
+        "1.0.9",
+        "1.0.8",
+        "1.0.6",
+        "1.0.5",
+        "1.0.4",
+        "1.0.3",
+        "1.0.2",
+        "1.0.1",
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-prompt-engineering-toolkit",
+      "name": "prompt-engineering-toolkit (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "prompt-engineering-toolkit",
+      "versions": [
+        "1.5.1",
+        "1.5.0",
+        "1.4.0",
+        "1.3.0",
+        "1.2.0",
+        "1.1.0",
+        "1.0.14",
+        "1.0.13",
+        "1.0.12",
+        "1.0.11",
+        "1.0.10",
+        "1.0.9",
+        "1.0.8",
+        "1.0.7",
+        "1.0.6",
+        "1.0.5",
+        "1.0.4",
+        "1.0.3",
+        "1.0.1",
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-solidity-deploy-guard",
+      "name": "solidity-deploy-guard (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "solidity-deploy-guard",
+      "versions": [
+        "4.0.0",
+        "1.5.8",
+        "1.5.7",
+        "1.5.5",
+        "1.5.4",
+        "1.5.3",
+        "1.5.2",
+        "1.5.1",
+        "1.5.0",
+        "1.4.3",
+        "1.4.2",
+        "1.4.1",
+        "1.4.0",
+        "0.4.5",
+        "0.4.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-token-usage-tracker",
+      "name": "token-usage-tracker (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "token-usage-tracker",
+      "versions": [
+        "1.5.1",
+        "1.5.0",
+        "1.4.0",
+        "1.3.0",
+        "1.2.0",
+        "1.1.0",
+        "1.0.14",
+        "1.0.13",
+        "1.0.12",
+        "1.0.11",
+        "1.0.10",
+        "1.0.9",
+        "1.0.8",
+        "1.0.6",
+        "1.0.5",
+        "1.0.4",
+        "1.0.3",
+        "1.0.1",
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-wallet-backup-verifier",
+      "name": "wallet-backup-verifier (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "wallet-backup-verifier",
+      "versions": [
+        "4.0.0",
+        "1.0.11",
+        "1.0.10",
+        "1.0.9",
+        "1.0.7",
+        "1.0.6",
+        "1.0.5",
+        "1.0.4",
+        "1.0.3",
+        "1.0.2",
+        "1.0.1",
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-wallet-security-checker",
+      "name": "wallet-security-checker (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "wallet-security-checker",
+      "versions": [
+        "4.0.0",
+        "2.1.8",
+        "2.1.7",
+        "2.1.5",
+        "2.1.4",
+        "2.1.3",
+        "2.1.2",
+        "2.1.1",
+        "2.1.0",
+        "2.0.3",
+        "2.0.2",
+        "2.0.1",
+        "2.0.0",
+        "1.0.4",
+        "1.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-web3-secrets-detector",
+      "name": "web3-secrets-detector (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "web3-secrets-detector",
+      "versions": [
+        "4.0.0",
+        "2.3.9",
+        "2.3.8",
+        "2.3.7",
+        "2.3.5",
+        "2.3.4",
+        "2.3.3",
+        "2.3.2",
+        "2.3.1",
+        "2.3.0",
+        "2.2.3",
+        "2.2.2",
+        "2.2.1",
+        "2.2.0",
+        "1.2.7",
+        "1.2.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-npm-workspace-config-loader",
+      "name": "workspace-config-loader (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "npm",
+      "package": "workspace-config-loader",
+      "versions": [
+        "1.5.1",
+        "1.5.0",
+        "1.4.0",
+        "1.3.0",
+        "1.2.0",
+        "1.1.0",
+        "1.0.14",
+        "1.0.13",
+        "1.0.12",
+        "1.0.11",
+        "1.0.10",
+        "1.0.9",
+        "1.0.8",
+        "1.0.6",
+        "1.0.5",
+        "1.0.4",
+        "1.0.3",
+        "1.0.2",
+        "1.0.1",
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-pypi-cryptowallet-safety",
+      "name": "cryptowallet-safety (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "pypi",
+      "package": "cryptowallet-safety",
+      "versions": [
+        "0.1.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-pypi-data-pipeline-check",
+      "name": "data-pipeline-check (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "pypi",
+      "package": "data-pipeline-check",
+      "versions": [
+        "0.1.1",
+        "0.1.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-pypi-defi-risk-scanner",
+      "name": "defi-risk-scanner (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "pypi",
+      "package": "defi-risk-scanner",
+      "versions": [
+        "0.1.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-pypi-env-loader-cli",
+      "name": "env-loader-cli (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "pypi",
+      "package": "env-loader-cli",
+      "versions": [
+        "0.1.1",
+        "0.1.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-pypi-eth-security-auditor",
+      "name": "eth-security-auditor (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "pypi",
+      "package": "eth-security-auditor",
+      "versions": [
+        "0.1.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-pypi-git-config-sync",
+      "name": "git-config-sync (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "pypi",
+      "package": "git-config-sync",
+      "versions": [
+        "0.1.1",
+        "0.1.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    },
+    {
+      "id": "socket-2026-05-24-trapdoor-pypi-solidity-build-guard",
+      "name": "solidity-build-guard (TrapDoor Crypto Stealer cross-ecosystem campaign)",
+      "ecosystem": "pypi",
+      "package": "solidity-build-guard",
+      "versions": [
+        "0.1.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates"
+    }
+  ]
+}
