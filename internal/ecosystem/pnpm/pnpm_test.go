@@ -60,11 +60,11 @@ func TestSplitPnpmStoreDir(t *testing.T) {
 
 func TestIsPnpmStorePackageJSON(t *testing.T) {
 	ok, proj, name, ver := IsPnpmStorePackageJSON("/x/proj/node_modules/.pnpm/lodash@4.17.21/node_modules/lodash/package.json")
-	if !ok || proj != "/x/proj" || name != "lodash" || ver != "4.17.21" {
+	if !ok || filepath.ToSlash(proj) != "/x/proj" || name != "lodash" || ver != "4.17.21" {
 		t.Errorf("got ok=%v proj=%q name=%q ver=%q", ok, proj, name, ver)
 	}
 	ok, proj, name, ver = IsPnpmStorePackageJSON("/x/proj/node_modules/.pnpm/@tanstack+query-core@5.0.0/node_modules/@tanstack/query-core/package.json")
-	if !ok || name != "@tanstack/query-core" || ver != "5.0.0" || proj != "/x/proj" {
+	if !ok || name != "@tanstack/query-core" || ver != "5.0.0" || filepath.ToSlash(proj) != "/x/proj" {
 		t.Errorf("scoped: got ok=%v proj=%q name=%q ver=%q", ok, proj, name, ver)
 	}
 	if ok, _, _, _ := IsPnpmStorePackageJSON("/x/proj/node_modules/lodash/package.json"); ok {

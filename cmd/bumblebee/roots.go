@@ -44,9 +44,39 @@ type rootsOpts struct {
 	// AllUsers, when true on macOS, expands the baseline/project profile
 	// defaults across every real user home under /Users instead of only
 	// the current process owner's home. System/Homebrew roots are still
-	// included exactly once. Has no effect on Linux, where multi-user
-	// fleet runs are not a supported deployment shape.
+	// included exactly once. Has no effect on Linux or Windows, where
+	// multi-user fleet runs are not a supported deployment shape.
 	AllUsers bool
+}
+
+func currentHomeDir() string {
+	if home := strings.TrimSpace(os.Getenv("HOME")); home != "" {
+		return home
+	}
+	if home, err := os.UserHomeDir(); err == nil && home != "" {
+		return home
+	}
+	return ""
+}
+
+func roamingAppDataDir(home string) string {
+	if d := strings.TrimSpace(os.Getenv("APPDATA")); d != "" {
+		return d
+	}
+	if home == "" {
+		return ""
+	}
+	return filepath.Join(home, "AppData", "Roaming")
+}
+
+func localAppDataDir(home string) string {
+	if d := strings.TrimSpace(os.Getenv("LOCALAPPDATA")); d != "" {
+		return d
+	}
+	if home == "" {
+		return ""
+	}
+	return filepath.Join(home, "AppData", "Local")
 }
 
 // resolveRoots picks the scan roots for the given profile. When the caller
@@ -132,6 +162,7 @@ func classifyRoot(path, profile string) string {
 	case strings.HasSuffix(p, "/Profiles") && containsAny(p, "Firefox", "LibreWolf", "Waterfox"):
 		return model.RootKindBrowserExtension
 	case strings.Contains(p, "Library/Application Support/Claude") ||
+		strings.Contains(p, "/AppData/Roaming/Claude") ||
 		strings.HasSuffix(p, "/.cursor") ||
 		strings.HasSuffix(p, "/.codeium/windsurf") ||
 		strings.HasSuffix(p, "/.claude") ||
@@ -172,25 +203,92 @@ func isBroadHomeRoot(path string) bool {
 	if path == "" {
 		return false
 	}
+	rawSlash := filepath.ToSlash(filepath.Clean(path))
+	if isUnixBroadHomePath(rawSlash) {
+		return true
+	}
 	abs, err := filepath.Abs(path)
 	if err != nil {
 		abs = path
 	}
 	abs = filepath.Clean(abs)
-	if abs == "/" {
+	if isFilesystemRoot(abs) {
 		return true
 	}
-	if home, err := os.UserHomeDir(); err == nil && home != "" {
-		if abs == filepath.Clean(home) {
+	if home := currentHomeDir(); home != "" {
+		if samePath(abs, cleanAbs(home)) {
 			return true
 		}
 	}
-	switch abs {
+	if isUnixBroadHomePath(filepath.ToSlash(abs)) {
+		return true
+	}
+	if runtime.GOOS == "windows" && isWindowsBroadHomePath(abs) {
+		return true
+	}
+	return false
+}
+
+func cleanAbs(path string) string {
+	abs, err := filepath.Abs(path)
+	if err != nil {
+		abs = path
+	}
+	return filepath.Clean(abs)
+}
+
+func samePath(a, b string) bool {
+	a = filepath.Clean(a)
+	b = filepath.Clean(b)
+	if runtime.GOOS == "windows" {
+		return strings.EqualFold(a, b)
+	}
+	return a == b
+}
+
+func isFilesystemRoot(path string) bool {
+	path = filepath.Clean(path)
+	if path == "/" {
+		return true
+	}
+	vol := filepath.VolumeName(path)
+	if vol == "" {
+		return false
+	}
+	rest := strings.TrimPrefix(path, vol)
+	return rest == "" || rest == string(filepath.Separator)
+}
+
+func isUnixBroadHomePath(p string) bool {
+	p = strings.TrimRight(filepath.ToSlash(filepath.Clean(p)), "/")
+	if p == "" {
+		p = "/"
+	}
+	switch p {
 	case "/Users", "/home", "/root":
 		return true
 	}
-	if dir, _ := filepath.Split(abs); dir == "/Users/" || dir == "/home/" {
+	if dir, _ := filepath.Split(p); dir == "/Users/" || dir == "/home/" {
 		return true
+	}
+	return false
+}
+
+func isWindowsBroadHomePath(path string) bool {
+	p := strings.TrimRight(filepath.ToSlash(filepath.Clean(path)), "/")
+	if len(p) >= 2 && p[1] == ':' {
+		p = p[2:]
+	}
+	p = strings.ToLower(p)
+	switch p {
+	case "/users", "/documents and settings":
+		return true
+	}
+	for _, parent := range []string{"/users", "/documents and settings"} {
+		if strings.HasPrefix(p, parent+"/") {
+			rest := strings.TrimPrefix(p, parent+"/")
+			return rest != "" && !strings.Contains(rest, "/")
+		}
 	}
 	return false
 }
@@ -221,6 +319,29 @@ func baselineHomeCandidates(home string) []scanner.Root {
 		add(p, model.RootKindUserPackage)
 	}
 	add(filepath.Join(home, ".local", "share", "pipx", "venvs"), model.RootKindUserPackage)
+	if runtime.GOOS == "windows" {
+		roaming := roamingAppDataDir(home)
+		local := localAppDataDir(home)
+		add(filepath.Join(home, ".pyenv", "pyenv-win", "versions"), model.RootKindUserPackage)
+		add(filepath.Join(home, ".local", "pipx", "venvs"), model.RootKindUserPackage)
+		add(filepath.Join(home, ".gem"), model.RootKindUserPackage)
+		if roaming != "" {
+			add(filepath.Join(roaming, "npm", "node_modules"), model.RootKindUserPackage)
+			add(filepath.Join(roaming, "nvm"), model.RootKindUserPackage)
+			add(filepath.Join(roaming, "fnm", "node-versions"), model.RootKindUserPackage)
+			for _, p := range globExisting(filepath.Join(roaming, "Python", "Python*")) {
+				add(p, model.RootKindUserPackage)
+			}
+		}
+		if local != "" {
+			add(filepath.Join(local, "pipx", "venvs"), model.RootKindUserPackage)
+			add(filepath.Join(local, "pnpm", "global"), model.RootKindUserPackage)
+			add(filepath.Join(local, "Yarn", "Data", "global", "node_modules"), model.RootKindUserPackage)
+			for _, p := range globExisting(filepath.Join(local, "Programs", "Python", "Python*")) {
+				add(p, model.RootKindUserPackage)
+			}
+		}
+	}
 
 	// Editor extension trees.
 	for _, seg := range []string{
@@ -253,6 +374,11 @@ func baselineHomeCandidates(home string) []scanner.Root {
 	case "linux":
 		add(filepath.Join(home, ".config", "Claude"), model.RootKindMCPConfig)
 		add(filepath.Join(home, ".config", "Claude Code"), model.RootKindMCPConfig)
+		add(filepath.Join(home, ".continue"), model.RootKindMCPConfig)
+	case "windows":
+		if roaming := roamingAppDataDir(home); roaming != "" {
+			add(filepath.Join(roaming, "Claude"), model.RootKindMCPConfig)
+		}
 		add(filepath.Join(home, ".continue"), model.RootKindMCPConfig)
 	}
 
@@ -300,6 +426,30 @@ func systemRoots() []scanner.Root {
 			for _, p := range globExisting(pattern) {
 				roots = append(roots, scanner.Root{Path: p, Kind: model.RootKindGlobalPackage})
 			}
+		}
+		return roots
+	case "windows":
+		var roots []scanner.Root
+		add := func(p string) {
+			if p != "" {
+				roots = append(roots, scanner.Root{Path: p, Kind: model.RootKindGlobalPackage})
+			}
+		}
+		for _, env := range []string{"ProgramFiles", "ProgramW6432", "ProgramFiles(x86)"} {
+			base := strings.TrimSpace(os.Getenv(env))
+			if base == "" {
+				continue
+			}
+			add(filepath.Join(base, "nodejs", "node_modules"))
+			for _, p := range globExisting(filepath.Join(base, "Python*")) {
+				add(p)
+			}
+			for _, p := range globExisting(filepath.Join(base, "Python", "Python*")) {
+				add(p)
+			}
+		}
+		for _, p := range globExisting(`C:\Python*`) {
+			add(p)
 		}
 		return roots
 	}
@@ -381,7 +531,7 @@ func homesForExpansion(opts rootsOpts) []string {
 		// Fall back to the current home if /Users enumeration found
 		// nothing usable — never silently degrade to no homes.
 	}
-	if home, _ := os.UserHomeDir(); home != "" {
+	if home := currentHomeDir(); home != "" {
 		return []string{home}
 	}
 	return nil
@@ -525,6 +675,20 @@ func browserExtensionCandidateRoots(home string) []string {
 			filepath.Join(home, ".var", "app", "com.microsoft.Edge", "config", "microsoft-edge"),
 		}
 		chromiumBases["vivaldi"] = []string{filepath.Join(cfg, "vivaldi")}
+	case "windows":
+		local := localAppDataDir(home)
+		if local != "" {
+			chromiumBases["chrome"] = []string{filepath.Join(local, "Google", "Chrome", "User Data")}
+			chromiumBases["chromium"] = []string{filepath.Join(local, "Chromium", "User Data")}
+			chromiumBases["brave"] = []string{filepath.Join(local, "BraveSoftware", "Brave-Browser", "User Data")}
+			chromiumBases["edge"] = []string{filepath.Join(local, "Microsoft", "Edge", "User Data")}
+			chromiumBases["vivaldi"] = []string{filepath.Join(local, "Vivaldi", "User Data")}
+			chromiumBases["arc"] = []string{filepath.Join(local, "Arc", "User Data")}
+			for _, p := range globExisting(filepath.Join(local, "Packages", "TheBrowserCompany.Arc_*", "LocalCache", "Local", "Arc", "User Data")) {
+				chromiumBases["arc"] = append(chromiumBases["arc"], p)
+			}
+			chromiumBases["comet"] = []string{filepath.Join(local, "Comet", "User Data")}
+		}
 	}
 	for _, bases := range chromiumBases {
 		for _, b := range bases {
@@ -555,6 +719,15 @@ func browserExtensionCandidateRoots(home string) []string {
 			filepath.Join(home, ".var", "app", "io.gitlab.librewolf-community", ".librewolf"),
 			filepath.Join(home, ".waterfox"),
 		)
+	case "windows":
+		roaming := roamingAppDataDir(home)
+		if roaming != "" {
+			roots = append(roots,
+				filepath.Join(roaming, "Mozilla", "Firefox", "Profiles"),
+				filepath.Join(roaming, "LibreWolf", "Profiles"),
+				filepath.Join(roaming, "Waterfox", "Profiles"),
+			)
+		}
 	}
 	return roots
 }
@@ -565,12 +738,21 @@ func browserExtensionCandidateRoots(home string) []string {
 func filterExistingRoots(candidates []scanner.Root) ([]scanner.Root, []string) {
 	var present []scanner.Root
 	skipped := 0
+	seen := map[string]struct{}{}
 	for _, c := range candidates {
 		info, err := os.Stat(c.Path)
 		if err != nil || !info.IsDir() {
 			skipped++
 			continue
 		}
+		key := filepath.Clean(c.Path)
+		if runtime.GOOS == "windows" {
+			key = strings.ToLower(key)
+		}
+		if _, ok := seen[key]; ok {
+			continue
+		}
+		seen[key] = struct{}{}
 		present = append(present, c)
 	}
 	if len(present) == 0 {

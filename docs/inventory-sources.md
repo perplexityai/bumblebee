@@ -29,7 +29,7 @@ Each scan profile reads from a different slice of the sources below:
 
 | Profile     | Sources walked                                                                                                                                                                                                |
 |-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `baseline` | Homebrew lib prefixes; `/Library/Python`; Linux system Python (`/usr/lib/python*`, plus `/usr/local/lib`); user Python (`~/.local/lib/python*`, `~/.local/share/pipx/venvs`, `pyenv`); language version managers (`asdf`, `nvm`, `rbenv`, `rvm`); `~/.cargo`; `~/go`; editor-extension trees; MCP config locations; per-profile browser-extension trees (Chromium-family + Firefox-family, including common snap/flatpak paths). No project trees.   |
+| `baseline` | Homebrew lib prefixes; `/Library/Python`; Linux system Python (`/usr/lib/python*`, plus `/usr/local/lib`); Windows global Python / Node roots under `%ProgramFiles%`; user Python (`~/.local/lib/python*`, `%APPDATA%\Python\Python*`, `%LOCALAPPDATA%\Programs\Python\Python*`, pipx, `pyenv` / `pyenv-win`); language version managers (`asdf`, `nvm`, `fnm`, `rbenv`, `rvm`); `~/.cargo`; `~/go`; editor-extension trees; MCP config locations; per-profile browser-extension trees (Chromium-family + Firefox-family, including common snap/flatpak paths on Linux and `%LOCALAPPDATA%` / `%APPDATA%` profile paths on Windows). No project trees.   |
 | `project`   | Configured developer/project roots (`~/code`, `~/src`, `~/Developer`, `~/Projects`, `~/workspace`, and any explicit `--root`). All ecosystem parsers below apply within those trees.                            |
 | `deep`      | Operator-supplied roots, typically a bare home directory during a campaign. Same ecosystem parsers; recommended only in combination with `--exposure-catalog` to emit `record_type=finding` records.            |
 
@@ -390,11 +390,13 @@ embeds the per-browser profile path. Every record carries
 
 Profile coverage on `baseline`: the curated default roots include
 `Default` and `Profile 1`..`Profile 9` for each Chromium-family browser,
-plus the Firefox-family profile parents. Profiles outside that range
-must be passed via `--root`. The deliberately narrow root list keeps the
-walker out of every other Chromium / Firefox subtree (cookies, Login
-Data, IndexedDB, Local Storage, Cache), which are TCC-protected on
-macOS and privacy-sensitive on every host.
+plus the Firefox-family profile parents. On Windows, Chromium-family
+roots are resolved under `%LOCALAPPDATA%` and Firefox-family roots under
+`%APPDATA%`. Profiles outside the built-in range must be passed via
+`--root`. The deliberately narrow root list keeps the walker out of
+every other Chromium / Firefox subtree (cookies, Login Data, IndexedDB,
+Local Storage, Cache), which are TCC-protected on macOS and
+privacy-sensitive on every host.
 
 Interaction with `--profile deep`: deep accepts a bare home root and
 therefore overlaps the baseline browser-extension roots. The walker
@@ -408,9 +410,9 @@ they fall inside the deep-scan walk. On macOS the curated excludes
 additionally drop the entire `Library/Application Support/<browser>`
 subtree from a deep walk, so deep on macOS picks up browser extensions
 only when the operator passes the per-profile `Extensions/` directory
-as an explicit `--root` (the baseline curated entry). On Linux the
-deep walk descends into `~/.config/<browser>/<profile>/` but, again,
-only opens path-shape-matched manifests.
+as an explicit `--root` (the baseline curated entry). On Linux and
+Windows, the deep walk can descend into browser profile directories but,
+again, only opens path-shape-matched manifests.
 
 Example jq filters:
 

@@ -1,7 +1,8 @@
 # bumblebee
 
 Bumblebee is a read-only inventory collector for package, extension,
-and developer-tool metadata on macOS and Linux developer endpoints.
+and developer-tool metadata on macOS, Linux, and Windows developer
+endpoints.
 
 It answers a narrow supply-chain response question: when an advisory
 names a package, extension, or version, which developer machines show
@@ -48,6 +49,8 @@ know what they are looking for.
 | Browser extensions | `browser-extension` | Chromium-family (`manifest.json`) and Firefox (`extensions.json`) per profile |
 
 Per-ecosystem detail: [docs/inventory-sources.md](docs/inventory-sources.md).
+Deployment notes: [macOS](docs/deployment-macos.md) and
+[Windows](docs/deployment-windows.md).
 
 ## Install
 
@@ -65,6 +68,13 @@ To build from a checkout:
 
 ```sh
 go build -o bumblebee ./cmd/bumblebee
+go test ./...
+```
+
+On Windows, build the `.exe` form:
+
+```powershell
+go build -o bumblebee.exe ./cmd/bumblebee
 go test ./...
 ```
 

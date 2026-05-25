@@ -145,6 +145,9 @@ func TestScanNodeModulesPackageJSONLifecycleScripts(t *testing.T) {
 	if !ok || proj == "" {
 		t.Fatalf("IsNodeModulesPackageJSON failed: %v %q", ok, proj)
 	}
+	if filepath.Clean(proj) != filepath.Clean(dir) {
+		t.Fatalf("projectPath = %q, want %q", proj, dir)
+	}
 	s, got, _ := newCollector()
 	if err := s.ScanNodeModulesPackageJSON(pj, proj, model.Record{}); err != nil {
 		t.Fatalf("scan: %v", err)
