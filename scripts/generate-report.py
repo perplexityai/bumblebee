@@ -246,82 +246,84 @@ def generate_report(ndjson_path: str, output_path: str) -> None:
 <title>Bumblebee Inventory Report — {esc(summary["endpoint"]["hostname"])}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Karla:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════
-   DARK TOKENS (default)
+   DARK TOKENS (default) — Midnight Parchment
+   Deep forest vellum with ivory ink.
    ══════════════════════════════════════════ */
 :root {{
-  --bg: #08080a;
-  --surface: #101014;
-  --surface2: #18181e;
-  --surface3: #202028;
-  --border: #28283a;
-  --border-hi: #38384a;
-  --text: #e8e8ec;
-  --text2: #8e8ea6;
-  --text3: #5a5a72;
+  --bg: #091717;
+  --surface: #0e2020;
+  --surface2: #142a2a;
+  --surface3: #1a3434;
+  --border: #1f3b3b;
+  --border-hi: #2a4e4e;
+  --text: #e6e2d8;
+  --text2: #9a9a8e;
+  --text3: #6a6a60;
   --amber: #f0a830;
   --amber-light: #ffd666;
-  --amber-dim: #8a6010;
+  --amber-dim: #6a4810;
   --red: #ef4444;
-  --radius: 8px;
-  --radius-lg: 14px;
-  --font-display: 'Syne', sans-serif;
-  --font-body: 'Karla', sans-serif;
+  --radius: 4px;
+  --radius-lg: 8px;
+  --font-display: 'Newsreader', serif;
+  --font-body: 'Outfit', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  --hex-opacity: 0.025;
-  --grain-opacity: 0.04;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
-  --table-hover-bg: rgba(240,168,48,0.04);
+  --hex-opacity: 0.02;
+  --grain-opacity: 0.03;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+  --table-hover-bg: rgba(240,168,48,0.05);
   --code-bg: var(--surface3);
-  --code-color: #c4c4dc;
-  --script-tag-bg: rgba(239,68,68,0.1);
-  --script-tag-border: rgba(239,68,68,0.2);
+  --code-color: #b8b4a8;
+  --script-tag-bg: rgba(239,68,68,0.12);
+  --script-tag-border: rgba(239,68,68,0.25);
   --script-tag-color: #f87171;
-  --warning-bg: rgba(239,68,68,0.06);
-  --warning-border: rgba(239,68,68,0.15);
+  --warning-bg: rgba(239,68,68,0.08);
+  --warning-border: rgba(239,68,68,0.2);
   --warning-text: #f87171;
   --warning-strong: #fca5a5;
   --section-line: linear-gradient(90deg, var(--border), transparent);
 }}
 
 /* ══════════════════════════════════════════
-   LIGHT TOKENS
+   LIGHT TOKENS — Perplexity Editorial
+   Warm parchment with deep teal ink.
    ══════════════════════════════════════════ */
 [data-theme="light"] {{
-  --bg: #f8f5ee;
+  --bg: #fbfaf4;
   --surface: #ffffff;
-  --surface2: #f0ece4;
-  --surface3: #e6e0d6;
-  --border: #d8d0c4;
-  --border-hi: #c4baa8;
-  --text: #1a1816;
-  --text2: #6b6358;
-  --text3: #9a9088;
+  --surface2: #f3f1ea;
+  --surface3: #e8e5dc;
+  --border: #c9c8bb;
+  --border-hi: #b0af9e;
+  --text: #13343b;
+  --text2: #64645f;
+  --text3: #9a9a8e;
   --amber: #c88820;
   --amber-light: #a06810;
   --amber-dim: #f0c060;
-  --hex-opacity: 0.03;
+  --hex-opacity: 0.025;
   --grain-opacity: 0.02;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
   --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
   --table-hover-bg: rgba(200,136,32,0.06);
   --code-bg: var(--surface2);
-  --code-color: #4a4238;
-  --script-tag-bg: rgba(220,50,50,0.08);
-  --script-tag-border: rgba(220,50,50,0.15);
-  --script-tag-color: #c03030;
-  --warning-bg: rgba(220,50,50,0.05);
-  --warning-border: rgba(220,50,50,0.12);
-  --warning-text: #b83030;
-  --warning-strong: #901818;
+  --code-color: #13343b;
+  --script-tag-bg: rgba(180,40,40,0.08);
+  --script-tag-border: rgba(180,40,40,0.15);
+  --script-tag-color: #a82020;
+  --warning-bg: rgba(180,40,40,0.06);
+  --warning-border: rgba(180,40,40,0.14);
+  --warning-text: #a82020;
+  --warning-strong: #7a1010;
   --section-line: linear-gradient(90deg, var(--border), transparent);
 }}
 
 [data-theme="light"] body::before {{
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='%23c88820' stroke-width='1'/%3E%3Cpath d='M28 0L28 34L0 50L0 84L28 100L56 84L56 50L28 34' fill='none' stroke='%23c88820' stroke-width='1'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='%2313343b' stroke-width='0.5'/%3E%3Cpath d='M28 0L28 34L0 50L0 84L28 100L56 84L56 50L28 34' fill='none' stroke='%2313343b' stroke-width='0.5'/%3E%3C/svg%3E");
 }}
 
 /* ══════════════════════════════════════════
@@ -348,7 +350,7 @@ body::before {{
   z-index: 0;
   pointer-events: none;
   opacity: var(--hex-opacity);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='%23f0a830' stroke-width='1'/%3E%3Cpath d='M28 0L28 34L0 50L0 84L28 100L56 84L56 50L28 34' fill='none' stroke='%23f0a830' stroke-width='1'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='%2320828d' stroke-width='0.5'/%3E%3Cpath d='M28 0L28 34L0 50L0 84L28 100L56 84L56 50L28 34' fill='none' stroke='%2320828d' stroke-width='0.5'/%3E%3C/svg%3E");
   background-size: 56px 100px;
 }}
 
@@ -535,7 +537,9 @@ body::after {{
 }}
 
 [data-theme="light"] .header-badge {{
-  color: #6b4800;
+  color: #13343b;
+  background: linear-gradient(135deg, #e8e5dc 0%, #f3f1ea 100%);
+  border-color: #c9c8bb;
 }}
 
 .header-badge svg {{
@@ -561,7 +565,7 @@ body::after {{
 }}
 
 [data-theme="light"] .header h1 em {{
-  background: linear-gradient(135deg, #a06810, var(--amber), #e07020);
+  background: linear-gradient(135deg, #13343b, #20808d, #0099ff);
   -webkit-background-clip: text;
   background-clip: text;
 }}
@@ -693,10 +697,14 @@ body {{
   font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--amber);
+  color: #20808d;
   letter-spacing: 0.02em;
   user-select: none;
-  opacity: 0.6;
+  opacity: 0.7;
+}}
+
+[data-theme="light"] .section-num {{
+  color: #13343b;
 }}
 
 .section-titles {{
@@ -705,7 +713,7 @@ body {{
 
 .section-titles h2 {{
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text);
