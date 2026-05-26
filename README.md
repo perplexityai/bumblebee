@@ -156,6 +156,10 @@ to promote a run to current state. See [docs/transport.md](docs/transport.md)
 for HTTPS/file output and [docs/state-model.md](docs/state-model.md) for the
 receiver-side current-state model.
 
+For interactive terminal use, `bumblebee scan --output=terminal` renders a
+colorized summary, a compact findings table, and a live spinner on stderr
+while the scan runs. The default `stdout` mode remains NDJSON for tooling.
+
 Package record:
 
 <details>

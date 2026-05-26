@@ -21,8 +21,9 @@
 //	version.go     — Version variable and the version-string formatters
 //	sink.go        — --output stdout|file|http construction and HTTP auth
 //
-// Output destinations: stdout (default), a local NDJSON file, or POST to a
-// generic HTTPS log-ingest endpoint. See `scan --help` and the README.
+// Output destinations: stdout (default), a local NDJSON file, a human-readable
+// terminal report, or POST to a generic HTTPS log-ingest endpoint. See
+// `scan --help` and the README.
 package main
 
 import (
@@ -114,6 +115,7 @@ type scanOpts struct {
 	outputFile    string
 	appendFile    bool
 	emitSummary   bool
+	terminalMode  bool
 	httpURL       string
 	httpAuth      string
 	httpTokenEnv  string
@@ -146,7 +148,8 @@ func registerScanFlags(fs *flag.FlagSet, o *scanOpts) {
 	fs.BoolVar(&o.allUsers, "all-users", false,
 		"on macOS, expand baseline/project per-user default roots across every real /Users/<name>/ home. Useful for root-owned LaunchDaemon runs. Cannot be combined with --root or --profile=deep. System/Homebrew roots are still included once. No effect on Linux.")
 
-	fs.StringVar(&o.outputDest, "output", "stdout", "where to send records: stdout, file, or http")
+	fs.StringVar(&o.outputDest, "output", "stdout", "where to send records: stdout, file, http, or terminal")
+	fs.BoolVar(&o.terminalMode, "terminal", false, "render a human-readable terminal report instead of raw NDJSON (implies --output=terminal)")
 	fs.StringVar(&o.outputFile, "output-file", "", "path for --output=file (NDJSON; required when --output=file)")
 	fs.BoolVar(&o.appendFile, "append", false, "append to --output-file instead of truncating")
 	fs.BoolVar(&o.emitSummary, "emit-summary", true, "emit a scan_summary record at end of run")
@@ -187,6 +190,9 @@ func runScan(args []string) int {
 		fmt.Fprintln(os.Stderr, "--findings-only requires --exposure-catalog")
 		return 2
 	}
+	if o.terminalMode {
+		o.outputDest = "terminal"
+	}
 
 	roots, diagNotes, err := resolveRoots(o.profile, o.roots, rootsOpts{AllUsers: o.allUsers})
 	if err != nil {
@@ -220,13 +226,26 @@ func runScan(args []string) int {
 	}
 
 	runID := newRunID()
-	emitter := output.New(recordsW, os.Stderr, runID)
+	diagW := io.Writer(os.Stderr)
+	if o.outputDest == "terminal" {
+		diagW = io.Discard
+	}
+	emitter := output.New(recordsW, diagW, runID)
 
-	for _, n := range diagNotes {
-		emitter.Diag("info", "", n)
+	if o.outputDest == "terminal" {
+		for _, n := range diagNotes {
+			fmt.Fprintln(os.Stderr, n)
+		}
+	} else {
+		for _, n := range diagNotes {
+			emitter.Diag("info", "", n)
+		}
 	}
 	deviceID, deviceIDWarn := resolveDeviceID(o.deviceIDEnv)
-	if deviceIDWarn != "" {
+	if deviceIDWarn != "" && o.outputDest == "terminal" {
+		fmt.Fprintln(os.Stderr, deviceIDWarn)
+	}
+	if deviceIDWarn != "" && o.outputDest != "terminal" {
 		emitter.Diag("warn", "", deviceIDWarn)
 	}
 	ep := endpoint.Current(deviceID)
@@ -251,6 +270,12 @@ func runScan(args []string) int {
 		cancel()
 	}()
 
+	spinnerDone := make(chan struct{})
+	spinnerFinished := make(chan struct{})
+	if o.outputDest == "terminal" {
+		go runSpinner(os.Stderr, spinnerDone, spinnerFinished)
+	}
+
 	cfg := scanner.Config{
 		Profile:      o.profile,
 		Roots:        roots,
@@ -265,8 +290,16 @@ func runScan(args []string) int {
 		Emitter:      emitter,
 	}
 	res, runErr := scanner.Run(ctx, cfg)
+	if o.outputDest == "terminal" {
+		close(spinnerDone)
+		<-spinnerFinished
+	}
 	if runErr != nil {
-		emitter.Diag("error", "", runErr.Error())
+		if o.outputDest == "terminal" {
+			fmt.Fprintln(os.Stderr, runErr.Error())
+		} else {
+			emitter.Diag("error", "", runErr.Error())
+		}
 	}
 
 	exitCode := 0
@@ -332,7 +365,11 @@ func runScan(args []string) int {
 	}
 
 	if closeErr := closeFn(); closeErr != nil {
-		emitter.Diag("error", "", closeErr.Error())
+		if o.outputDest == "terminal" {
+			fmt.Fprintln(os.Stderr, closeErr.Error())
+		} else {
+			emitter.Diag("error", "", closeErr.Error())
+		}
 		exitCode = 1
 	}
 
@@ -376,6 +413,26 @@ func runRoots(args []string) int {
 		fmt.Printf("%s\t%s\n", r.Kind, r.Path)
 	}
 	return 0
+}
+
+func runSpinner(w io.Writer, done <-chan struct{}, finished chan<- struct{}) {
+	defer close(finished)
+	frames := []string{"|", "/", "-", "\\"}
+	ticker := time.NewTicker(120 * time.Millisecond)
+	defer ticker.Stop()
+	idx := 0
+	_, _ = fmt.Fprint(w, "scanning ")
+	for {
+		select {
+		case <-done:
+			_, _ = fmt.Fprint(w, "\r")
+			_, _ = fmt.Fprintln(w, "scanning complete")
+			return
+		case <-ticker.C:
+			_, _ = fmt.Fprintf(w, "\rscanning %s", frames[idx%len(frames)])
+			idx++
+		}
+	}
 }
 
 // resolveDeviceID reads the configured env var and returns the trimmed
