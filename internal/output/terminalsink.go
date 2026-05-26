@@ -29,6 +29,7 @@ type TerminalSink struct {
 	packageCounts  map[string]int
 	severityCounts map[string]int
 	findings       []model.Finding
+	findingCount   int
 	summary        *model.ScanSummary
 	err            error
 	closed         bool
@@ -133,7 +134,27 @@ func (t *TerminalSink) consumeLine(line []byte) error {
 			finding.Severity = "unspecified"
 		}
 		t.severityCounts[finding.Severity]++
+		t.findingCount++
 		t.findings = append(t.findings, finding)
+		sort.SliceStable(t.findings, func(i, j int) bool {
+			li, lj := severityRank(t.findings[i].Severity), severityRank(t.findings[j].Severity)
+			if li != lj {
+				return li < lj
+			}
+			if t.findings[i].PackageName != t.findings[j].PackageName {
+				return t.findings[i].PackageName < t.findings[j].PackageName
+			}
+			if t.findings[i].Version != t.findings[j].Version {
+				return t.findings[i].Version < t.findings[j].Version
+			}
+			if t.findings[i].SourceFile != t.findings[j].SourceFile {
+				return t.findings[i].SourceFile < t.findings[j].SourceFile
+			}
+			return t.findings[i].CatalogID < t.findings[j].CatalogID
+		})
+		if len(t.findings) > terminalFindingLimit {
+			t.findings = append([]model.Finding(nil), t.findings[:terminalFindingLimit]...)
+		}
 	case model.RecordTypeScanSummary:
 		var summary model.ScanSummary
 		if err := json.Unmarshal(line, &summary); err != nil {
@@ -151,9 +172,9 @@ func (t *TerminalSink) render() error {
 	summary := t.summary
 	if summary == nil {
 		summary = &model.ScanSummary{
-			Status:                model.ScanStatusComplete,
+			Status:                "unknown",
 			PackageRecordsEmitted: t.totalPackages(),
-			FindingsEmitted:       len(t.findings),
+			FindingsEmitted:       t.findingCount,
 		}
 	}
 
@@ -200,8 +221,8 @@ func (t *TerminalSink) render() error {
 		}
 	}
 
-	if len(t.findings) == 0 {
-		return t.writeLine("No findings matched the supplied exposure catalog.")
+	if t.findingCount == 0 {
+		return t.writeLine("No findings were emitted.")
 	}
 
 	sortedFindings := append([]model.Finding(nil), t.findings...)

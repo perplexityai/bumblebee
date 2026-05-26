@@ -27,9 +27,11 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -37,6 +39,7 @@ import (
 	"os/signal"
 	"sort"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -228,7 +231,7 @@ func runScan(args []string) int {
 	runID := newRunID()
 	diagW := io.Writer(os.Stderr)
 	if o.outputDest == "terminal" {
-		diagW = io.Discard
+		diagW = newTerminalDiagWriter(os.Stderr)
 	}
 	emitter := output.New(recordsW, diagW, runID)
 
@@ -272,7 +275,7 @@ func runScan(args []string) int {
 
 	spinnerDone := make(chan struct{})
 	spinnerFinished := make(chan struct{})
-	if o.outputDest == "terminal" {
+	if o.outputDest == "terminal" && isInteractiveTerminal(os.Stderr) {
 		go runSpinner(os.Stderr, spinnerDone, spinnerFinished)
 	}
 
@@ -378,6 +381,56 @@ func runScan(args []string) int {
 		o.profile, status, res.FilesConsidered, res.RecordsEmitted, res.FindingsEmitted, res.PackageRecordsSuppressed, res.Duplicates, res.Diagnostics, res.TimedOut, res.Duration,
 	))
 	return exitCode
+}
+
+type terminalDiagWriter struct {
+	out     io.Writer
+	mu      sync.Mutex
+	pending []byte
+}
+
+func newTerminalDiagWriter(out io.Writer) io.Writer {
+	return &terminalDiagWriter{out: out}
+}
+
+func (w *terminalDiagWriter) Write(p []byte) (int, error) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	w.pending = append(w.pending, p...)
+	for {
+		idx := bytes.IndexByte(w.pending, '\n')
+		if idx < 0 {
+			break
+		}
+		line := bytes.TrimSpace(w.pending[:idx])
+		w.pending = w.pending[idx+1:]
+		if len(line) == 0 {
+			continue
+		}
+		var d model.Diagnostic
+		if err := json.Unmarshal(line, &d); err != nil {
+			_, _ = fmt.Fprintln(w.out, string(line))
+			continue
+		}
+		msg := d.Message
+		if d.Path != "" {
+			msg = d.Path + ": " + msg
+		}
+		if d.Level != "" {
+			_, _ = fmt.Fprintf(w.out, "%s: %s\n", strings.ToUpper(d.Level), msg)
+		} else {
+			_, _ = fmt.Fprintln(w.out, msg)
+		}
+	}
+	return len(p), nil
+}
+
+func isInteractiveTerminal(f *os.File) bool {
+	info, err := f.Stat()
+	if err != nil {
+		return false
+	}
+	return info.Mode()&os.ModeCharDevice != 0
 }
 
 // runRoots prints the resolved roots for the given profile and exits. It
