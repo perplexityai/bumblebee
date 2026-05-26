@@ -171,12 +171,10 @@ def generate_report(ndjson_path: str, output_path: str) -> None:
     max_proj = max(projects.values())
     for proj, cnt in projects.most_common(25):
         pct = cnt / max_proj * 100
-        short = proj.split("/")[-1] if len(proj) > 60 else proj
         proj_rows += f"""
           <tr>
             <td class="proj-cell" title="{esc(proj)}">
-              <span class="proj-short">{esc(short)}</span>
-              <span class="proj-full">{esc(proj)}</span>
+              <span class="proj-trunc">{esc(proj)}</span>
             </td>
             <td class="num">{cnt:,}</td>
             <td class="bar-cell">{bar_html(pct, "#d97706")}</td>
@@ -210,7 +208,7 @@ def generate_report(ndjson_path: str, output_path: str) -> None:
             <td><span class="eco-dot" style="--dot-color:{color}"></span><span class="eco-name">{esc(pkg["ecosystem"])}</span></td>
             <td><code>{esc(pkg["name"])}</code></td>
             <td class="scripts-cell">{scripts_html}</td>
-            <td class="proj-cell" title="{esc(pkg["project"])}"><span class="proj-short">{esc(pkg["project"].split("/")[-1])}</span><span class="proj-full">{esc(pkg["project"])}</span></td>
+            <td class="proj-cell" title="{esc(pkg["project"])}"><span class="proj-trunc">{esc(pkg["project"])}</span></td>
           </tr>"""
 
     # Scan roots
@@ -878,29 +876,29 @@ code {{
 
 /* ── Project paths ── */
 .proj-cell {{
-  max-width: 260px;
-  overflow: hidden;
-  cursor: default;
-}}
-
-.proj-cell .proj-short {{
-  display: inline;
+  max-width: 320px;
   font-family: var(--font-mono);
   font-size: 0.78rem;
   color: var(--text2);
+  cursor: default;
 }}
 
-.proj-cell .proj-full {{
-  display: none;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
+.proj-cell .proj-trunc {{
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+  transition: none;
+}}
+
+.proj-cell:hover .proj-trunc {{
+  white-space: normal;
   word-break: break-all;
-  color: var(--text2);
-  line-height: 1.5;
+  text-overflow: unset;
+  overflow: visible;
 }}
-
-.proj-cell:hover .proj-short {{ display: none; }}
-.proj-cell:hover .proj-full {{ display: inline; }}
 
 /* ── Versions ── */
 .versions {{
