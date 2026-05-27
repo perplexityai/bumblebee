@@ -402,7 +402,8 @@ func looksUnresolvedShellVar(s string) bool {
 // Supported launchers:
 //
 //	npx / bunx                          -> first non-flag arg
-//	pnpm/yarn/bun/npm dlx|exec|x|run    -> first non-flag arg past sub
+//	npm exec|x, pnpm dlx, yarn dlx, bun x -> first non-flag arg past sub
+//	  (any other first token             -> no spec; caller uses server id)
 //	uvx / pipx                          -> first non-flag arg
 //	uv / uv tool run                    -> first non-flag arg past sub,
 //	                                       also honors --from <pkg>
@@ -427,23 +428,33 @@ func inferPackageFromArgs(cmd string, args []string) (spec, launcher string) {
 		}
 		return firstNonFlag(args, nil, npmValueTakingFlags), ""
 	case "pnpm", "yarn", "bun", "npm":
-		// These wrappers take a subcommand (dlx, exec, x, run) before the
-		// package. Skip the subcommand so we return the actual package
-		// argument rather than "dlx" / "exec" / "x". Honor
-		// "npm exec --package=<pkg>" / "npm exec --package <pkg>" since
-		// those configs name the package explicitly via flag rather than
-		// positional.
+		// We read a package identity only from the manager's package
+		// executor — the subcommand that fetches a published package and
+		// runs it (packageExecutors; npx/bunx are handled above). The
+		// positional after it — or --package — is the spec.
 		//
-		// Restrict the --package scan to args before "--": npm does not
-		// parse options past "--", so `npm exec foo -- --package @npmcli/bar`
-		// must resolve to foo, not @npmcli/bar.
-		subcommands := map[string]bool{
-			"dlx": true, "exec": true, "x": true, "run": true,
+		// Any other first token gets no package identity: return an empty
+		// spec and let the caller fall back to the server id at low
+		// confidence, like "uv run <script>" below. That stops a local-script
+		// launcher (`run <script>`, `npm start`, bare `yarn dev`, `bun <file>`)
+		// from leaking its script or file name as a package — the reported
+		// bug where `bun run … start` became the package "start". The same
+		// holds for `exec` under pnpm/yarn/bun, which runs a local bin or a
+		// shell command (`yarn exec node …` would otherwise become "node"),
+		// and for create/init, which name a create-<name> package we
+		// deliberately don't resolve (initializers don't launch servers).
+		// See mcp_test.go for these and the flag-ordering edge case.
+		//
+		// scanExplicitPackage / firstNonFlag honor "npm exec --package=<pkg>"
+		// and stop at "--", so `npm exec foo -- --package @npmcli/bar` -> foo.
+		executors := packageExecutors[bn]
+		if !executors[firstNonFlag(args, nil, npmValueTakingFlags)] {
+			return "", ""
 		}
-		if spec := scanExplicitPackage(args, subcommands); spec != "" {
+		if spec := scanExplicitPackage(args, executors); spec != "" {
 			return spec, ""
 		}
-		return firstNonFlag(args, subcommands, npmValueTakingFlags), ""
+		return firstNonFlag(args, executors, npmValueTakingFlags), ""
 	case "uvx":
 		return firstNonFlag(args, nil, nil), "uv"
 	case "uv":
@@ -547,8 +558,8 @@ func inferPackageFromArgs(cmd string, args []string) (spec, launcher string) {
 // scanExplicitPackage looks for "--package <pkg>" / "--package=<pkg>" in
 // the launcher-parsed prefix of args. The scan stops at "--" (npm/npx do
 // not interpret options past it) and at the first positional non-flag
-// token that is not in the skip set of recognized subcommands
-// (dlx/exec/x/run). Other value-taking flags are consumed so their values
+// token that is not in the skip set of recognized executor subcommands
+// (packageExecutors). Other value-taking flags are consumed so their values
 // are not misread as --package. Returns the explicit package spec when
 // found, otherwise "".
 func scanExplicitPackage(args []string, skip map[string]bool) string {
@@ -602,6 +613,18 @@ func firstNonFlag(args []string, skip map[string]bool, valueTaking map[string]bo
 		return a
 	}
 	return ""
+}
+
+// packageExecutors lists, per package manager, the subcommands that fetch a
+// published package and run it. Only these name a package in an MCP launch.
+// `exec` qualifies under npm alone: pnpm `exec` runs a locally installed bin,
+// and yarn `exec` / bun `exec` run a shell command, so their first token is a
+// binary or script, not a package identity (per each manager's own CLI docs).
+var packageExecutors = map[string]map[string]bool{
+	"npm":  {"exec": true, "x": true},
+	"pnpm": {"dlx": true},
+	"yarn": {"dlx": true},
+	"bun":  {"x": true},
 }
 
 // npmValueTakingFlags lists npm/pnpm/yarn/bun flags that consume a

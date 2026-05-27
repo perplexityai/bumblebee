@@ -339,6 +339,16 @@ is inferred; the record falls back to the server id with `confidence=low`.
 `uvx`, `uv tool run <pkg>`, and `uv run --from <pkg> ...` use the
 published package name.
 
+For `npm`/`pnpm`/`yarn`/`bun`, only the manager's package executor names a
+published package: `npm exec`/`npm x`, `pnpm dlx`, `yarn dlx`, `bun x`, or
+the separate `npx`/`bunx`. `exec` under pnpm, yarn, and bun runs a locally
+installed binary or a shell command, so its first token is not a package.
+`run <script>`, the npm lifecycle aliases (`start`/`stop`/`restart`/`test`),
+bare `yarn dev` / `bun start`, `bun <file>` / `bun run <file>`, and the
+`create`/`init` initializers (which resolve to a `create-<name>` package that
+is intentionally not inferred) yield no package identity; the record falls
+back to the server id with `confidence=low`.
+
 Docker/OCI image refs split a pinned tag into `version`:
 `hashicorp/terraform-mcp-server:0.4.0` becomes
 `package_name=hashicorp/terraform-mcp-server`, `version=0.4.0`. Untagged
