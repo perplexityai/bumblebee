@@ -1,5 +1,7 @@
 # bumblebee
 
+> **Fork of [perplexityai/bumblebee](https://github.com/perplexityai/bumblebee)** — this fork adds npm and pip installation support via the [`bumblebee-scan`](https://www.npmjs.com/package/bumblebee-scan) npm package and [`bumblebee-scan`](https://pypi.org/project/bumblebee-scan/) pip package.
+
 Bumblebee is a read-only inventory collector for package, extension,
 and developer-tool metadata on macOS and Linux developer endpoints.
 
