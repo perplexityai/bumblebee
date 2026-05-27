@@ -1,11 +1,11 @@
-# @perplexityai/bumblebee
+# bumblebee-scan
 
 npm wrapper for [bumblebee](https://github.com/perplexityai/bumblebee) — a read-only supply-chain inventory collector for package, extension, and developer-tool metadata on macOS and Linux.
 
 ## Install
 
 ```sh
-npm install -g @perplexityai/bumblebee
+npm install -g bumblebee-scan
 ```
 
 The postinstall script downloads the pre-built binary from GitHub Releases. If that fails, it falls back to `go install` (requires Go 1.25+).

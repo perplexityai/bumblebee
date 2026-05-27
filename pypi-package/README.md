@@ -1,11 +1,11 @@
-# bumblebee-scanner
+# bumblebee-scan
 
 PyPI wrapper for [bumblebee](https://github.com/perplexityai/bumblebee) — a read-only supply-chain inventory collector for package, extension, and developer-tool metadata on macOS and Linux.
 
 ## Install
 
 ```sh
-pip install bumblebee-scanner
+pip install bumblebee-scan
 ```
 
 On first run, the wrapper downloads the pre-built binary from GitHub Releases. If that fails, it falls back to `go install` (requires Go 1.25+).
