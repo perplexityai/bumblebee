@@ -16,7 +16,6 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          # GoReleaser needs full history for changelog generation.
           fetch-depth: 0
           persist-credentials: false
 
@@ -25,8 +24,6 @@ jobs:
           go-version: "1.25"
           check-latest: true
 
-      # SHA-pinned to the v7 tag of goreleaser/goreleaser-action; rotate
-      # the SHA when bumping the major version intentionally.
       - uses: goreleaser/goreleaser-action@5daf1e915a5f0af01ddbcd89a43b8061ff4f1a89 # v7.2.2
         with:
           distribution: goreleaser
@@ -34,3 +31,68 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-npm:
+    name: publish to npm
+    runs-on: ubuntu-latest
+    needs: goreleaser
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: update version from tag
+        working-directory: npm-package
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          npm version "$VERSION" --no-git-tag-version --allow-same-version
+          sed -i "s/const VERSION = \".*\"/const VERSION = \"$VERSION\"/" scripts/install.js
+
+      - name: publish
+        working-directory: npm-package
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-pypi:
+    name: publish to PyPI
+    runs-on: ubuntu-latest
+    needs: goreleaser
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+
+      - name: update version from tag
+        working-directory: pypi-package
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          sed -i "s/^version = \".*\"/version = \"$VERSION\"/" pyproject.toml
+          sed -i "s/^__version__ = \".*\"/__version__ = \"$VERSION\"/" bumblebee_scanner/__init__.py
+          sed -i "s/^VERSION = \".*\"/VERSION = \"$VERSION\"/" bumblebee_scanner/cli.py
+
+      - name: build
+        working-directory: pypi-package
+        run: |
+          pip install build
+          python -m build
+
+      - name: publish
+        working-directory: pypi-package
+        run: |
+          pip install twine
+          twine upload dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}

@@ -51,6 +51,20 @@ Per-ecosystem detail: [docs/inventory-sources.md](docs/inventory-sources.md).
 
 ## Install
 
+### npm
+
+```sh
+npm install -g bumblebee-scan
+```
+
+### pip
+
+```sh
+pip install bumblebee-scan
+```
+
+### Go
+
 Requires Go 1.25+. Zero non-stdlib dependencies.
 
 ```sh

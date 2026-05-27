@@ -7,3 +7,13 @@
 
 # goreleaser output
 /dist/
+
+# npm package build artifacts
+npm-package/node_modules/
+npm-package/binary/
+
+# pypi package build artifacts
+pypi-package/dist/
+pypi-package/build/
+pypi-package/*.egg-info/
+pypi-package/bumblebee_scan.egg-info/
