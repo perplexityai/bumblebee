@@ -388,8 +388,36 @@ body::after {{
 }}
 
 /* ══════════════════════════════════════════
-   THEME TOGGLE
+   VIEW + THEME TOGGLES
    ══════════════════════════════════════════ */
+.view-toggle {{
+  position: fixed;
+  top: 20px; right: 74px;
+  z-index: 999;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text2);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: background 0.25s, border-color 0.25s, color 0.25s, box-shadow 0.25s;
+  box-shadow: var(--shadow-sm);
+}}
+
+.view-toggle:hover {{
+  border-color: var(--amber);
+  color: var(--amber);
+  box-shadow: var(--shadow-md);
+}}
+
 .theme-toggle {{
   position: fixed;
   top: 20px; right: 24px;
@@ -742,6 +770,61 @@ body {{
 }}
 
 /* ══════════════════════════════════════════
+   FOCUS VIEW TABS
+   ══════════════════════════════════════════ */
+.section-tabs {{
+  display: none;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 20px;
+}}
+
+.section-tab {{
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text2);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}}
+
+.section-tab:hover {{
+  border-color: var(--amber);
+  color: var(--amber);
+}}
+
+.section-tab.active {{
+  border-color: var(--amber);
+  background: color-mix(in srgb, var(--amber) 10%, var(--surface));
+  color: var(--amber);
+}}
+
+[data-view="focus"] .section-tabs {{
+  display: flex;
+}}
+
+[data-view="focus"] .section {{
+  display: none;
+  margin: 20px 0 52px;
+  opacity: 1;
+  transform: none;
+  animation: none;
+}}
+
+[data-view="focus"] .section.focus-active {{
+  display: block;
+}}
+
+[data-view="focus"] .page-outline {{
+  display: none !important;
+}}
+
+/* ══════════════════════════════════════════
    TABLES
    ══════════════════════════════════════════ */
 .table-wrap {{
@@ -1054,6 +1137,7 @@ code {{
   .kpi-strip {{ grid-template-columns: 1fr 1fr; }}
   .header h1 {{ font-size: 1.8rem; }}
   .bar-cell {{ min-width: 80px; }}
+  .view-toggle {{ top: 12px; right: 56px; height: 36px; padding: 0 11px; }}
   .theme-toggle {{ top: 12px; right: 12px; width: 36px; height: 36px; }}
 }}
 </style>
@@ -1062,6 +1146,9 @@ code {{
 
 <!-- Scroll progress -->
 <div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- View toggle -->
+<button class="view-toggle" id="viewToggle" aria-label="Switch to focus view">Story view</button>
 
 <!-- Theme toggle -->
 <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
@@ -1133,8 +1220,18 @@ code {{
     </div>
   </div>
 
+  <nav class="section-tabs" id="sectionTabs" aria-label="Report sections (focus view)">
+    <button class="section-tab" type="button" data-section="sec-ecosystems">Ecosystems</button>
+    <button class="section-tab" type="button" data-section="sec-lifecycle">Lifecycle</button>
+    <button class="section-tab" type="button" data-section="sec-versions">Versions</button>
+    <button class="section-tab" type="button" data-section="sec-projects">Projects</button>
+    <button class="section-tab" type="button" data-section="sec-confidence">Confidence</button>
+    <button class="section-tab" type="button" data-section="sec-sources">Sources</button>
+    <button class="section-tab" type="button" data-section="sec-roots">Roots</button>
+  </nav>
+
   <!-- 01. Ecosystems -->
-  <section class="section" id="sec-ecosystems">
+  <section class="section" id="sec-ecosystems" data-section="sec-ecosystems">
     <div class="section-head">
       <span class="section-num">01</span>
       <div class="section-titles">
@@ -1151,7 +1248,7 @@ code {{
   </section>
 
   <!-- 02. Lifecycle Scripts -->
-  <section class="section" id="sec-lifecycle">
+  <section class="section" id="sec-lifecycle" data-section="sec-lifecycle">
     <div class="section-head">
       <span class="section-num">02</span>
       <div class="section-titles">
@@ -1172,7 +1269,7 @@ code {{
   </section>
 
   <!-- 03. Version Sprawl -->
-  <section class="section" id="sec-versions">
+  <section class="section" id="sec-versions" data-section="sec-versions">
     <div class="section-head">
       <span class="section-num">03</span>
       <div class="section-titles">
@@ -1189,7 +1286,7 @@ code {{
   </section>
 
   <!-- 04. Top Projects -->
-  <section class="section" id="sec-projects">
+  <section class="section" id="sec-projects" data-section="sec-projects">
     <div class="section-head">
       <span class="section-num">04</span>
       <div class="section-titles">
@@ -1206,7 +1303,7 @@ code {{
   </section>
 
   <!-- 05. Confidence -->
-  <section class="section" id="sec-confidence">
+  <section class="section" id="sec-confidence" data-section="sec-confidence">
     <div class="section-head">
       <span class="section-num">05</span>
       <div class="section-titles">
@@ -1222,7 +1319,7 @@ code {{
   </section>
 
   <!-- 06. Detection Sources -->
-  <section class="section" id="sec-sources">
+  <section class="section" id="sec-sources" data-section="sec-sources">
     <div class="section-head">
       <span class="section-num">06</span>
       <div class="section-titles">
@@ -1239,7 +1336,7 @@ code {{
   </section>
 
   <!-- 07. Scan Roots -->
-  <section class="section" id="sec-roots">
+  <section class="section" id="sec-roots" data-section="sec-roots">
     <div class="section-head">
       <span class="section-num">07</span>
       <div class="section-titles">
@@ -1301,15 +1398,109 @@ code {{
 (function() {{
   // ── Theme toggle ──
   var html = document.documentElement;
-  var toggle = document.getElementById('themeToggle');
-  var stored = localStorage.getItem('bumblebee-theme');
-  if (stored) html.setAttribute('data-theme', stored);
+  var themeToggle = document.getElementById('themeToggle');
+  var viewToggle = document.getElementById('viewToggle');
+  var tabs = document.querySelectorAll('.section-tab');
+  var sections = document.querySelectorAll('.section');
+  var outline = document.getElementById('pageOutline');
+  var outlineItems = outline.querySelectorAll('.outline-item');
+  var sectionIds = [];
+  outlineItems.forEach(function(item) {{
+    sectionIds.push(item.getAttribute('data-section'));
+  }});
 
-  toggle.addEventListener('click', function() {{
+  var currentView = 'story';
+  var activeFocusSection = sectionIds[0];
+  var storedTheme = localStorage.getItem('bumblebee-theme');
+  if (storedTheme) html.setAttribute('data-theme', storedTheme);
+
+  themeToggle.addEventListener('click', function() {{
     var current = html.getAttribute('data-theme');
     var next = current === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', next);
     localStorage.setItem('bumblebee-theme', next);
+  }});
+
+  function isValidSection(id) {{
+    return !!id && sectionIds.indexOf(id) !== -1;
+  }}
+
+  function syncTabState() {{
+    tabs.forEach(function(tab) {{
+      tab.classList.toggle('active', tab.getAttribute('data-section') === activeFocusSection);
+    }});
+  }}
+
+  function syncOutlineState(activeId) {{
+    var activeFound = false;
+    outlineItems.forEach(function(item) {{
+      var id = item.getAttribute('data-section');
+      item.classList.remove('active', 'passed');
+      if (id === activeId) {{
+        item.classList.add('active');
+        activeFound = true;
+      }} else if (!activeFound) {{
+        item.classList.add('passed');
+      }}
+    }});
+  }}
+
+  function setFocusSection(id, opts) {{
+    opts = opts || {{}};
+    if (!isValidSection(id)) return;
+    activeFocusSection = id;
+    sections.forEach(function(section) {{
+      section.classList.toggle('focus-active', section.id === id);
+    }});
+    syncTabState();
+    syncOutlineState(id);
+    if (opts.updateHash) {{
+      history.replaceState(null, '', '#' + id);
+    }}
+  }}
+
+  function setView(mode, opts) {{
+    opts = opts || {{}};
+    currentView = mode === 'focus' ? 'focus' : 'story';
+    html.setAttribute('data-view', currentView);
+    localStorage.setItem('bumblebee-view', currentView);
+
+    if (currentView === 'focus') {{
+      viewToggle.textContent = 'Story view';
+      viewToggle.setAttribute('aria-label', 'Switch to story view');
+      setFocusSection(activeFocusSection, {{ updateHash: !opts.fromLoad }});
+      outline.classList.remove('visible');
+      if (!opts.fromLoad) {{
+        window.scrollTo({{ top: 0, behavior: 'smooth' }});
+      }}
+    }} else {{
+      viewToggle.textContent = 'Focus view';
+      viewToggle.setAttribute('aria-label', 'Switch to focus view');
+      sections.forEach(function(section) {{
+        section.classList.remove('focus-active');
+      }});
+      if (!opts.fromLoad && isValidSection(activeFocusSection)) {{
+        var target = document.getElementById(activeFocusSection);
+        if (target) {{
+          target.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
+        }}
+      }}
+    }}
+  }}
+
+  viewToggle.addEventListener('click', function() {{
+    setView(currentView === 'story' ? 'focus' : 'story');
+  }});
+
+  tabs.forEach(function(tab) {{
+    tab.addEventListener('click', function() {{
+      var id = tab.getAttribute('data-section');
+      if (!isValidSection(id)) return;
+      if (currentView !== 'focus') {{
+        setView('focus');
+      }}
+      setFocusSection(id, {{ updateHash: true }});
+    }});
   }});
 
   // ── Scroll progress ──
@@ -1324,14 +1515,13 @@ code {{
   updateProgress();
 
   // ── Page outline scroll-spy ──
-  var outline = document.getElementById('pageOutline');
-  var outlineItems = outline.querySelectorAll('.outline-item');
-  var sectionIds = [];
-  outlineItems.forEach(function(item) {{
-    sectionIds.push(item.getAttribute('data-section'));
-  }});
-
   function updateOutline() {{
+    if (currentView === 'focus') {{
+      outline.classList.remove('visible');
+      syncOutlineState(activeFocusSection);
+      return;
+    }}
+
     var scrollTop = window.scrollY;
     var viewportMid = scrollTop + window.innerHeight * 0.35;
     var activeId = null;
@@ -1352,20 +1542,28 @@ code {{
       outline.classList.remove('visible');
     }}
 
-    // Update active/passed states
-    var activeFound = false;
-    outlineItems.forEach(function(item) {{
-      var id = item.getAttribute('data-section');
-      item.classList.remove('active', 'passed');
-      if (id === activeId) {{
-        item.classList.add('active');
-        activeFound = true;
-      }} else if (!activeFound) {{
-        item.classList.add('passed');
-      }}
-    }});
+    syncOutlineState(activeId);
   }}
   window.addEventListener('scroll', updateOutline, {{ passive: true }});
+
+  var hashId = window.location.hash.replace('#', '');
+  if (isValidSection(hashId)) {{
+    activeFocusSection = hashId;
+  }}
+
+  var storedView = localStorage.getItem('bumblebee-view');
+  setView(storedView === 'story' ? 'story' : 'focus', {{ fromLoad: true }});
+
+  window.addEventListener('hashchange', function() {{
+    var id = window.location.hash.replace('#', '');
+    if (!isValidSection(id)) return;
+    activeFocusSection = id;
+    if (currentView === 'focus') {{
+      setFocusSection(id, {{ updateHash: false }});
+    }}
+    updateOutline();
+  }});
+
   updateOutline();
 }})();
 </script>
