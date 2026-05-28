@@ -1,0 +1,27 @@
+{
+  "schema_version": "0.1.0",
+  "_comment": "CVE-2025-27510 / GHSA-vwfh-m3q7-9jpw: conda-forge-metadata <=0.4.1 declares an optional dependency on `conda-oci-mirror` (an unregistered PyPI name) under its `[oci]` extras. A user who runs `pip install conda-forge-metadata[oci]` would have pip resolve `conda-oci-mirror` from PyPI; an attacker who registered that name on PyPI before the conda-forge team did would achieve remote code execution at install time. The advisory is `affected versions: 0.4.1 <=`; PyPI's release history shows exactly two releases at or below 0.4.1 (0.3.0 published 2023-04-09 and 0.4.1 published 2023-04-21 — there is no 0.1.x/0.2.x/0.4.0 release). 0.5.0 (2023-05-17) is the first non-affected release. The fix was applied upstream by registering the placeholder package, so the advisory header states `addressed and no further action is required from users for future or past versions`; we still catalog the affected installed versions so an inventory scan can flag hosts that pinned a pre-0.5.0 release. Ecosystem is `pypi` because conda-forge-metadata is distributed via PyPI, not via the conda-forge channel. Pixi users picking up conda tooling via pixi.lock's pypi section, or anyone with a `pip install conda-forge-metadata` in their environment, would surface here.",
+  "entries": [
+    {
+      "id": "ghsa-vwfh-m3q7-9jpw-conda-forge-metadata-dependency-confusion",
+      "name": "conda-forge-metadata <=0.4.1 (CVE-2025-27510 dependency-confusion RCE via unregistered conda-oci-mirror PyPI name)",
+      "ecosystem": "pypi",
+      "package": "conda-forge-metadata",
+      "versions": [
+        "0.3.0",
+        "0.4.1"
+      ],
+      "severity": "critical",
+      "source": "https://github.com/conda-forge/conda-forge-metadata/security/advisories/GHSA-vwfh-m3q7-9jpw",
+      "cve": "CVE-2025-27510",
+      "ghsa": "GHSA-vwfh-m3q7-9jpw",
+      "cvss": "9.3 (CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N)",
+      "published": "2025-03-04",
+      "indicators": {
+        "vulnerable_install_command": "pip install conda-forge-metadata[oci]",
+        "unregistered_dependency_name": "conda-oci-mirror",
+        "fix_strategy": "upstream-side; conda-forge claimed the placeholder PyPI name, so no version bump on conda-forge-metadata itself"
+      }
+    }
+  ]
+}
