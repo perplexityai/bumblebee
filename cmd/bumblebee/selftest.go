@@ -23,12 +23,14 @@ var selftestFS embed.FS
 
 // expectedSelftestFindings is the count of catalog-matched findings the
 // embedded fixtures must produce. One npm package-lock.json entry, one
-// PyPI dist-info METADATA file, and one MCP config naming a pinned
-// docker image — each matched against the embedded catalog: three
-// findings. The MCP fixture guards against regressions in the MCP
-// parser/scanner integration (basename dispatch, docker tag split,
-// catalog matching for the mcp ecosystem).
-const expectedSelftestFindings = 3
+// PyPI dist-info METADATA file, one MCP config naming a pinned docker
+// image, and one conda-meta install record — each matched against the
+// embedded catalog: four findings. The MCP fixture guards against
+// regressions in the MCP parser/scanner integration (basename dispatch,
+// docker tag split, catalog matching for the mcp ecosystem); the conda
+// fixture guards against regressions in conda-meta path detection and
+// the conda-ecosystem catalog-matching path.
+const expectedSelftestFindings = 4
 
 // runSelftest extracts the embedded fixture tree to a temp directory,
 // runs the scanner with the embedded exposure catalog, and asserts the
@@ -87,7 +89,7 @@ func runSelftest(args []string) int {
 	cfg := scanner.Config{
 		Profile:     model.ProfileProject,
 		Roots:       []scanner.Root{{Path: tmp, Kind: model.RootKindProject}},
-		MaxFileSize: 5 * 1024 * 1024,
+		MaxFileSize: 16 * 1024 * 1024,
 		Concurrency: 2,
 		Catalog:     catalog,
 		BaseRecord:  base,

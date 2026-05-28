@@ -16,6 +16,23 @@ func TestNPM(t *testing.T) {
 	}
 }
 
+func TestConda(t *testing.T) {
+	cases := map[string]string{
+		"NumPy":           "numpy",
+		"python-dateutil": "python-dateutil",
+		"  PyTorch-CPU  ": "pytorch-cpu",
+		"libstdcxx-ng":    "libstdcxx-ng",
+		"pytorch-mutex":   "pytorch-mutex",
+		"_libgcc_mutex":   "_libgcc_mutex",
+		"OpenSSL":         "openssl",
+	}
+	for in, want := range cases {
+		if got := Conda(in); got != want {
+			t.Errorf("Conda(%q) = %q, want %q", in, got, want)
+		}
+	}
+}
+
 func TestPyPI(t *testing.T) {
 	cases := map[string]string{
 		"Flask":                  "flask",

@@ -43,6 +43,7 @@ know what they are looking for.
 | Go modules | `go` | `go.sum`, `go.mod` |
 | RubyGems | `rubygems` | `Gemfile.lock`, installed `*.gemspec` |
 | Composer | `packagist` | `composer.lock`, `vendor/composer/installed.json` |
+| Conda / pixi | `conda` | `<env>/conda-meta/<name>-<version>-<build>.json` install records |
 | MCP | `mcp` | JSON host configs: `mcp.json`, `.mcp.json`, `claude_desktop_config.json`, `mcp_config.json`, `mcp_settings.json`, `cline_mcp_settings.json`, plus `~/.gemini/settings.json` (Gemini CLI / Code Assist). Non-JSON configs (Codex `config.toml`, Continue YAML) are not parsed in v0.1. |
 | Editor extensions | `editor-extension` | VS Code, Cursor, Windsurf, VSCodium manifests |
 | Browser extensions | `browser-extension` | Chromium-family (`manifest.json`) and Firefox (`extensions.json`) per profile |
@@ -192,6 +193,46 @@ Package record:
   "confidence": "high"
 }
 ```
+
+</details>
+
+<details>
+<summary>Example conda package record</summary>
+
+```json
+{
+  "record_type": "package",
+  "record_id": "package:...",
+  "schema_version": "0.1.0",
+  "scanner_name": "bumblebee",
+  "scanner_version": "v0.1.1",
+  "run_id": "3a8c7d1e9f0b2a4c6d8e0f1a2b3c4d5e",
+  "scan_time": "2026-05-15T18:22:01.482Z",
+  "endpoint": {
+    "hostname": "alex-mbp",
+    "os": "darwin",
+    "arch": "arm64",
+    "username": "alex",
+    "uid": "501"
+  },
+  "profile": "baseline",
+  "ecosystem": "conda",
+  "package_name": "conda-build",
+  "normalized_name": "conda-build",
+  "version": "3.21.9",
+  "project_path": "/opt/homebrew/anaconda3",
+  "root_kind": "homebrew_root",
+  "package_manager": "conda",
+  "source_type": "conda-meta",
+  "source_file": "/opt/homebrew/anaconda3/conda-meta/conda-build-3.21.9-py39h6e9494a_1.json",
+  "has_lifecycle_scripts": false,
+  "confidence": "high"
+}
+```
+
+`package_manager` is `pip` instead of `conda` when the record represents
+a pip-installed package conda has recorded under the same `conda-meta/`
+directory (these have either `schannel: "pypi"` or `channel: "pypi"`).
 
 </details>
 

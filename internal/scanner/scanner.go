@@ -21,6 +21,7 @@ import (
 	"github.com/perplexityai/bumblebee/internal/ecosystem/browserext"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/bun"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/composer"
+	"github.com/perplexityai/bumblebee/internal/ecosystem/conda"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/editorext"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/gomod"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/mcp"
@@ -246,6 +247,7 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 	goS := &gomod.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 	rbS := &rubygems.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 	cmpS := &composer.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
+	condaS := &conda.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 	mcpS := &mcp.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 	extS := &editorext.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 	bxS := &browserext.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
@@ -306,6 +308,8 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 					err = cmpS.ScanComposerLock(j.path, cfg.BaseRecord)
 				case "composer-installed":
 					err = cmpS.ScanInstalledJSON(j.path, cfg.BaseRecord)
+				case "conda-meta":
+					err = condaS.ScanCondaMetaRecord(j.path, j.projectPath, cfg.BaseRecord)
 				case "mcp-config":
 					err = mcpS.ScanConfig(j.path, cfg.BaseRecord)
 				case "editor-ext":
@@ -453,6 +457,16 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 		case enabled(model.EcosystemPyPI) && base == "PKG-INFO":
 			if ok, dir := pypi.IsEggInfoPKGInfo(path); ok {
 				send(job{kind: "py-egg", path: path, projectPath: dir})
+			}
+		case enabled(model.EcosystemConda) && strings.HasSuffix(base, ".json"):
+			// conda-meta records have package-derived filenames
+			// (<name>-<version>-<build>.json), so we can only pre-filter
+			// by suffix and let conda.IsCondaMetaRecord confirm the
+			// parent directory. This case is reached only when no
+			// fixed-basename JSON match above (package.json, manifest.json,
+			// installed.json, ...) fired.
+			if ok, envRoot := conda.IsCondaMetaRecord(path); ok {
+				send(job{kind: "conda-meta", path: path, projectPath: envRoot})
 			}
 		}
 		return nil

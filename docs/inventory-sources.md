@@ -8,10 +8,12 @@ by recent supply-chain incidents — see the [Why these ecosystems](#why-these-e
 section at the bottom for the reporting that informed it.
 
 The `ecosystem` field on every record matches OSV ecosystem identifiers
-where one exists (`npm`, `pypi`, `go`, `rubygems`, `packagist`, ...). `mcp`
-and `editor-extension` are project-local values for execution surfaces that
-do not map cleanly to a package registry; both are emitted without resolved
-package versions.
+where one exists (`npm`, `pypi`, `go`, `rubygems`, `packagist`, ...). For
+ecosystems OSV does not yet enumerate, the value matches the
+[Package URL](https://github.com/package-url/purl-spec) `type` convention
+instead (`conda`). `mcp` and `editor-extension` are project-local values
+for execution surfaces that do not map cleanly to a package registry;
+both are emitted without resolved package versions.
 
 ## `ecosystem` vs source toolchain
 
@@ -29,7 +31,7 @@ Each scan profile reads from a different slice of the sources below:
 
 | Profile     | Sources walked                                                                                                                                                                                                |
 |-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `baseline` | Homebrew lib prefixes; `/Library/Python`; Linux system Python (`/usr/lib/python*`, plus `/usr/local/lib`); user Python (`~/.local/lib/python*`, `~/.local/share/pipx/venvs`, `pyenv`); language version managers (`asdf`, `nvm`, `rbenv`, `rvm`); `~/.cargo`; `~/go`; editor-extension trees; MCP config locations; per-profile browser-extension trees (Chromium-family + Firefox-family, including common snap/flatpak paths). No project trees.   |
+| `baseline` | Homebrew lib prefixes; `/Library/Python`; Linux system Python (`/usr/lib/python*`, plus `/usr/local/lib`); user Python (`~/.local/lib/python*`, `~/.local/share/pipx/venvs`, `pyenv`); language version managers (`asdf`, `nvm`, `rbenv`, `rvm`); `~/.cargo`; `~/go`; conda/pixi prefixes (`~/.pixi`, `~/miniconda3`, `~/anaconda3`, `~/miniforge3`, `~/mambaforge`, `~/micromamba`); editor-extension trees; MCP config locations; per-profile browser-extension trees (Chromium-family + Firefox-family, including common snap/flatpak paths). No project trees. |
 | `project`   | Configured developer/project roots (`~/code`, `~/src`, `~/Developer`, `~/Projects`, `~/workspace`, and any explicit `--root`). All ecosystem parsers below apply within those trees.                            |
 | `deep`      | Operator-supplied roots, typically a bare home directory during a campaign. Same ecosystem parsers; recommended only in combination with `--exposure-catalog` to emit `record_type=finding` records.            |
 
@@ -234,6 +236,58 @@ References:
 
 - `composer.lock` format: <https://getcomposer.org/doc/01-basic-usage.md#commit-your-composer-lock-file-to-version-control>
 - `vendor/composer/installed.json` (Composer v2): <https://getcomposer.org/doc/articles/plugins.md>
+
+## Conda / pixi
+
+Files read:
+
+- `<env>/conda-meta/<name>-<version>-<build>.json` — the per-package
+  install record conda, mamba, micromamba, and pixi all write when a
+  package is linked into an environment prefix. Each record carries
+  exact `name`, `version`, `build`, and channel fields emitted by the
+  package builder, so a parsed record is high-confidence proof that the
+  named package version is currently linked into the surrounding
+  environment.
+
+The walker matches any `*.json` file whose immediate parent directory is
+`conda-meta`; the sibling `history` text file is not JSON and is not
+matched. The `conda-meta` schema has many additional fields
+(`files`, `paths_data`, `link`, `depends`, `constrains`, ...) which are
+deliberately not decoded; only `name`, `version`, `channel`, and
+`schannel` are read.
+
+The environment prefix that owns the record (the parent of `conda-meta/`)
+is recorded as `project_path` so receivers can group records by
+environment. `package_manager` is `conda` for records installed from a
+conda channel and `pip` for pip-installed packages that conda has
+recorded under the same `conda-meta/` directory; this preserves the
+ability to tell pip and conda installs apart inside a shared env. The
+channel-extraction rules (canonical `schannel`, fallback to the first
+path segment of the `channel` URL, bare-string `"pypi"` / `"<unknown>"`)
+are documented exhaustively in the `channelFromURL` doc-comment in
+[`internal/ecosystem/conda/conda.go`](../internal/ecosystem/conda/conda.go).
+
+The `pixi.lock` project lockfile and `pixi.toml` / `pyproject.toml`
+`[tool.pixi]` manifests are NOT parsed in this release. `conda-meta` is
+the authoritative installed-state source and is shared by every
+conda-compatible package manager, so it carries the highest-signal
+inventory of what is actually linked into an environment right now.
+
+The baseline profile adds `~/.pixi`, `~/miniconda3`, `~/anaconda3`,
+`~/miniforge3`, `~/mambaforge`, and `~/micromamba` as user-package roots
+when present; project-tree scans pick up `.pixi/envs/*/conda-meta/`
+inside walked workspaces automatically.
+
+The emitted `ecosystem` value is `conda`. OSV does not yet define a
+conda ecosystem identifier; the value matches the
+[Package URL](https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#conda)
+`pkg:conda/<name>@<version>` convention.
+
+References:
+
+- conda-meta record schema (per-package JSON): <https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/pkg-specs.html>
+- Pixi environments and lockfile layout: <https://pixi.sh/latest/reference/project_configuration/>
+- PURL `conda` type: <https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#conda>
 
 ## MCP server configs
 

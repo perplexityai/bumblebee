@@ -28,6 +28,15 @@
       "versions": ["0.0.0"],
       "severity": "critical",
       "source": "bumblebee selftest"
+    },
+    {
+      "id": "selftest-conda-evil",
+      "name": "bumblebee selftest fixture (conda)",
+      "ecosystem": "conda",
+      "package": "bumblebee-selftest-evil",
+      "versions": ["0.0.0"],
+      "severity": "critical",
+      "source": "bumblebee selftest"
     }
   ]
 }
