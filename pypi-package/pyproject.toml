@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bumblebee-scan"
-version = "0.1.2"
+version = "0.1.3"
 description = "Supply-chain inventory collector for package, extension, and developer-tool metadata on macOS and Linux."
 readme = "README.md"
 license = "Apache-2.0"
