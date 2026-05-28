@@ -304,6 +304,12 @@ func systemRoots() []scanner.Root {
 			{Path: "/opt/homebrew/lib", Kind: model.RootKindHomebrew},
 			{Path: "/usr/local/lib", Kind: model.RootKindHomebrew},
 			{Path: "/Library/Python", Kind: model.RootKindHomebrew},
+			// Homebrew anaconda casks install to /opt/homebrew/anaconda3
+			// (Apple Silicon) or /usr/local/anaconda3 (Intel), outside
+			// /opt/homebrew/lib. Without these roots the base env's
+			// conda-meta records are missed by default.
+			{Path: "/opt/homebrew/anaconda3", Kind: model.RootKindHomebrew},
+			{Path: "/usr/local/anaconda3", Kind: model.RootKindHomebrew},
 		}
 	case "linux":
 		roots := []scanner.Root{{Path: "/usr/local/lib", Kind: model.RootKindGlobalPackage}}

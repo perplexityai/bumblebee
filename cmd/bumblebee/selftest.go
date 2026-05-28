@@ -87,7 +87,7 @@ func runSelftest(args []string) int {
 	cfg := scanner.Config{
 		Profile:     model.ProfileProject,
 		Roots:       []scanner.Root{{Path: tmp, Kind: model.RootKindProject}},
-		MaxFileSize: 5 * 1024 * 1024,
+		MaxFileSize: 16 * 1024 * 1024,
 		Concurrency: 2,
 		Catalog:     catalog,
 		BaseRecord:  base,
