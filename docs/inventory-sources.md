@@ -260,8 +260,13 @@ The environment prefix that owns the record (the parent of `conda-meta/`)
 is recorded as `project_path` so receivers can group records by
 environment. `package_manager` is `conda` for records installed from a
 conda channel and `pip` for pip-installed packages that conda has
-recorded under the same `conda-meta/` directory (these have
-`schannel: "pypi"`); this preserves the ability to tell pip and conda
+recorded under the same `conda-meta/` directory (these have either
+`schannel: "pypi"` — the canonical conda spelling — or
+`channel: "pypi"` as a bare string, the shape some mamba/micromamba
+versions write). Otherwise the channel is read from the `schannel`
+field, falling back to the first path segment of the `channel` URL
+(e.g. `https://conda.anaconda.org/conda-forge/osx-arm64` →
+`conda-forge`). This preserves the ability to tell pip and conda
 installs apart inside a shared env.
 
 The `pixi.lock` project lockfile and `pixi.toml` / `pyproject.toml`

@@ -1,0 +1,10 @@
+{
+  "name": "bumblebee-selftest-evil",
+  "version": "0.0.0",
+  "build": "py_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/bumblebee-selftest/noarch",
+  "schannel": "bumblebee-selftest",
+  "subdir": "noarch",
+  "depends": []
+}

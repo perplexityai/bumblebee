@@ -137,6 +137,67 @@ func TestScanCondaMetaRecord_ChannelFromURL(t *testing.T) {
 	}
 }
 
+// TestChannelFromURL covers the real-world channel-field shapes observed
+// across pixi/mamba/micromamba/conda installs. Earlier revisions used a
+// "second-to-last segment" heuristic that mis-attributed URLs without a
+// trailing subdir (the common pixi shape) to the hostname.
+func TestChannelFromURL(t *testing.T) {
+	cases := []struct {
+		in, want string
+	}{
+		// URL with subdir suffix (canonical anaconda.org-hosted channel).
+		{"https://conda.anaconda.org/conda-forge/osx-arm64", "conda-forge"},
+		{"https://conda.anaconda.org/bioconda/linux-64", "bioconda"},
+		// URL with trailing slash, no subdir (what pixi writes on this host).
+		{"https://conda.anaconda.org/conda-forge/", "conda-forge"},
+		// URL with no subdir and no trailing slash.
+		{"https://conda.anaconda.org/conda-forge", "conda-forge"},
+		// Non-anaconda.org host.
+		{"https://prefix.dev/my-channel", "my-channel"},
+		// Bare-string channels (mamba/micromamba write these for pip-installed
+		// packages and for the "<unknown>" sentinel).
+		{"pypi", "pypi"},
+		{"<unknown>", "<unknown>"},
+		// Empty and whitespace.
+		{"", ""},
+		{"   ", ""},
+		// URL with no path component (no channel to extract).
+		{"https://conda.anaconda.org", ""},
+		{"https://conda.anaconda.org/", ""},
+	}
+	for _, c := range cases {
+		if got := channelFromURL(c.in); got != c.want {
+			t.Errorf("channelFromURL(%q) = %q, want %q", c.in, got, c.want)
+		}
+	}
+}
+
+// TestScanCondaMetaRecord_PipInstalledBareChannel verifies the
+// pip-vs-conda attribution still works when `schannel` is missing and
+// `channel` is the bare string "pypi" rather than a URL. Older
+// mamba/micromamba records use this shape.
+func TestScanCondaMetaRecord_PipInstalledBareChannel(t *testing.T) {
+	dir := t.TempDir()
+	env := filepath.Join(dir, "envs", "data")
+	meta := filepath.Join(env, "conda-meta")
+	if err := os.MkdirAll(meta, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	path := filepath.Join(meta, "rich-13.7.0-pyhd8ed1ab_0.json")
+	body := `{"name": "rich", "version": "13.7.0", "channel": "pypi"}`
+	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	var out []model.Record
+	s := &Scanner{MaxFileSize: 1 << 20, Emit: func(r model.Record) { out = append(out, r) }}
+	if err := s.ScanCondaMetaRecord(path, env, model.Record{}); err != nil {
+		t.Fatal(err)
+	}
+	if len(out) != 1 || out[0].PackageManager != "pip" {
+		t.Fatalf("expected package_manager=pip from bare 'pypi' channel, got %+v", out)
+	}
+}
+
 func TestScanCondaMetaRecord_MissingFields(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "broken-0.0.0-foo.json")

@@ -120,20 +120,43 @@ func packageManagerFor(meta metadata) string {
 	return "conda"
 }
 
-// channelFromURL pulls the channel short name out of a conda channel URL
-// like `https://conda.anaconda.org/conda-forge/osx-arm64`. The trailing
-// segment is the subdir (linux-64, osx-arm64, noarch, ...); the segment
-// before it is the channel.
+// channelFromURL pulls the channel short name out of the `channel` field
+// of a conda-meta record. The field comes in several real-world shapes:
+//
+//	"https://conda.anaconda.org/conda-forge/osx-arm64" -> "conda-forge"
+//	"https://conda.anaconda.org/conda-forge/"          -> "conda-forge"  (no subdir)
+//	"https://conda.anaconda.org/conda-forge"           -> "conda-forge"
+//	"https://prefix.dev/my-channel"                    -> "my-channel"
+//	"pypi"                                             -> "pypi"  (bare; pip-installed)
+//	"<unknown>"                                        -> "<unknown>"
+//
+// Channel is always the first path segment after the host; subdir
+// (linux-64, osx-arm64, noarch, ...), if present, is always trailing.
+// Taking the second-to-last segment misattributes URLs that omit the
+// subdir to the hostname, so we strip scheme+host explicitly and return
+// the first path component.
 func channelFromURL(u string) string {
-	u = strings.TrimRight(u, "/")
+	u = strings.TrimSpace(u)
 	if u == "" {
 		return ""
 	}
-	parts := strings.Split(u, "/")
-	if len(parts) < 2 {
+	if i := strings.Index(u, "://"); i >= 0 {
+		rest := u[i+3:]
+		slash := strings.IndexByte(rest, '/')
+		if slash < 0 {
+			// Scheme + host with no path — nothing to extract.
+			return ""
+		}
+		u = rest[slash+1:]
+	}
+	u = strings.Trim(u, "/")
+	if u == "" {
 		return ""
 	}
-	return parts[len(parts)-2]
+	if slash := strings.IndexByte(u, '/'); slash >= 0 {
+		return u[:slash]
+	}
+	return u
 }
 
 func (s *Scanner) readBounded(path string) ([]byte, error) {
