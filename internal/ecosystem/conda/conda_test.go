@@ -230,8 +230,17 @@ func TestScanCondaMetaRecord_MalformedJSON(t *testing.T) {
 		t.Fatal(err)
 	}
 	s := &Scanner{MaxFileSize: 1 << 20, Emit: func(model.Record) { t.Fatal("should not emit") }}
-	if err := s.ScanCondaMetaRecord(path, dir, model.Record{}); err == nil {
+	err := s.ScanCondaMetaRecord(path, dir, model.Record{})
+	if err == nil {
 		t.Fatalf("expected error on malformed JSON, got nil")
+	}
+	// Lock in the error-wrapping contract: the returned error must
+	// reference the offending file path so the scanner orchestrator's
+	// downstream Diag(\"error\", path, err.Error()) yields a useful
+	// message. A future refactor that swallows the parse error or
+	// drops the path wrap would silently break operator diagnostics.
+	if !strings.Contains(err.Error(), path) {
+		t.Errorf("error message %q does not reference path %q", err.Error(), path)
 	}
 }
 

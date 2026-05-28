@@ -300,17 +300,22 @@ func projectHomeCandidates(home string) []scanner.Root {
 func systemRoots() []scanner.Root {
 	switch runtime.GOOS {
 	case "darwin":
-		return []scanner.Root{
+		roots := []scanner.Root{
 			{Path: "/opt/homebrew/lib", Kind: model.RootKindHomebrew},
 			{Path: "/usr/local/lib", Kind: model.RootKindHomebrew},
 			{Path: "/Library/Python", Kind: model.RootKindHomebrew},
-			// Homebrew anaconda casks install to /opt/homebrew/anaconda3
-			// (Apple Silicon) or /usr/local/anaconda3 (Intel), outside
-			// /opt/homebrew/lib. Without these roots the base env's
-			// conda-meta records are missed by default.
-			{Path: "/opt/homebrew/anaconda3", Kind: model.RootKindHomebrew},
-			{Path: "/usr/local/anaconda3", Kind: model.RootKindHomebrew},
 		}
+		// Homebrew anaconda casks install to /opt/homebrew/anaconda3
+		// (Apple Silicon) or /usr/local/anaconda3 (Intel), outside
+		// /opt/homebrew/lib. Globbed so versioned variants
+		// (`anaconda3-2024.02`, etc.) are also picked up; absent
+		// prefixes are dropped by filterExistingRoots.
+		for _, pattern := range []string{"/opt/homebrew/anaconda*", "/usr/local/anaconda*"} {
+			for _, p := range globExisting(pattern) {
+				roots = append(roots, scanner.Root{Path: p, Kind: model.RootKindHomebrew})
+			}
+		}
+		return roots
 	case "linux":
 		roots := []scanner.Root{{Path: "/usr/local/lib", Kind: model.RootKindGlobalPackage}}
 		for _, pattern := range []string{"/usr/lib/python*"} {
