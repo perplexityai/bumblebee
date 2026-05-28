@@ -40,6 +40,7 @@ const (
 	EcosystemGo               = "go"
 	EcosystemRubyGems         = "rubygems"
 	EcosystemPackagist        = "packagist"
+	EcosystemConda            = "conda"
 	EcosystemMCP              = "mcp"
 	EcosystemEditorExtension  = "editor-extension"
 	EcosystemBrowserExtension = "browser-extension"
@@ -51,6 +52,7 @@ var supportedEcosystems = map[string]struct{}{
 	EcosystemGo:               {},
 	EcosystemRubyGems:         {},
 	EcosystemPackagist:        {},
+	EcosystemConda:            {},
 	EcosystemMCP:              {},
 	EcosystemEditorExtension:  {},
 	EcosystemBrowserExtension: {},
@@ -62,6 +64,7 @@ var supportedEcosystemOrder = []string{
 	EcosystemGo,
 	EcosystemRubyGems,
 	EcosystemPackagist,
+	EcosystemConda,
 	EcosystemMCP,
 	EcosystemEditorExtension,
 	EcosystemBrowserExtension,

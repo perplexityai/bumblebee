@@ -222,6 +222,17 @@ func baselineHomeCandidates(home string) []scanner.Root {
 	}
 	add(filepath.Join(home, ".local", "share", "pipx", "venvs"), model.RootKindUserPackage)
 
+	// Conda/mamba/pixi install prefixes. Each prefix contains a base
+	// environment under conda-meta/ and additional named environments
+	// under envs/<name>/conda-meta/. filterExistingRoots drops any
+	// prefix that is not present on this host.
+	add(filepath.Join(home, ".pixi"), model.RootKindUserPackage)
+	add(filepath.Join(home, "miniconda3"), model.RootKindUserPackage)
+	add(filepath.Join(home, "anaconda3"), model.RootKindUserPackage)
+	add(filepath.Join(home, "miniforge3"), model.RootKindUserPackage)
+	add(filepath.Join(home, "mambaforge"), model.RootKindUserPackage)
+	add(filepath.Join(home, "micromamba"), model.RootKindUserPackage)
+
 	// Editor extension trees.
 	for _, seg := range []string{
 		".vscode/extensions",

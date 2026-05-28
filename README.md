@@ -43,6 +43,7 @@ know what they are looking for.
 | Go modules | `go` | `go.sum`, `go.mod` |
 | RubyGems | `rubygems` | `Gemfile.lock`, installed `*.gemspec` |
 | Composer | `packagist` | `composer.lock`, `vendor/composer/installed.json` |
+| Conda / pixi | `conda` | `<env>/conda-meta/<name>-<version>-<build>.json` install records (conda, mamba, micromamba, pixi all share this layout) |
 | MCP | `mcp` | JSON host configs: `mcp.json`, `.mcp.json`, `claude_desktop_config.json`, `mcp_config.json`, `mcp_settings.json`, `cline_mcp_settings.json`, plus `~/.gemini/settings.json` (Gemini CLI / Code Assist). Non-JSON configs (Codex `config.toml`, Continue YAML) are not parsed in v0.1. |
 | Editor extensions | `editor-extension` | VS Code, Cursor, Windsurf, VSCodium manifests |
 | Browser extensions | `browser-extension` | Chromium-family (`manifest.json`) and Firefox (`extensions.json`) per profile |
