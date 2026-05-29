@@ -237,6 +237,58 @@ func TestResolveRootsBaselineSkipsAbsentClaudeCodexRoots(t *testing.T) {
 	}
 }
 
+// TestResolveRootsBaselineIncludesAgentSkillRoot verifies that ~/.agents
+// (and the XDG override) are picked up by baseline when present.
+func TestResolveRootsBaselineIncludesAgentSkillRoot(t *testing.T) {
+	if runtime.GOOS != "darwin" && runtime.GOOS != "linux" {
+		t.Skipf("profile defaults are darwin/linux specific")
+	}
+	home := t.TempDir()
+	xdg := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("XDG_STATE_HOME", xdg)
+
+	agents := filepath.Join(home, ".agents")
+	xdgSkills := filepath.Join(xdg, "skills")
+	for _, p := range []string{agents, xdgSkills} {
+		if err := os.MkdirAll(p, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	roots, _, err := resolveRoots(model.ProfileBaseline, nil, rootsOpts{})
+	if err != nil {
+		t.Fatalf("resolveRoots baseline: %v", err)
+	}
+	got := map[string]string{}
+	for _, r := range roots {
+		got[r.Path] = r.Kind
+	}
+	for _, p := range []string{agents, xdgSkills} {
+		kind, ok := got[p]
+		if !ok {
+			t.Errorf("baseline missing agent-skill root %q (got %v)", p, roots)
+			continue
+		}
+		if kind != model.RootKindAgentSkill {
+			t.Errorf("baseline root %q kind = %q, want %q", p, kind, model.RootKindAgentSkill)
+		}
+	}
+}
+
+func TestClassifyRootAgentSkill(t *testing.T) {
+	cases := []string{
+		"/Users/alice/.agents",
+		"/home/alice/.agents",
+		"/home/alice/.local/state/skills",
+	}
+	for _, p := range cases {
+		if got := classifyRoot(p, model.ProfileBaseline); got != model.RootKindAgentSkill {
+			t.Errorf("classifyRoot(%q) = %q, want %q", p, got, model.RootKindAgentSkill)
+		}
+	}
+}
+
 func TestClassifyRootClaudeCodexMCP(t *testing.T) {
 	cases := []string{
 		"/Users/alice/.claude",

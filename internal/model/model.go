@@ -43,6 +43,7 @@ const (
 	EcosystemMCP              = "mcp"
 	EcosystemEditorExtension  = "editor-extension"
 	EcosystemBrowserExtension = "browser-extension"
+	EcosystemAgentSkill       = "agent-skill"
 )
 
 var supportedEcosystems = map[string]struct{}{
@@ -54,6 +55,7 @@ var supportedEcosystems = map[string]struct{}{
 	EcosystemMCP:              {},
 	EcosystemEditorExtension:  {},
 	EcosystemBrowserExtension: {},
+	EcosystemAgentSkill:       {},
 }
 
 var supportedEcosystemOrder = []string{
@@ -65,6 +67,7 @@ var supportedEcosystemOrder = []string{
 	EcosystemMCP,
 	EcosystemEditorExtension,
 	EcosystemBrowserExtension,
+	EcosystemAgentSkill,
 }
 
 // SupportedEcosystems returns the emitted ecosystem values supported by v0.1.
@@ -90,6 +93,7 @@ const (
 	RootKindEditorExtension  = "editor_extension_root"
 	RootKindBrowserExtension = "browser_extension_root"
 	RootKindMCPConfig        = "mcp_config_root"
+	RootKindAgentSkill       = "agent_skill_root"
 	RootKindHomebrew         = "homebrew_root"
 	RootKindDeepHome         = "deep_home_root"
 	RootKindUnknown          = "unknown"
@@ -154,9 +158,11 @@ type Record struct {
 	// Version remains empty unless an exact installed version is known.
 	RequestedSpec string `json:"requested_spec,omitempty"`
 
-	// ServerName is set on MCP records to the id (map key) of the server
-	// entry in the config so the configured alias survives even when
-	// PackageName is derived from the command/args.
+	// ServerName is set to the local alias (the map key) of a configured
+	// entry whose identity comes from somewhere other than the alias
+	// itself. On MCP records it carries the configured server id; on
+	// agent-skill records it carries the local skill name from the lock
+	// file, since PackageName is taken from the upstream source slug.
 	ServerName string `json:"server_name,omitempty"`
 }
 

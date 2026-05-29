@@ -28,6 +28,7 @@ import (
 	"github.com/perplexityai/bumblebee/internal/ecosystem/pnpm"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/pypi"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/rubygems"
+	"github.com/perplexityai/bumblebee/internal/ecosystem/skills"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/yarn"
 	"github.com/perplexityai/bumblebee/internal/exposure"
 	"github.com/perplexityai/bumblebee/internal/model"
@@ -247,6 +248,7 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 	rbS := &rubygems.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 	cmpS := &composer.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 	mcpS := &mcp.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
+	skillS := &skills.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 	extS := &editorext.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 	bxS := &browserext.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 
@@ -308,6 +310,8 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 					err = cmpS.ScanInstalledJSON(j.path, cfg.BaseRecord)
 				case "mcp-config":
 					err = mcpS.ScanConfig(j.path, cfg.BaseRecord)
+				case "skill-lock":
+					err = skillS.ScanLockFile(j.path, cfg.BaseRecord)
 				case "editor-ext":
 					err = extS.ScanExtension(j.path, j.extra1, j.extra2, cfg.BaseRecord)
 				case "chromium-ext":
@@ -420,6 +424,8 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 			send(job{kind: "mcp-config", path: path})
 		case enabled(model.EcosystemMCP) && base == "settings.json" && mcp.IsGeminiSettingsJSON(path):
 			send(job{kind: "mcp-config", path: path})
+		case enabled(model.EcosystemAgentSkill) && skills.IsKnownLockFile(base):
+			send(job{kind: "skill-lock", path: path})
 		case enabled(model.EcosystemBrowserExtension) && base == "manifest.json":
 			if ok, extID, verDir, profDir := browserext.IsChromiumExtensionManifest(path); ok {
 				send(job{kind: "chromium-ext", path: path, projectPath: profDir, extra1: extID, extra2: verDir})

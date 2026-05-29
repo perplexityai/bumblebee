@@ -131,7 +131,7 @@ func registerScanFlags(fs *flag.FlagSet, o *scanOpts) {
 		"scan profile: baseline (bounded known package/tool roots), project (configured developer/project roots), or deep (incident-response exposure scan; may include user home roots)")
 	fs.Var(&o.roots, "root", "directory to scan (repeatable or comma-separated; unrelated to running as root). Required for deep; optional for baseline/project.")
 	fs.Var(&o.excludes, "exclude", "additional directory name or suffix path to exclude (repeatable)")
-	fs.Var(&o.ecosystems, "ecosystem", "limit scanning to emitted ecosystem values (repeatable or comma-separated): npm,pypi,go,rubygems,packagist,mcp,editor-extension,browser-extension")
+	fs.Var(&o.ecosystems, "ecosystem", "limit scanning to emitted ecosystem values (repeatable or comma-separated): "+strings.Join(model.SupportedEcosystems(), ","))
 	fs.Int64Var(&o.maxFileSize, "max-file-size", 5*1024*1024, "max bytes to read from any single metadata file")
 	fs.DurationVar(&o.maxDuration, "max-duration", 0, "max wall-clock duration for the whole scan (0 = unbounded)")
 	fs.IntVar(&o.concurrency, "concurrency", 4, "number of concurrent file parsers")

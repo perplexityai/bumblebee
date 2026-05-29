@@ -141,6 +141,8 @@ func classifyRoot(path, profile string) string {
 		strings.HasSuffix(p, "/.config/Claude Code") ||
 		strings.HasSuffix(p, "/.continue"):
 		return model.RootKindMCPConfig
+	case strings.HasSuffix(p, "/.agents") || strings.HasSuffix(p, "/.local/state/skills"):
+		return model.RootKindAgentSkill
 	case p == "/opt/homebrew/lib" || p == "/usr/local/lib" || strings.HasSuffix(p, "/Library/Python"):
 		return model.RootKindHomebrew
 	case isBroadHomeRoot(path):
@@ -254,6 +256,15 @@ func baselineHomeCandidates(home string) []scanner.Root {
 		add(filepath.Join(home, ".config", "Claude"), model.RootKindMCPConfig)
 		add(filepath.Join(home, ".config", "Claude Code"), model.RootKindMCPConfig)
 		add(filepath.Join(home, ".continue"), model.RootKindMCPConfig)
+	}
+
+	// Agent-skill lock locations. ~/.agents holds the global
+	// `.skill-lock.json` written by the skills.sh CLI; $XDG_STATE_HOME
+	// overrides that to <state>/skills/.skill-lock.json when set.
+	// Absent locations are dropped by filterExistingRoots.
+	add(filepath.Join(home, ".agents"), model.RootKindAgentSkill)
+	if xdg := os.Getenv("XDG_STATE_HOME"); xdg != "" {
+		add(filepath.Join(xdg, "skills"), model.RootKindAgentSkill)
 	}
 
 	// Browser extension trees. We point directly at the per-profile

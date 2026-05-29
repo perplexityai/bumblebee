@@ -102,6 +102,25 @@ PLATFORMS
   }
 }`)
 
+	// Agent-skill lock file: skills.sh / vercel-labs/skills format.
+	// One github skill with a ref, one local skill whose on-disk path
+	// must not leak into the emitted record.
+	writeFile(t, filepath.Join(root, "p-skills", "skills-lock.json"), `{
+  "version": 3,
+  "skills": {
+    "ai-sdk": {
+      "source": "vercel/ai",
+      "sourceType": "github",
+      "ref": "main",
+      "skillFolderHash": "deadbeef"
+    },
+    "my-local": {
+      "source": "/Users/alice/secret/path/to/skill",
+      "sourceType": "local"
+    }
+  }
+}`)
+
 	// VS Code extension
 	writeFile(t,
 		filepath.Join(root, ".vscode", "extensions", "ms-python.python-2024.0.0", "package.json"),
@@ -183,6 +202,7 @@ PLATFORMS
 		"composer-lock",
 		"composer-installed",
 		"mcp-config",
+		"skill-lock",
 		"editor-extension",
 		"browser-extension",
 	}
@@ -191,7 +211,7 @@ PLATFORMS
 			t.Errorf("missing source_type %q", st)
 		}
 	}
-	wantEcosystems := []string{"npm", "go", "rubygems", "packagist", "mcp", "editor-extension", "browser-extension"}
+	wantEcosystems := []string{"npm", "go", "rubygems", "packagist", "mcp", "agent-skill", "editor-extension", "browser-extension"}
 	for _, e := range wantEcosystems {
 		if !gotEcosystem[e] {
 			t.Errorf("missing ecosystem %q", e)
@@ -207,6 +227,10 @@ PLATFORMS
 		"packagist:intercom/intercom-php",
 		"mcp:@modelcontextprotocol/server-github",
 		"mcp:@example/gemini-search",
+		"agent-skill:vercel/ai",
+		// Local skills fall back to the local alias as PackageName so
+		// the on-disk path in `source` does not leak into the record.
+		"agent-skill:my-local",
 		"editor-extension:ms-python.python",
 		"browser-extension:" + chromeExtID,
 		"browser-extension:sample@example.com",
@@ -234,6 +258,20 @@ PLATFORMS
 	// path is outside any configured root.
 	if got := gotRootKindByEcosystem["mcp"]; got != model.RootKindProject {
 		t.Errorf("mcp root_kind=%q, want %q", got, model.RootKindProject)
+	}
+	// Same inheritance applies to agent-skill records under the project
+	// root: the configured root_kind wins over the scanner's
+	// RootKindAgentSkill fallback.
+	if got := gotRootKindByEcosystem["agent-skill"]; got != model.RootKindProject {
+		t.Errorf("agent-skill root_kind=%q, want %q", got, model.RootKindProject)
+	}
+
+	// Belt-and-braces: verify the local-skill `source` path string never
+	// appears anywhere in stdout. The fixture used a /Users/alice path
+	// that does not collide with any other field, so any occurrence is
+	// a leak.
+	if bytes.Contains(stdout.Bytes(), []byte("/Users/alice/secret/path/to/skill")) {
+		t.Errorf("local skill on-disk path leaked into emitted records")
 	}
 
 	// stderr should be NDJSON diagnostics only.
