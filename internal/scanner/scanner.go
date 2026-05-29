@@ -308,6 +308,8 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 					err = cmpS.ScanInstalledJSON(j.path, cfg.BaseRecord)
 				case "mcp-config":
 					err = mcpS.ScanConfig(j.path, cfg.BaseRecord)
+				case "mcp-claude-config":
+					err = mcpS.ScanClaudeConfig(j.path, cfg.BaseRecord)
 				case "editor-ext":
 					err = extS.ScanExtension(j.path, j.extra1, j.extra2, cfg.BaseRecord)
 				case "chromium-ext":
@@ -420,6 +422,8 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 			send(job{kind: "mcp-config", path: path})
 		case enabled(model.EcosystemMCP) && base == "settings.json" && mcp.IsGeminiSettingsJSON(path):
 			send(job{kind: "mcp-config", path: path})
+		case enabled(model.EcosystemMCP) && mcp.IsClaudeConfigJSON(path):
+			send(job{kind: "mcp-claude-config", path: path})
 		case enabled(model.EcosystemBrowserExtension) && base == "manifest.json":
 			if ok, extID, verDir, profDir := browserext.IsChromiumExtensionManifest(path); ok {
 				send(job{kind: "chromium-ext", path: path, projectPath: profDir, extra1: extID, extra2: verDir})

@@ -658,6 +658,123 @@ func TestIsGeminiSettingsJSON(t *testing.T) {
 	}
 }
 
+// TestIsClaudeConfigJSON verifies path-aware dispatch for Claude Code's
+// `~/.claude.json` user config, which the basename allowlist does not
+// route to the generic MCP parser.
+func TestIsClaudeConfigJSON(t *testing.T) {
+	match := []string{
+		"/home/alice/.claude.json",
+		"/Users/alice/.claude.json",
+		".claude.json",
+	}
+	for _, p := range match {
+		if !IsClaudeConfigJSON(p) {
+			t.Errorf("IsClaudeConfigJSON(%q) = false, want true", p)
+		}
+	}
+	noMatch := []string{
+		"/home/alice/.claude/mcp.json",
+		"/home/alice/claude.json", // missing the dot
+		"/home/alice/.claude.jsonc",
+		"",
+	}
+	for _, p := range noMatch {
+		if IsClaudeConfigJSON(p) {
+			t.Errorf("IsClaudeConfigJSON(%q) = true, want false", p)
+		}
+	}
+}
+
+// TestScanClaudeConfig verifies that both MCP scopes in ~/.claude.json are
+// inventoried — the top-level `mcpServers` (user scope) and the
+// per-project `projects.<dir>.mcpServers` (local scope) — while the file's
+// many unrelated settings are ignored and never misread as servers.
+func TestScanClaudeConfig(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, ".claude.json")
+	body := `{
+  "numStartups": 42,
+  "oauthAccount": {"emailAddress": "shouldnotbecaptured"},
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {"GITHUB_TOKEN": "shouldnotbecaptured"}
+    }
+  },
+  "projects": {
+    "/home/alice/proj-a": {
+      "allowedTools": [],
+      "mcpServers": {
+        "local-time": {"command": "uvx", "args": ["mcp-server-time"]}
+      }
+    },
+    "/home/alice/proj-b": {
+      "mcpServers": {
+        "stripe": {"type": "http", "url": "https://user:secret@mcp.stripe.com/mcp?token=abc"}
+      }
+    },
+    "/home/alice/proj-c": {
+      "lastCost": 0.12
+    }
+  }
+}`
+	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	var out []model.Record
+	s := &Scanner{MaxFileSize: 1 << 20, Emit: func(r model.Record) { out = append(out, r) }}
+	if err := s.ScanClaudeConfig(path, model.Record{}); err != nil {
+		t.Fatal(err)
+	}
+	if len(out) != 3 {
+		t.Fatalf("want 3 records (1 user-scope + 2 local-scope), got %d: %+v", len(out), out)
+	}
+	byServer := map[string]model.Record{}
+	for _, r := range out {
+		byServer[r.ServerName] = r
+		if r.RootKind != model.RootKindMCPConfig {
+			t.Errorf("%s: RootKind = %q, want %q", r.ServerName, r.RootKind, model.RootKindMCPConfig)
+		}
+		if r.SourceFile != path {
+			t.Errorf("%s: SourceFile = %q, want %q", r.ServerName, r.SourceFile, path)
+		}
+	}
+	// User-scope server: top-level mcpServers, ProjectPath is the file's dir.
+	if got := byServer["github"]; got.PackageName != "@modelcontextprotocol/server-github" || got.ProjectPath != dir {
+		t.Errorf("github user-scope record wrong: %+v", got)
+	}
+	// Local-scope servers: ProjectPath is the per-project key.
+	if got := byServer["local-time"]; got.PackageName != "mcp-server-time" || got.ProjectPath != "/home/alice/proj-a" {
+		t.Errorf("local-time local-scope record wrong: %+v", got)
+	}
+	// Remote entry: sanitized to scheme://host, no userinfo/path/query.
+	if got := byServer["stripe"]; got.ProjectPath != "/home/alice/proj-b" || got.PackageManager != "mcp-remote" || got.RequestedSpec != "https://mcp.stripe.com" {
+		t.Errorf("stripe remote record wrong: %+v", got)
+	}
+}
+
+// TestScanClaudeConfig_NoServers verifies that a ~/.claude.json with no
+// MCP servers configured (only unrelated settings) emits nothing — the
+// generic flat-object fallback must not run over this file and treat
+// arbitrary top-level keys as server entries.
+func TestScanClaudeConfig_NoServers(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, ".claude.json")
+	body := `{"numStartups": 3, "oauthAccount": {"emailAddress": "x"}, "projects": {"/p": {"lastCost": 1}}}`
+	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	var out []model.Record
+	s := &Scanner{MaxFileSize: 1 << 20, Emit: func(r model.Record) { out = append(out, r) }}
+	if err := s.ScanClaudeConfig(path, model.Record{}); err != nil {
+		t.Fatal(err)
+	}
+	if len(out) != 0 {
+		t.Fatalf("want 0 records, got %d: %+v", len(out), out)
+	}
+}
+
 // TestLooksLikePackageSpec verifies the package-spec gate that keeps
 // non-package launcher arguments — URLs, VCS refs, file/path refs, and
 // tarball archives — out of PackageName and RequestedSpec.

@@ -245,6 +245,10 @@ func baselineHomeCandidates(home string) []scanner.Root {
 	add(filepath.Join(home, ".cursor"), model.RootKindMCPConfig)
 	add(filepath.Join(home, ".codeium", "windsurf"), model.RootKindMCPConfig)
 	add(filepath.Join(home, ".claude"), model.RootKindMCPConfig)
+	// Claude Code stores user-scope MCP servers (top-level `mcpServers`)
+	// and local-scope ones (`projects.<dir>.mcpServers`) in this single
+	// file, which sits beside the `.claude` dir rather than inside it.
+	add(filepath.Join(home, ".claude.json"), model.RootKindMCPConfig)
 	add(filepath.Join(home, ".codex"), model.RootKindMCPConfig)
 	add(filepath.Join(home, ".gemini"), model.RootKindMCPConfig)
 	switch runtime.GOOS {
@@ -559,15 +563,18 @@ func browserExtensionCandidateRoots(home string) []string {
 	return roots
 }
 
-// filterExistingRoots returns the subset of candidate roots that exist
-// as directories, along with a short note describing how many were
-// skipped. Absent candidates are normal on most developer machines.
+// filterExistingRoots returns the subset of candidate roots that exist,
+// along with a short note describing how many were skipped. Absent
+// candidates are normal on most developer machines. Both directories and
+// regular files are kept: a handful of roots (e.g. `~/.claude.json`) are
+// single config files rather than trees, and the walker handles a file
+// root by visiting just that file.
 func filterExistingRoots(candidates []scanner.Root) ([]scanner.Root, []string) {
 	var present []scanner.Root
 	skipped := 0
 	for _, c := range candidates {
 		info, err := os.Stat(c.Path)
-		if err != nil || !info.IsDir() {
+		if err != nil || (!info.IsDir() && !info.Mode().IsRegular()) {
 			skipped++
 			continue
 		}

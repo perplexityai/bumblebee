@@ -80,6 +80,16 @@ func IsGeminiSettingsJSON(path string) bool {
 		filepath.Base(filepath.Dir(path)) == ".gemini"
 }
 
+// IsClaudeConfigJSON reports whether path is Claude Code's user config
+// file (`<home>/.claude.json`). This file carries MCP servers in two
+// places — top-level `mcpServers` (user scope) and
+// `projects.<dir>.mcpServers` (local scope) — neither of which the
+// generic basename allowlist routes here, so dispatch is path-aware and
+// the file is parsed by ScanClaudeConfig rather than ScanConfig.
+func IsClaudeConfigJSON(path string) bool {
+	return filepath.Base(path) == ".claude.json"
+}
+
 type serverEntry struct {
 	Command   string                 `json:"command"`
 	Args      []string               `json:"args"`
@@ -194,6 +204,57 @@ func (s *Scanner) ScanConfig(path string, base model.Record) error {
 		return nil
 	}
 
+	s.emitServers(servers, base, path, filepath.Dir(path))
+	return nil
+}
+
+// ScanClaudeConfig parses Claude Code's user config file
+// (`<home>/.claude.json`). Unlike the single-envelope configs handled by
+// ScanConfig, this file holds MCP servers at two scopes: the top-level
+// `mcpServers` map (user scope, available across all projects) and a
+// per-project `projects.<dir>.mcpServers` map (local scope, private to
+// one project). Both are inventoried. Only those two keys are read; the
+// file's many unrelated settings are ignored, and the flat-object
+// fallback is deliberately not applied here so surrounding config never
+// gets misread as a server entry. Per-project servers carry the project
+// directory in ProjectPath; top-level servers use the config file's own
+// directory.
+func (s *Scanner) ScanClaudeConfig(path string, base model.Record) error {
+	data, err := s.readBounded(path)
+	if err != nil {
+		return err
+	}
+	var doc struct {
+		MCPServers map[string]serverEntry `json:"mcpServers"`
+		Projects   map[string]struct {
+			MCPServers map[string]serverEntry `json:"mcpServers"`
+		} `json:"projects"`
+	}
+	if err := json.Unmarshal(data, &doc); err != nil {
+		if s.Diag != nil {
+			s.Diag("warn", path, "parse Claude config: "+err.Error())
+		}
+		return nil
+	}
+	s.emitServers(doc.MCPServers, base, path, filepath.Dir(path))
+	projectDirs := make([]string, 0, len(doc.Projects))
+	for dir := range doc.Projects {
+		projectDirs = append(projectDirs, dir)
+	}
+	sort.Strings(projectDirs)
+	for _, dir := range projectDirs {
+		s.emitServers(doc.Projects[dir].MCPServers, base, path, dir)
+	}
+	return nil
+}
+
+// emitServers turns a map of parsed server entries into one record each,
+// keyed by the configured server id. sourcePath is recorded as the
+// originating file; projectPath is the directory the servers are scoped
+// to (the config file's own directory for top-level entries, or the
+// per-project key for nested entries). Server ids are emitted in sorted
+// order so a record stream over the same config is deterministic.
+func (s *Scanner) emitServers(servers map[string]serverEntry, base model.Record, sourcePath, projectPath string) {
 	ids := make([]string, 0, len(servers))
 	for k := range servers {
 		ids = append(ids, k)
@@ -205,8 +266,8 @@ func (s *Scanner) ScanConfig(path string, base model.Record) error {
 		r.Ecosystem = Ecosystem
 		r.PackageManager = "mcp"
 		r.SourceType = "mcp-config"
-		r.SourceFile = path
-		r.ProjectPath = filepath.Dir(path)
+		r.SourceFile = sourcePath
+		r.ProjectPath = projectPath
 		r.RootKind = model.RootKindMCPConfig
 		r.ServerName = id
 		r.Confidence = "low"
@@ -289,7 +350,6 @@ func (s *Scanner) ScanConfig(path string, base model.Record) error {
 		}
 		s.Emit(r)
 	}
-	return nil
 }
 
 // looksUnresolvedShellVar reports whether s contains a literal variable

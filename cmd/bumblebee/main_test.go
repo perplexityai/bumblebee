@@ -237,6 +237,35 @@ func TestResolveRootsBaselineSkipsAbsentClaudeCodexRoots(t *testing.T) {
 	}
 }
 
+// TestResolveRootsBaselineIncludesClaudeJSONFileRoot verifies that the
+// `~/.claude.json` config file is included as a baseline MCP root when
+// present. Unlike the other MCP candidates it is a regular file, not a
+// directory, so this also exercises filterExistingRoots keeping files.
+func TestResolveRootsBaselineIncludesClaudeJSONFileRoot(t *testing.T) {
+	if runtime.GOOS != "darwin" && runtime.GOOS != "linux" {
+		t.Skipf("profile defaults are darwin/linux specific")
+	}
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	claudeJSON := filepath.Join(home, ".claude.json")
+	if err := os.WriteFile(claudeJSON, []byte(`{"mcpServers":{}}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	roots, _, err := resolveRoots(model.ProfileBaseline, nil, rootsOpts{})
+	if err != nil {
+		t.Fatalf("resolveRoots baseline: %v", err)
+	}
+	for _, r := range roots {
+		if r.Path == claudeJSON {
+			if r.Kind != model.RootKindMCPConfig {
+				t.Errorf("~/.claude.json root kind = %q, want %q", r.Kind, model.RootKindMCPConfig)
+			}
+			return
+		}
+	}
+	t.Errorf("baseline did not include file root %q (got %v)", claudeJSON, roots)
+}
+
 func TestClassifyRootClaudeCodexMCP(t *testing.T) {
 	cases := []string{
 		"/Users/alice/.claude",
