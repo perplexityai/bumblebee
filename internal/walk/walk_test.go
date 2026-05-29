@@ -88,6 +88,67 @@ func TestWalkSkipsExcludedLibrarySubtrees(t *testing.T) {
 	}
 }
 
+// TestWalkSkipsFileSymlinks verifies that file-typed symlinks under a
+// scan root are not surfaced to the visitor. Without this, a single
+// planted symlink at, say, node_modules/<pkg>/package.json pointing at
+// an unrelated JSON file outside the scan root would be parsed by the
+// ecosystem scanners (which open through os.Open and follow the link),
+// causing the target file's name/version-shaped fields to be emitted as
+// if they belonged to a real installed package. The walker's contract
+// is that it never crosses into an unrelated subtree by indirection.
+func TestWalkSkipsFileSymlinks(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("symlinks require admin on Windows")
+	}
+	root := t.TempDir()
+	// In-scope regular file the walker should visit.
+	inScope := filepath.Join(root, "proj", "package-lock.json")
+	mustMkdir(t, filepath.Dir(inScope))
+	mustWrite(t, inScope, "{}")
+
+	// Out-of-scope target the symlink will point at.
+	outOfScope := filepath.Join(root, "elsewhere", "target.json")
+	mustMkdir(t, filepath.Dir(outOfScope))
+	mustWrite(t, outOfScope, `{"name":"out-of-scope","version":"1.0.0"}`)
+
+	// Plant a file-typed symlink inside the scan root pointing at the
+	// out-of-scope target.
+	symlinkPath := filepath.Join(root, "proj", "node_modules", "evil", "package.json")
+	mustMkdir(t, filepath.Dir(symlinkPath))
+	if err := os.Symlink(outOfScope, symlinkPath); err != nil {
+		t.Skipf("symlink unsupported: %v", err)
+	}
+
+	scanRoot := filepath.Join(root, "proj")
+	var seen []string
+	err := Walk(Options{Roots: []string{scanRoot}}, func(path string, d fs.DirEntry) error {
+		if !d.IsDir() {
+			seen = append(seen, path)
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("Walk: %v", err)
+	}
+
+	for _, p := range seen {
+		if p == symlinkPath {
+			t.Errorf("file-typed symlink was surfaced to visitor: %q", p)
+		}
+	}
+
+	foundInScope := false
+	for _, p := range seen {
+		if p == inScope {
+			foundInScope = true
+			break
+		}
+	}
+	if !foundInScope {
+		t.Errorf("expected to visit %q; saw %v", inScope, seen)
+	}
+}
+
 func mustMkdir(t *testing.T, p string) {
 	t.Helper()
 	if err := os.MkdirAll(p, 0o755); err != nil {
