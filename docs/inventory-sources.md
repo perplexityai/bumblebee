@@ -29,12 +29,53 @@ Each scan profile reads from a different slice of the sources below:
 
 | Profile     | Sources walked                                                                                                                                                                                                |
 |-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `baseline` | Homebrew lib prefixes; `/Library/Python`; Linux system Python (`/usr/lib/python*`, plus `/usr/local/lib`); user Python (`~/.local/lib/python*`, `~/.local/share/pipx/venvs`, `pyenv`); language version managers (`asdf`, `nvm`, `rbenv`, `rvm`); `~/.cargo`; `~/go`; editor-extension trees; MCP config locations; agent-skill lock locations (`~/.agents`, `$XDG_STATE_HOME/skills`); per-profile browser-extension trees (Chromium-family + Firefox-family, including common snap/flatpak paths). No project trees.   |
+| `baseline` | Homebrew `Cellar` / `Caskroom` install metadata and lib prefixes; `/Library/Python`; Linux system Python (`/usr/lib/python*`, plus `/usr/local/lib`); user Python (`~/.local/lib/python*`, `~/.local/share/pipx/venvs`, `pyenv`); language version managers (`asdf`, `nvm`, `rbenv`, `rvm`); `~/.cargo`; `~/go`; editor-extension trees; MCP config locations; agent-skill lock locations (`~/.agents`, `$XDG_STATE_HOME/skills`); per-profile browser-extension trees (Chromium-family + Firefox-family, including common snap/flatpak paths). No project trees.   |
 | `project`   | Configured developer/project roots (`~/code`, `~/src`, `~/Developer`, `~/Projects`, `~/workspace`, and any explicit `--root`). All ecosystem parsers below apply within those trees.                            |
 | `deep`      | Operator-supplied roots, typically a bare home directory during a campaign. Same ecosystem parsers; recommended only in combination with `--exposure-catalog` to emit `record_type=finding` records.            |
 
 The `source_type` values emitted are the same across profiles. What
 changes is the population of files the walker visits.
+
+## Homebrew
+
+Files read:
+
+- Formulae: `<prefix>/Cellar/<formula>/<version>/INSTALL_RECEIPT.json`.
+  The formula name and installed version are derived from the Cellar path,
+  matching Homebrew's own filesystem listing behavior. The receipt is read
+  only for small install metadata such as `installed_on_request`, which is
+  emitted as `direct_dependency` when present.
+- Casks: `<prefix>/Caskroom/<token>/.metadata/<version>/<timestamp>/Casks/<token>.{internal.json,json,rb}`
+  as the installed-cask marker, plus the optional cask-level
+  `<prefix>/Caskroom/<token>/.metadata/INSTALL_RECEIPT.json` for
+  `installed_on_request`. JSON marker files are not used as a broad
+  metadata source in v0.1, and `.rb` cask definitions are never opened;
+  a `.rb` marker only proves Homebrew saved an installed cask snapshot.
+
+Captured fields emitted on the record: `package_name` (formula rack name
+or cask token), `version`, `package_manager=homebrew`,
+`source_type` (`homebrew-formula-receipt` or `homebrew-cask-metadata`),
+and `direct_dependency` when Homebrew's receipt records
+`installed_on_request`.
+
+Baseline defaults include Apple Silicon macOS (`/opt/homebrew/Cellar`,
+`/opt/homebrew/Caskroom`), Intel macOS (`/usr/local/Cellar`,
+`/usr/local/Caskroom`), Linuxbrew (`/home/linuxbrew/.linuxbrew/Cellar`,
+`/home/linuxbrew/.linuxbrew/Caskroom`). Custom Homebrew prefixes are not
+inferred from environment variables; pass their `Cellar` and `Caskroom`
+paths with `--root` when they need coverage.
+
+We do not run `brew list`, `brew info`, or any other Homebrew command. We
+do not read formula Ruby files, cask Ruby definitions, installed payload
+files, app bundles, linked `opt` symlinks, pinned symlinks, or tap source
+trees. Tap names, bottle/source build flags, install timestamps, runtime
+dependencies, and artifact lists may exist in Homebrew metadata but are
+not emitted in v0.1's slim schema.
+
+References:
+
+- Homebrew formula tab metadata: <https://docs.brew.sh/Formula-Cookbook>
+- Homebrew installation paths: <https://docs.brew.sh/Installation>
 
 ## npm
 
@@ -592,7 +633,8 @@ strong installed-state correlation tooling today.
 ## What this collector deliberately does not do
 
 - No package-manager command execution. No `npm ls`, no `pnpm list`, no
-  `pip show`, no `go list`, no `bundle list`, no `composer show`.
+  `pip show`, no `go list`, no `bundle list`, no `composer show`, no
+  `brew list`.
 - No source-file reading. Only the metadata files listed above. The
   walker visits directories; the scanners open only the targeted files.
 - No bundled threat intelligence. Bumblebee ships no built-in advisory

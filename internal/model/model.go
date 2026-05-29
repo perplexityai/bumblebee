@@ -43,6 +43,7 @@ const (
 	EcosystemMCP              = "mcp"
 	EcosystemEditorExtension  = "editor-extension"
 	EcosystemBrowserExtension = "browser-extension"
+	EcosystemHomebrew         = "homebrew"
 	EcosystemAgentSkill       = "agent-skill"
 )
 
@@ -55,6 +56,7 @@ var supportedEcosystems = map[string]struct{}{
 	EcosystemMCP:              {},
 	EcosystemEditorExtension:  {},
 	EcosystemBrowserExtension: {},
+	EcosystemHomebrew:         {},
 	EcosystemAgentSkill:       {},
 }
 
@@ -67,6 +69,7 @@ var supportedEcosystemOrder = []string{
 	EcosystemMCP,
 	EcosystemEditorExtension,
 	EcosystemBrowserExtension,
+	EcosystemHomebrew,
 	EcosystemAgentSkill,
 }
 

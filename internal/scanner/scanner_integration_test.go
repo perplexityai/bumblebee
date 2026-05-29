@@ -126,6 +126,14 @@ PLATFORMS
 		filepath.Join(root, ".vscode", "extensions", "ms-python.python-2024.0.0", "package.json"),
 		`{"name":"python","version":"2024.0.0","publisher":"ms-python"}`)
 
+	// Homebrew formula receipt + cask metadata marker.
+	writeFile(t,
+		filepath.Join(root, "Cellar", "wget", "1.21.4", "INSTALL_RECEIPT.json"),
+		`{"installed_on_request":true,"source":{"tap":"homebrew/core"}}`)
+	writeFile(t,
+		filepath.Join(root, "Caskroom", "sample-cask", ".metadata", "2.0.0", "20260523010203.004", "Casks", "sample-cask.json"),
+		`{"token":"sample-cask","version":"2.0.0"}`)
+
 	// Chromium-family browser extension (Chrome layout). We create the
 	// fixture under a fresh tempdir so the walker's default home-tree
 	// excludes (which suffix-match Library/Application Support/Google/Chrome,
@@ -205,13 +213,15 @@ PLATFORMS
 		"skill-lock",
 		"editor-extension",
 		"browser-extension",
+		"homebrew-formula-receipt",
+		"homebrew-cask-metadata",
 	}
 	for _, st := range wantSourceTypes {
 		if !gotSource[st] {
 			t.Errorf("missing source_type %q", st)
 		}
 	}
-	wantEcosystems := []string{"npm", "go", "rubygems", "packagist", "mcp", "agent-skill", "editor-extension", "browser-extension"}
+	wantEcosystems := []string{"npm", "go", "rubygems", "packagist", "mcp", "editor-extension", "browser-extension", "homebrew", "agent-skill"}
 	for _, e := range wantEcosystems {
 		if !gotEcosystem[e] {
 			t.Errorf("missing ecosystem %q", e)
@@ -234,6 +244,8 @@ PLATFORMS
 		"editor-extension:ms-python.python",
 		"browser-extension:" + chromeExtID,
 		"browser-extension:sample@example.com",
+		"homebrew:wget",
+		"homebrew:sample-cask",
 	}
 	for _, p := range wantPkgs {
 		if !gotPkg[p] {

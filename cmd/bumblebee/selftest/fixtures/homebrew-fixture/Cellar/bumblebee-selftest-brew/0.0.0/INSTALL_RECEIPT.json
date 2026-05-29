@@ -1,0 +1,7 @@
+{
+  "installed_on_request": true,
+  "source": {
+    "tap": "homebrew/core",
+    "spec": "stable"
+  }
+}
