@@ -52,6 +52,22 @@ Per-ecosystem detail: [docs/inventory-sources.md](docs/inventory-sources.md).
 
 ## Install
 
+### Homebrew
+
+```sh
+brew install bumblebee
+```
+
+A formula is in review for [Homebrew core](https://github.com/Homebrew/homebrew-core/pull/284878). Until it merges, install from [GitHub releases](https://github.com/perplexityai/bumblebee/releases) or build from source below.
+
+Verify any install with:
+
+```sh
+bumblebee selftest
+```
+
+### Go install
+
 Requires Go 1.25+. Zero non-stdlib dependencies.
 
 ```sh
