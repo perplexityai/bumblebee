@@ -55,6 +55,29 @@ func TestInferPackageFromArgs(t *testing.T) {
 		{"docker", []string{"run", "-e", "FOO=bar", "--name", "x", "mcp/slack"}, "mcp/slack", "docker"},
 		{"docker", []string{"run", "--env-file=.env", "ghcr.io/github/github-mcp-server"}, "ghcr.io/github/github-mcp-server", "docker"},
 		{"/usr/local/bin/docker", []string{"run", "mcp/slack"}, "mcp/slack", "docker"},
+		// Non-executor first tokens name no published package: the spec is
+		// empty and ScanConfig falls back to the server id, like `uv run
+		// <script>` below. The case body is identical for npm/pnpm/yarn/bun,
+		// so one row per distinct shape suffices.
+		//
+		// `run <script>` — incl. the reported `bun run … start` from the
+		// official Claude messaging plugins, which had leaked package "start".
+		{"bun", []string{"run", "--cwd", "/x", "--shell=bun", "--silent", "start"}, "", ""},
+		{"npm", []string{"run", "start"}, "", ""},
+		// Bare `<script>`: an npm lifecycle alias, a plain script, and one with
+		// a trailing flag (which must not be mistaken for the package).
+		{"npm", []string{"start"}, "", ""},
+		{"yarn", []string{"dev"}, "", ""},
+		{"yarn", []string{"build", "--port", "3000"}, "", ""},
+		// create/init DO name a published create-<name> package, but resolving
+		// that is intentionally out of scope (initializers don't launch MCP
+		// servers); pinned so the fallback is deliberate, not an accidental drop.
+		{"npm", []string{"create", "vite"}, "", ""},
+		{"npm", []string{"init", "foo"}, "", ""},
+		// Known limitation: a value-taking global flag NOT in npmValueTakingFlags
+		// before the subcommand shifts detection, missing a genuine `exec`
+		// package. Does not occur in real MCP configs; documented, not desired.
+		{"npm", []string{"--unknownflag", "val", "exec", "real-pkg"}, "", ""},
 	}
 	for _, c := range cases {
 		gotSpec, gotLauncher := inferPackageFromArgs(c.cmd, c.args)
@@ -342,6 +365,67 @@ func TestScanConfig_UVRunDirectory(t *testing.T) {
 	// --from still wins even when "tool" is absent.
 	if r := byServer["from-flag"]; r.PackageName != "bugcrowd-mcp" || r.PackageManager != "uv" {
 		t.Errorf("from-flag: %+v", r)
+	}
+}
+
+// TestScanConfig_RealWorldCorpus runs the parser over command/args shapes
+// taken from real MCP configurations (the modelcontextprotocol servers, the
+// Claude/Cursor setup guides, and the official Claude bundled-server
+// plugins). It is the regression guard for the script-runner change: genuine
+// package launchers (npx/uvx/docker) must keep their package identity, while
+// local-script launchers (`bun run … start`, bare `yarn`/`pnpm`, `node` file,
+// `npm create`) must fall back to the server id rather than leak a script or
+// initializer-verb token as a package.
+func TestScanConfig_RealWorldCorpus(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "mcp.json")
+	body := `{
+  "mcpServers": {
+    "seq-think":  {"command":"npx","args":["-y","@modelcontextprotocol/server-sequential-thinking"]},
+    "omnisearch": {"command":"npx","args":["-y","mcp-omnisearch"]},
+    "sqlite":     {"command":"uvx","args":["mcp-server-sqlite","--db-path","test.db"]},
+    "chronulus":  {"command":"uvx","args":["chronulus-mcp"]},
+    "github":     {"command":"docker","args":["run","-i","--rm","ghcr.io/github/github-mcp-server"]},
+    "local-node": {"command":"node","args":["/home/u/mcp-tools/build/index.js"]},
+    "discord":    {"command":"bun","args":["run","--cwd","/plugins/discord","--shell=bun","--silent","start"]},
+    "yarn-dev":   {"command":"yarn","args":["dev"]},
+    "scaffold":   {"command":"npm","args":["create","vite"]}
+  }
+}`
+	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	var out []model.Record
+	s := &Scanner{MaxFileSize: 1 << 20, Emit: func(r model.Record) { out = append(out, r) }}
+	if err := s.ScanConfig(path, model.Record{}); err != nil {
+		t.Fatal(err)
+	}
+	byServer := map[string]model.Record{}
+	for _, r := range out {
+		byServer[r.ServerName] = r
+	}
+	want := map[string]struct{ pkg, pm string }{
+		// Genuine package launchers — identity preserved.
+		"seq-think":  {"@modelcontextprotocol/server-sequential-thinking", "mcp"},
+		"omnisearch": {"mcp-omnisearch", "mcp"},
+		"sqlite":     {"mcp-server-sqlite", "uv"},
+		"chronulus":  {"chronulus-mcp", "uv"},
+		"github":     {"ghcr.io/github/github-mcp-server", "docker"},
+		// Local-script / non-package launchers — fall back to the server id.
+		"local-node": {"local-node", "mcp"}, // node <file>
+		"discord":    {"discord", "mcp"},    // claude-plugins-official template: bun run … start
+		"yarn-dev":   {"yarn-dev", "mcp"},   // bare yarn <script>
+		"scaffold":   {"scaffold", "mcp"},   // npm create (initializer, out of scope)
+	}
+	for id, w := range want {
+		r, ok := byServer[id]
+		if !ok {
+			t.Fatalf("%s: no record emitted", id)
+		}
+		if r.PackageName != w.pkg || r.PackageManager != w.pm {
+			t.Errorf("%s: got package_name=%q package_manager=%q, want %q/%q",
+				id, r.PackageName, r.PackageManager, w.pkg, w.pm)
+		}
 	}
 }
 
