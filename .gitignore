@@ -2,6 +2,7 @@
 *.test
 *.out
 *.ndjson
+report.html
 .idea/
 .vscode/
 
