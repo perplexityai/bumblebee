@@ -49,6 +49,9 @@ New catalogs land under `threat_intel/`. Before submitting:
 - Include `source` on each entry pointing at the public advisory or
   research writeup that backs it.
 
+Catalogs can also be generated offline from OSV data with
+`tools/osvcatalog`; see [`threat_intel/README.md`](threat_intel/README.md).
+
 ## Schema changes
 
 Any change to `docs/schema/v0.1.0/*.json` or the wire format that breaks

@@ -20,3 +20,27 @@ the entries against current advisories before production use.
 | [`shopsprint-decimal-typosquat.json`](shopsprint-decimal-typosquat.json) | Go `github.com/shopsprint/decimal` v1.3.3 typosquat with DNS TXT backdoor | [Socket, 2026-05-19](https://socket.dev/blog/popular-go-decimal-library-typosquat-dns-backdoor) |
 | [`gemstuffer.json`](gemstuffer.json) | GemStuffer RubyGems exfiltration campaign (123 gems / 155 versions) targeting UK local government | [Socket, 2026-05-13](https://socket.dev/blog/gemstuffer) |
 | [`trapdoor-crypto-stealer.json`](trapdoor-crypto-stealer.json) | TrapDoor Crypto Stealer cross-ecosystem credential/wallet stealer across npm, PyPI, and Cargo/Crates.io (28 npm/PyPI entries / 378 versions; 6 Cargo packages documented under `_cargo_packages`, not matched until Cargo support lands) | [Socket, 2026-05-24](https://socket.dev/blog/trapdoor-crypto-stealer-npm-pypi-crates) |
+
+## Generating catalogs from OSV
+
+`tools/osvcatalog` converts a local [OSV](https://osv.dev) snapshot into a
+catalog. This is offline — Bumblebee never queries osv.dev at scan time.
+Download the data, then convert:
+
+```sh
+curl -fsSLO https://osv-vulnerabilities.storage.googleapis.com/npm/all.zip
+go run ./tools/osvcatalog -o threat_intel/osv-malicious.json npm/all.zip
+```
+
+The per-ecosystem OSV dumps cover both malicious packages and
+vulnerabilities. The OSSF [malicious-packages](https://github.com/ossf/malicious-packages)
+repo is the malicious-only upstream; point the tool at a clone's `osv/`
+tree instead.
+
+By default only malicious packages (`MAL-` ids) are emitted; `-include-vulns`
+widens to all OSV records. OSV ecosystems (`npm`, `PyPI`, `Go`, `RubyGems`,
+`Packagist`) map to Bumblebee's, using OSV's enumerated
+`affected[].versions`. Records that give only a version range — about half
+of malicious entries, where every version is affected — are skipped, since
+v0.1 matches exact versions only. Output validates against the schema and
+should be reviewed before use, like the catalogs above.
