@@ -26,8 +26,8 @@ type sinkHTTPOpts struct {
 
 // openSink returns the io.Writer the emitter should write records to,
 // along with a close function to invoke at end-of-scan. dest selects the
-// kind ("stdout", "file", or "http"); filePath and appendMode only
-// apply when dest=="file"; h carries the HTTP-sink options when
+// kind ("stdout", "terminal", "file", or "http"); filePath and appendMode
+// only apply when dest=="file"; h carries the HTTP-sink options when
 // dest=="http".
 //
 // The returned close function is always non-nil. For stdout it is a
@@ -36,6 +36,9 @@ func openSink(dest, filePath string, appendMode bool, h sinkHTTPOpts) (io.Writer
 	switch dest {
 	case "", "stdout":
 		return os.Stdout, func() error { return nil }, nil
+	case "terminal":
+		sink := output.NewTerminalSink(os.Stdout)
+		return sink, sink.Close, nil
 	case "file":
 		if filePath == "" {
 			return nil, nil, fmt.Errorf("--output=file requires --output-file")
@@ -70,7 +73,7 @@ func openSink(dest, filePath string, appendMode bool, h sinkHTTPOpts) (io.Writer
 		}
 		return sink, sink.Close, nil
 	default:
-		return nil, nil, fmt.Errorf("unknown --output %q (want stdout|file|http)", dest)
+		return nil, nil, fmt.Errorf("unknown --output %q (want stdout|file|http|terminal)", dest)
 	}
 }
 
