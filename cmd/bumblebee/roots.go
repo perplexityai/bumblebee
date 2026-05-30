@@ -176,26 +176,57 @@ func isBroadHomeRoot(path string) bool {
 	if path == "" {
 		return false
 	}
+
+	// Normalize path slashes for comparison
+	normalized := filepath.ToSlash(filepath.Clean(path))
+
+	// Check Unix/Linux patterns first (before filepath.Abs, which converts them on Windows)
+	switch normalized {
+	case "/", "/Users", "/home", "/root":
+		return true
+	}
+
+	// Unix user home patterns: /Users/<name> or /home/<name>
+	if strings.HasPrefix(normalized, "/Users/") || strings.HasPrefix(normalized, "/home/") {
+		parts := strings.Split(strings.TrimPrefix(normalized, "/"), "/")
+		if len(parts) == 2 && parts[0] != "" && parts[1] != "" {
+			return true
+		}
+	}
+
+	// For absolute paths, use filepath.Abs which respects the OS
 	abs, err := filepath.Abs(path)
 	if err != nil {
 		abs = path
 	}
 	abs = filepath.Clean(abs)
-	if abs == "/" {
-		return true
-	}
+
+	// Check if path matches current user's home directory
 	if home, err := os.UserHomeDir(); err == nil && home != "" {
 		if abs == filepath.Clean(home) {
 			return true
 		}
 	}
-	switch abs {
-	case "/Users", "/home", "/root":
+
+	// Windows drive roots (C:\, D:\, etc.)
+	if len(abs) == 3 && abs[1] == ':' && (abs[2] == '\\' || abs[2] == '/') {
 		return true
 	}
-	if dir, _ := filepath.Split(abs); dir == "/Users/" || dir == "/home/" {
+
+	// Windows: C:\Users (case-insensitive)
+	upperAbs := strings.ToUpper(filepath.ToSlash(abs))
+	if upperAbs == "C:/USERS" {
 		return true
 	}
+
+	// Windows: C:\Users\someone (case-insensitive)
+	if strings.HasPrefix(upperAbs, "C:/USERS/") {
+		parts := strings.Split(strings.TrimPrefix(upperAbs, "C:/USERS/"), "/")
+		if len(parts) == 1 && parts[0] != "" {
+			return true
+		}
+	}
+
 	return false
 }
 
@@ -262,6 +293,11 @@ func baselineHomeCandidates(home string) []scanner.Root {
 		add(filepath.Join(home, ".config", "Claude"), model.RootKindMCPConfig)
 		add(filepath.Join(home, ".config", "Claude Code"), model.RootKindMCPConfig)
 		add(filepath.Join(home, ".continue"), model.RootKindMCPConfig)
+	case "windows":
+		appData := os.Getenv("APPDATA")
+		add(filepath.Join(appData, "Claude"), model.RootKindMCPConfig)
+	default:
+		// Unknown platform: no platform-specific MCP config paths added
 	}
 
 	// Browser extension trees. We point directly at the per-profile
@@ -317,6 +353,21 @@ func systemRoots() []scanner.Root {
 			for _, p := range globExisting(pattern) {
 				roots = append(roots, scanner.Root{Path: p, Kind: model.RootKindGlobalPackage})
 			}
+		}
+		return roots
+	case "windows":
+		// Windows developers typically use per-project installs (venvs, node_modules).
+		// Global installs are less common, but include:
+		// - Python in %LOCALAPPDATA%\Programs\Python\*
+		// - NuGet packages in %USERPROFILE%\.nuget\packages
+		var roots []scanner.Root
+		localAppData := os.Getenv("LOCALAPPDATA")
+		for _, p := range globExisting(filepath.Join(localAppData, "Programs", "Python*")) {
+			roots = append(roots, scanner.Root{Path: p, Kind: model.RootKindGlobalPackage})
+		}
+		if userProfile := os.Getenv("USERPROFILE"); userProfile != "" {
+			nugetPath := filepath.Join(userProfile, ".nuget", "packages")
+			roots = append(roots, scanner.Root{Path: nugetPath, Kind: model.RootKindGlobalPackage})
 		}
 		return roots
 	}
@@ -542,6 +593,15 @@ func browserExtensionCandidateRoots(home string) []string {
 			filepath.Join(home, ".var", "app", "com.microsoft.Edge", "config", "microsoft-edge"),
 		}
 		chromiumBases["vivaldi"] = []string{filepath.Join(cfg, "vivaldi")}
+	case "windows":
+		localAppData := os.Getenv("LOCALAPPDATA")
+		chromiumBases["chrome"] = []string{filepath.Join(localAppData, "Google", "Chrome", "User Data")}
+		chromiumBases["chromium"] = []string{filepath.Join(localAppData, "Chromium", "User Data")}
+		chromiumBases["brave"] = []string{filepath.Join(localAppData, "BraveSoftware", "Brave-Browser", "User Data")}
+		chromiumBases["edge"] = []string{filepath.Join(localAppData, "Microsoft", "Edge", "User Data")}
+		chromiumBases["vivaldi"] = []string{filepath.Join(localAppData, "Vivaldi", "User Data")}
+	default:
+		// Unknown platform: no Chromium-family browser paths added
 	}
 	for _, bases := range chromiumBases {
 		for _, b := range bases {
@@ -572,6 +632,15 @@ func browserExtensionCandidateRoots(home string) []string {
 			filepath.Join(home, ".var", "app", "io.gitlab.librewolf-community", ".librewolf"),
 			filepath.Join(home, ".waterfox"),
 		)
+	case "windows":
+		appData := os.Getenv("APPDATA")
+		roots = append(roots,
+			filepath.Join(appData, "Mozilla", "Firefox", "Profiles"),
+			filepath.Join(appData, "LibreWolf", "Profiles"),
+			filepath.Join(appData, "Waterfox", "Profiles"),
+		)
+	default:
+		// Unknown platform: no Firefox-family browser paths added
 	}
 	return roots
 }

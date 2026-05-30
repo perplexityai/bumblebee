@@ -159,6 +159,15 @@ var DefaultExcludes = []string{
 	".windsurf-server/bin",
 	".windsurf-server/cli",
 	".windsurf-server/logs",
+
+	// Windows-specific excludes for AppData directories and caches.
+	// AppData\Local\Temp accumulates temporary files from installers and
+	// app runtime. AppData\Local\Microsoft contains OS-managed state and
+	// Windows-specific caches. AppData\Local\Packages holds UWP app data.
+	"AppData/Local/Temp",
+	"AppData/Local/Microsoft",
+	"AppData/Local/Packages",
+	"AppData/LocalLow",
 }
 
 // Visitor is called for every directory entry the walker decides to surface.

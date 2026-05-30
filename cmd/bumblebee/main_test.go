@@ -53,6 +53,7 @@ func TestResolveDeviceIDEmptyEnv(t *testing.T) {
 func TestIsBroadHomeRoot(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
 
 	broad := []string{
 		home,
@@ -95,6 +96,7 @@ func TestResolveRootsBaselineExcludesProjectTrees(t *testing.T) {
 	}
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
 	codeDir := filepath.Join(home, "code")
 	if err := os.MkdirAll(codeDir, 0o755); err != nil {
 		t.Fatal(err)
@@ -117,6 +119,7 @@ func TestResolveRootsBaselineExcludesProjectTrees(t *testing.T) {
 func TestResolveRootsProjectIncludesCodeDir(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
 	codeDir := filepath.Join(home, "code")
 	if err := os.MkdirAll(codeDir, 0o755); err != nil {
 		t.Fatal(err)
@@ -139,6 +142,7 @@ func TestResolveRootsProjectIncludesCodeDir(t *testing.T) {
 func TestResolveRootsBaselineIncludesUserLocalPython(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
 	pyRoot := filepath.Join(home, ".local", "lib", "python3.12")
 	if err := os.MkdirAll(filepath.Join(pyRoot, "site-packages"), 0o755); err != nil {
 		t.Fatal(err)
@@ -167,6 +171,7 @@ func TestResolveRootsBaselineIncludesClaudeAndCodexMCPRoots(t *testing.T) {
 	}
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
 	want := []string{
 		filepath.Join(home, ".claude"),
 		filepath.Join(home, ".codex"),
@@ -211,6 +216,7 @@ func TestResolveRootsBaselineSkipsAbsentClaudeCodexRoots(t *testing.T) {
 	}
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
 	// Provide one unrelated default so the baseline run does not fail
 	// with "no default roots". `~/go` is not one of the MCP candidates
 	// under test, so its presence cannot mask the assertion below.
@@ -292,6 +298,7 @@ func TestClassifyRootClaudeCodexMCP(t *testing.T) {
 func TestResolveRootsBaselineRefusesBroadHome(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
 	_, _, err := resolveRoots(model.ProfileBaseline, []string{home}, rootsOpts{})
 	if err == nil {
 		t.Fatalf("expected refusal for baseline+%q", home)
@@ -304,6 +311,7 @@ func TestResolveRootsBaselineRefusesBroadHome(t *testing.T) {
 func TestResolveRootsProjectRefusesBroadHome(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
 	_, _, err := resolveRoots(model.ProfileProject, []string{home}, rootsOpts{})
 	if err == nil {
 		t.Fatalf("expected refusal for project+%q", home)
@@ -313,6 +321,7 @@ func TestResolveRootsProjectRefusesBroadHome(t *testing.T) {
 func TestResolveRootsDeepAllowsBroadHome(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
 	roots, _, err := resolveRoots(model.ProfileDeep, []string{home}, rootsOpts{})
 	if err != nil {
 		t.Fatalf("deep should accept broad home root: %v", err)
@@ -328,6 +337,7 @@ func TestResolveRootsDeepAllowsBroadHome(t *testing.T) {
 func TestResolveRootsDeepRequiresExplicitRoot(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
 	_, _, err := resolveRoots(model.ProfileDeep, nil, rootsOpts{})
 	if err == nil {
 		t.Fatalf("deep with no roots should error")
