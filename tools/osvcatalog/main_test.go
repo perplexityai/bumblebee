@@ -136,7 +136,7 @@ func TestMaxFileSizeZeroIsUnbounded(t *testing.T) {
 	}
 }
 
-// TestLoadZipRejectsOversizedEntry verifies the M1 size guard end-to-end:
+// TestLoadZipRejectsOversizedEntry verifies the zip size guard end-to-end:
 // a zip entry whose uncompressed size exceeds -max-file-size is skipped
 // (caught by the pre-read central-directory check) while a small entry
 // alongside it still imports. The defensive post-read length check in

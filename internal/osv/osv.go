@@ -267,6 +267,8 @@ func (r Record) toEntries(opts Options, st *Stats) []CatalogEntry {
 		}
 		name := strings.TrimSpace(a.Package.Name)
 		if name == "" {
+			// Malformed affected entry; not counted in Stats
+			// (empty names are effectively nonexistent in the real corpus).
 			continue
 		}
 		if len(a.Versions) == 0 {

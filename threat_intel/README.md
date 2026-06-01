@@ -54,8 +54,9 @@ single `.json` record. Supported OSV ecosystems map to Bumblebee as:
 `npm`, `PyPI` → `pypi`, `Go` → `go`, `RubyGems` → `rubygems`,
 `Packagist` → `packagist`, `VSCode` → `editor-extension`. Records with
 only a version range and no enumerated `affected[].versions` are skipped
-(v0.1 matches exact versions only); this drops roughly half of upstream
-malicious entries. Output is deterministic, validates against the
-schema, and should be reviewed before use. The generated `_comment`
-records scope, per-ecosystem counts, skip-reason breakdown, and the
-optional `-source` provenance label.
+(v0.1 matches exact versions only); this drops the large majority of
+upstream entries (~90% of the current OSSF corpus). Output is
+deterministic, validates against the schema, and should be reviewed
+before use. The generated `_comment` records scope, per-ecosystem
+counts, skip-reason breakdown, and the optional `-source` provenance
+label.
