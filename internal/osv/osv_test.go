@@ -247,7 +247,7 @@ func TestSeverityCritical(t *testing.T) {
 	recs := []Record{{ID: "MAL-sev", Affected: []Affected{{Package: Package{Ecosystem: "npm", Name: "x"}, Versions: []string{"1.0.0"}}}}}
 	entries, _ := Convert(recs, Options{})
 	if len(entries) != 1 || entries[0].Severity != "critical" {
-		t.Fatalf("severity = %q, want critical", entries[0].Severity)
+		t.Fatalf("severity = critical, got entries: %+v", entries)
 	}
 }
 
