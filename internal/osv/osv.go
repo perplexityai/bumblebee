@@ -1,7 +1,13 @@
-// Package osv converts records from the OSV schema
+// Package osv converts malicious-package records from the OSV schema
 // (https://ossf.github.io/osv-schema/) into Bumblebee exposure-catalog
 // entries. OSV data is downloaded and converted offline; the scanner
 // itself never contacts osv.dev.
+//
+// Scope is malicious packages only — records with a MAL- id or aliased
+// to one. CVE-style vulnerability advisories are deliberately not
+// emitted: this catalog format is for supply-chain compromise response,
+// not vulnerability tracking, and mixing the two would produce huge
+// catalogs whose entries can't faithfully carry an OSV-side severity.
 //
 // Matching is by (ecosystem, normalized_name, exact version), so only
 // OSV's enumerated affected[].versions are usable. An affected entry
@@ -13,11 +19,22 @@ package osv
 
 import (
 	"fmt"
+	"regexp"
 	"sort"
 	"strings"
 
 	"github.com/perplexityai/bumblebee/internal/model"
 )
+
+// idShape constrains the OSV record id before it is embedded in the
+// generated Source URL. OSV ids in practice are short alphanumeric strings
+// with `-`, `.`, `_`, `:`, or `/` (the set chosen here mirrors what we see
+// in MAL-/GHSA-/CVE- ids). It rejects whitespace, control characters, `?`,
+// `#`, `%`, `@`, and anything else outside `[A-Za-z0-9._:/-]`. It does NOT
+// reject `:` or `/`, so the id can contain colons and slashes; the id is
+// only ever appended to a fixed `https://osv.dev/vulnerability/` prefix and
+// lands in the URL path, so the host cannot be spoofed regardless.
+var idShape = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._:/-]{0,128}$`)
 
 // Catalog is the exposure-catalog document this package emits, matching
 // docs/schema/v0.1.0/exposure-catalog.schema.json with a leading
@@ -43,10 +60,6 @@ func BuildCatalog(entries []CatalogEntry, opts Options, st Stats) Catalog {
 }
 
 func comment(opts Options, st Stats) string {
-	scope := "malicious packages only (MAL- ids)"
-	if opts.IncludeVulns {
-		scope = "all OSV records with enumerated versions (malicious + vulnerabilities)"
-	}
 	ecos := make([]string, 0, len(st.EcosystemCounts))
 	for e := range st.EcosystemCounts {
 		ecos = append(ecos, e)
@@ -60,12 +73,38 @@ func comment(opts Options, st Stats) string {
 	if len(parts) > 0 {
 		byEco = strings.Join(parts, ", ")
 	}
+	// Skip-reason breakdown: deterministic, in a fixed order, and only
+	// for non-zero buckets so the typical comment stays short.
+	var skips []string
+	if st.SkippedNotMalicious > 0 {
+		skips = append(skips, fmt.Sprintf("%d non-malicious", st.SkippedNotMalicious))
+	}
+	if st.SkippedNoVersions > 0 {
+		skips = append(skips, fmt.Sprintf("%d no-versions", st.SkippedNoVersions))
+	}
+	if st.SkippedEcosystem > 0 {
+		skips = append(skips, fmt.Sprintf("%d unsupported-ecosystem", st.SkippedEcosystem))
+	}
+	if st.SkippedWithdrawn > 0 {
+		skips = append(skips, fmt.Sprintf("%d withdrawn", st.SkippedWithdrawn))
+	}
+	if st.SkippedBadID > 0 {
+		skips = append(skips, fmt.Sprintf("%d bad-id", st.SkippedBadID))
+	}
+	skipStr := ""
+	if len(skips) > 0 {
+		skipStr = " Skipped: " + strings.Join(skips, ", ") + "."
+	}
+	srcStr := ""
+	if s := strings.TrimSpace(opts.Source); s != "" {
+		srcStr = " Source: " + s + "."
+	}
 	return fmt.Sprintf(
 		"Generated offline from OSV (https://osv.dev) by tools/osvcatalog; not fetched at scan time. "+
-			"Scope: %s. %d entries across %d source records (by ecosystem: %s). "+
+			"Scope: malicious packages only (MAL- ids). %d entries across %d source records (by ecosystem: %s).%s%s "+
 			"Affected entries with only version ranges and no enumerated versions are not included, "+
 			"since v0.1 matching is exact-version only.",
-		scope, st.Entries, st.RecordsSeen, byEco)
+		st.Entries, st.RecordsSeen, byEco, skipStr, srcStr)
 }
 
 // Record is the subset of an OSV record consumed by the converter.
@@ -90,28 +129,26 @@ type Package struct {
 }
 
 // CatalogEntry is one exposure-catalog item. Source is the OSV record's
-// page, so each entry is traceable to its upstream advisory. The schema's
-// optional `severity` field is left unset: OSV carries no rating an
-// importer could assign faithfully.
+// page, so each entry is traceable to its upstream advisory.
 type CatalogEntry struct {
 	ID        string   `json:"id"`
 	Name      string   `json:"name,omitempty"`
 	Ecosystem string   `json:"ecosystem"`
 	Package   string   `json:"package"`
 	Versions  []string `json:"versions"`
+	Severity  string   `json:"severity,omitempty"`
 	Source    string   `json:"source,omitempty"`
 }
 
 // Options controls which OSV records the converter emits.
 type Options struct {
-	// IncludeVulns widens conversion to every OSV record with enumerated
-	// versions. When false (the default), only malicious-package records
-	// (MAL- ids, or records aliased to one) are converted — the
-	// supply-chain-response slice Bumblebee targets.
-	IncludeVulns bool
 	// Ecosystems, when non-empty, restricts output to these Bumblebee
 	// ecosystem values (e.g. "npm", "pypi"). Empty means all supported.
 	Ecosystems map[string]bool
+	// Source is an optional human-readable provenance label (e.g. the
+	// upstream repo URL or a snapshot timestamp) stamped into the
+	// generated catalog's `_comment`. Empty means no extra stamping.
+	Source string
 }
 
 // Stats records why records were or were not converted, for the catalog
@@ -123,6 +160,7 @@ type Stats struct {
 	SkippedNotMalicious int
 	SkippedNoVersions   int
 	SkippedEcosystem    int
+	SkippedBadID        int
 	EcosystemCounts     map[string]int
 }
 
@@ -138,6 +176,7 @@ var ecosystemMap = map[string]string{
 	"Go":        "go",
 	"RubyGems":  "rubygems",
 	"Packagist": "packagist",
+	"VSCode":    "editor-extension",
 }
 
 // mapEcosystem returns the Bumblebee ecosystem for an OSV ecosystem
@@ -199,8 +238,14 @@ func (r Record) toEntries(opts Options, st *Stats) []CatalogEntry {
 		st.SkippedWithdrawn++
 		return nil
 	}
-	malicious := r.isMalicious()
-	if !opts.IncludeVulns && !malicious {
+	// Reject ids with a shape we can't safely embed in the Source URL.
+	// In practice this only fires on corrupt or hand-crafted records;
+	// keeping them out is cheaper than URL-escaping every id.
+	if !idShape.MatchString(r.ID) {
+		st.SkippedBadID++
+		return nil
+	}
+	if !r.isMalicious() {
 		st.SkippedNotMalicious++
 		return nil
 	}
@@ -262,12 +307,16 @@ func (r Record) toEntries(opts Options, st *Stats) []CatalogEntry {
 		if multi {
 			id = r.ID + ":" + k.eco + "/" + k.name
 		}
+		// Hand-curated catalogs use "critical" for malicious packages;
+		// stamp the same so generated entries are consistent with the
+		// rest of threat_intel.
 		entries = append(entries, CatalogEntry{
 			ID:        id,
 			Name:      strings.TrimSpace(r.Summary),
 			Ecosystem: k.eco,
 			Package:   k.name,
 			Versions:  vers,
+			Severity:  "critical",
 			Source:    "https://osv.dev/vulnerability/" + r.ID,
 		})
 		st.EcosystemCounts[k.eco]++

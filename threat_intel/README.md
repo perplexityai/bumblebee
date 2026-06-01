@@ -23,24 +23,39 @@ the entries against current advisories before production use.
 
 ## Generating catalogs from OSV
 
-`tools/osvcatalog` converts a local [OSV](https://osv.dev) snapshot into a
-catalog. This is offline — Bumblebee never queries osv.dev at scan time.
-Download the data, then convert:
+`tools/osvcatalog` converts a local [OSV](https://osv.dev) snapshot into
+a catalog offline. Bumblebee never queries osv.dev at scan time. Only
+malicious-package records (`MAL-` ids, or records aliased to one) are
+emitted, with `severity: "critical"`.
+
+Two input shapes are supported. Pick one based on coverage.
+
+**OSSF malicious-packages repo** (recommended, all ecosystems in one
+tree):
+
+```sh
+git clone --filter=blob:none --sparse --depth=1 \
+  https://github.com/ossf/malicious-packages.git mp
+git -C mp sparse-checkout set osv/malicious
+go run ./tools/osvcatalog \
+  -source "https://github.com/ossf/malicious-packages@$(git -C mp rev-parse HEAD)" \
+  -o threat_intel/osv-malicious.json mp/osv/malicious/
+```
+
+**OSV per-ecosystem dump** (single ecosystem, zip archive):
 
 ```sh
 curl -fsSLO https://osv-vulnerabilities.storage.googleapis.com/npm/all.zip
-go run ./tools/osvcatalog -o threat_intel/osv-malicious.json npm/all.zip
+go run ./tools/osvcatalog -o threat_intel/osv-npm-malicious.json npm/all.zip
 ```
 
-The per-ecosystem OSV dumps cover both malicious packages and
-vulnerabilities. The OSSF [malicious-packages](https://github.com/ossf/malicious-packages)
-repo is the malicious-only upstream; point the tool at a clone's `osv/`
-tree instead.
-
-By default only malicious packages (`MAL-` ids) are emitted; `-include-vulns`
-widens to all OSV records. OSV ecosystems (`npm`, `PyPI`, `Go`, `RubyGems`,
-`Packagist`) map to Bumblebee's, using OSV's enumerated
-`affected[].versions`. Records that give only a version range — about half
-of malicious entries, where every version is affected — are skipped, since
-v0.1 matches exact versions only. Output validates against the schema and
-should be reviewed before use, like the catalogs above.
+Each input path can be a directory tree, an OSV `all.zip` archive, or a
+single `.json` record. Supported OSV ecosystems map to Bumblebee as:
+`npm`, `PyPI` → `pypi`, `Go` → `go`, `RubyGems` → `rubygems`,
+`Packagist` → `packagist`, `VSCode` → `editor-extension`. Records with
+only a version range and no enumerated `affected[].versions` are skipped
+(v0.1 matches exact versions only); this drops roughly half of upstream
+malicious entries. Output is deterministic, validates against the
+schema, and should be reviewed before use. The generated `_comment`
+records scope, per-ecosystem counts, skip-reason breakdown, and the
+optional `-source` provenance label.

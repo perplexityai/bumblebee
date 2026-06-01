@@ -3,22 +3,26 @@
 //
 // It is a maintainer-side tool, not part of the shipped scanner: Bumblebee
 // never contacts osv.dev at scan time. Download the OSV data separately,
-// then point this tool at the .zip archives, directories, or .json
-// records.
+// then point this tool at a directory tree, a .zip archive, or a single
+// .json record.
 //
-// The OSV per-ecosystem dumps are the convenient source and cover both
-// malicious packages and vulnerabilities:
+// Recommended source: the OSSF malicious-packages repo
+// (https://github.com/ossf/malicious-packages), the upstream
+// malicious-only set covering every ecosystem in one tree:
+//
+//	osvcatalog -o threat_intel/osv-malicious.json /path/to/malicious-packages/osv/malicious/
+//
+// Also supported: an OSV per-ecosystem dump archive
+// (https://osv-vulnerabilities.storage.googleapis.com/<eco>/all.zip),
+// from which only malicious-package records are extracted:
 //
 //	curl -fsSLO https://osv-vulnerabilities.storage.googleapis.com/npm/all.zip
-//	osvcatalog -o threat_intel/osv-malicious.json npm/all.zip
+//	osvcatalog -o threat_intel/osv-npm-malicious.json npm/all.zip
 //
-// The OSSF malicious-packages repo (https://github.com/ossf/malicious-packages)
-// is the upstream malicious-only set; clone it and point at its osv/ tree.
-//
-// By default only malicious-package records (`MAL-` ids) are emitted.
-// Pass -include-vulns to widen to every OSV record with an enumerated
-// affected-version list. Records whose only version information is a
-// range (no enumerated versions) are skipped — see internal/osv.
+// Only malicious-package records (MAL- ids, or records aliased to one)
+// are emitted, with severity "critical". Vulnerability advisories are
+// out of scope. Records whose only version information is a range (no
+// enumerated versions) are skipped — see internal/osv.
 //
 // The output validates against docs/schema/v0.1.0/exposure-catalog.schema.json
 // and is consumed by `bumblebee scan --exposure-catalog`.
@@ -48,14 +52,16 @@ func run(args []string, stdout, stderr io.Writer) error {
 	fs := flag.NewFlagSet("osvcatalog", flag.ContinueOnError)
 	fs.SetOutput(stderr)
 	out := fs.String("o", "", "output catalog path (default stdout)")
-	ecoFlag := fs.String("ecosystem", "", "restrict to these Bumblebee ecosystems (comma-separated: npm,pypi,go,rubygems,packagist)")
-	includeVulns := fs.Bool("include-vulns", false, "include all OSV records with enumerated versions, not just malicious (MAL-) packages")
+	ecoFlag := fs.String("ecosystem", "", "restrict to these Bumblebee ecosystems (comma-separated: npm,pypi,go,rubygems,packagist,editor-extension)")
 	maxFileSize := fs.Int64("max-file-size", 5*1024*1024, "max bytes to read from any single OSV JSON record")
+	source := fs.String("source", "", "optional provenance label (e.g. repo URL or snapshot date) stamped into the generated catalog's _comment")
 	fs.Usage = func() {
 		fmt.Fprintf(stderr, "Usage: osvcatalog [flags] <path>...\n\n"+
-			"Each <path> is an OSV all.zip archive, a directory (walked for .json/.zip),\n"+
-			"or an individual OSV .json record. Bumblebee does not fetch OSV at scan time;\n"+
-			"download the data first from https://osv-vulnerabilities.storage.googleapis.com/.\n\nFlags:\n")
+			"Each <path> is a directory tree (walked for .json/.zip), an OSV all.zip\n"+
+			"archive, or an individual OSV .json record. Only malicious-package (MAL-)\n"+
+			"records are emitted. Bumblebee does not fetch OSV at scan time; download\n"+
+			"first from https://github.com/ossf/malicious-packages or\n"+
+			"https://osv-vulnerabilities.storage.googleapis.com/.\n\nFlags:\n")
 		fs.PrintDefaults()
 	}
 	if err := fs.Parse(args); err != nil {
@@ -68,8 +74,8 @@ func run(args []string, stdout, stderr io.Writer) error {
 	}
 
 	opts := osv.Options{
-		IncludeVulns: *includeVulns,
-		Ecosystems:   parseEcosystems(*ecoFlag),
+		Ecosystems: parseEcosystems(*ecoFlag),
+		Source:     strings.TrimSpace(*source),
 	}
 
 	var records []osv.Record
@@ -97,8 +103,8 @@ func run(args []string, stdout, stderr io.Writer) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(stderr, "osvcatalog: %d entries from %d records (skipped: %d non-malicious, %d no-versions, %d unsupported-ecosystem, %d withdrawn)\n",
-		st.Entries, st.RecordsSeen, st.SkippedNotMalicious, st.SkippedNoVersions, st.SkippedEcosystem, st.SkippedWithdrawn)
+	fmt.Fprintf(stderr, "osvcatalog: %d entries from %d records (skipped: %d non-malicious, %d no-versions, %d unsupported-ecosystem, %d withdrawn, %d bad-id)\n",
+		st.Entries, st.RecordsSeen, st.SkippedNotMalicious, st.SkippedNoVersions, st.SkippedEcosystem, st.SkippedWithdrawn, st.SkippedBadID)
 	return nil
 }
 
@@ -176,10 +182,18 @@ func loadZip(path string, maxSize int64, stderr io.Writer) ([]osv.Record, error)
 			fmt.Fprintf(stderr, "osvcatalog: skipping %s!%s: %v\n", path, f.Name, err)
 			continue
 		}
-		data, err := io.ReadAll(io.LimitReader(rc, maxSize+1))
+		data, err := readLimited(rc, maxSize)
 		rc.Close()
 		if err != nil {
 			fmt.Fprintf(stderr, "osvcatalog: skipping %s!%s: %v\n", path, f.Name, err)
+			continue
+		}
+		// Defensive post-read length check. archive/zip will normally surface
+		// a size mismatch against the central directory as a read error above,
+		// so this rarely fires in practice; kept as belt-and-suspenders for
+		// malformed archives where pre-read size could not be trusted.
+		if maxSize > 0 && int64(len(data)) > maxSize {
+			fmt.Fprintf(stderr, "osvcatalog: skipping %s!%s: exceeds max %d bytes\n", path, f.Name, maxSize)
 			continue
 		}
 		var rec osv.Record
@@ -199,12 +213,12 @@ func loadJSONFile(path string, maxSize int64, stderr io.Writer) (osv.Record, boo
 		return osv.Record{}, false
 	}
 	defer f.Close()
-	data, err := io.ReadAll(io.LimitReader(f, maxSize+1))
+	data, err := readLimited(f, maxSize)
 	if err != nil {
 		fmt.Fprintf(stderr, "osvcatalog: skipping %s: %v\n", path, err)
 		return osv.Record{}, false
 	}
-	if int64(len(data)) > maxSize {
+	if maxSize > 0 && int64(len(data)) > maxSize {
 		fmt.Fprintf(stderr, "osvcatalog: skipping %s: exceeds max %d bytes\n", path, maxSize)
 		return osv.Record{}, false
 	}
@@ -214,4 +228,14 @@ func loadJSONFile(path string, maxSize int64, stderr io.Writer) (osv.Record, boo
 		return osv.Record{}, false
 	}
 	return rec, true
+}
+
+// readLimited reads from r honoring maxSize. maxSize <= 0 means
+// unbounded (matching internal/exposure.LoadFile semantics); maxSize > 0
+// caps the read at maxSize+1 bytes so the caller can detect overflow.
+func readLimited(r io.Reader, maxSize int64) ([]byte, error) {
+	if maxSize <= 0 {
+		return io.ReadAll(r)
+	}
+	return io.ReadAll(io.LimitReader(r, maxSize+1))
 }

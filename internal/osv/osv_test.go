@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/perplexityai/bumblebee/internal/exposure"
@@ -50,6 +51,7 @@ func TestMapEcosystem(t *testing.T) {
 		"Go":           "go",
 		"RubyGems":     "rubygems",
 		"Packagist":    "packagist",
+		"VSCode":       "editor-extension",
 		"Go:something": "go", // suffix after ':' is ignored
 	}
 	for osvEco, want := range supported {
@@ -60,23 +62,26 @@ func TestMapEcosystem(t *testing.T) {
 	}
 	// OSV identifiers are case-sensitive and several ecosystems have no
 	// Bumblebee equivalent; none of these must map.
-	for _, osvEco := range []string{"pypi", "NPM", "crates.io", "NuGet", "Maven", "VSCode", "Debian:11", ""} {
+	for _, osvEco := range []string{"pypi", "NPM", "crates.io", "NuGet", "Maven", "vscode", "Debian:11", ""} {
 		if got, ok := mapEcosystem(osvEco); ok {
 			t.Errorf("mapEcosystem(%q) = (%q, true), want no mapping", osvEco, got)
 		}
 	}
 }
 
-func TestConvertIncludeVulns(t *testing.T) {
+// TestConvertDropsNonMaliciousVuln confirms CVE-style advisories are
+// never emitted: the catalog format targets supply-chain compromise
+// response, not vulnerability tracking.
+func TestConvertDropsNonMaliciousVuln(t *testing.T) {
 	records := []Record{
 		{ID: "GHSA-aaaa", Affected: []Affected{{Package: Package{Ecosystem: "PyPI", Name: "Requests"}, Versions: []string{"2.0.0"}}}},
 	}
-	entries, _ := Convert(records, Options{IncludeVulns: true})
-	if len(entries) != 1 {
-		t.Fatalf("want 1 entry with IncludeVulns, got %d", len(entries))
+	entries, st := Convert(records, Options{})
+	if len(entries) != 0 {
+		t.Fatalf("want 0 entries, got %d: %+v", len(entries), entries)
 	}
-	if entries[0].Ecosystem != "pypi" || entries[0].Package != "Requests" {
-		t.Errorf("unexpected entry: %+v", entries[0])
+	if st.SkippedNotMalicious != 1 {
+		t.Errorf("SkippedNotMalicious = %d, want 1", st.SkippedNotMalicious)
 	}
 }
 
@@ -198,6 +203,12 @@ func TestRoundTripLoadsAndMatches(t *testing.T) {
 func TestBuildCatalogCommentDeterministic(t *testing.T) {
 	records := []Record{
 		{ID: "MAL-1", Affected: []Affected{{Package: Package{Ecosystem: "npm", Name: "a"}, Versions: []string{"1.0.0"}}}},
+		// Non-malicious + unsupported eco + withdrawn + bad id so all
+		// skip counters are exercised in the comment.
+		{ID: "GHSA-vuln", Affected: []Affected{{Package: Package{Ecosystem: "npm", Name: "b"}, Versions: []string{"1.0.0"}}}},
+		{ID: "MAL-crates", Affected: []Affected{{Package: Package{Ecosystem: "crates.io", Name: "c"}, Versions: []string{"1.0.0"}}}},
+		{ID: "MAL-withdrawn", Withdrawn: "2026-01-01T00:00:00Z", Affected: []Affected{{Package: Package{Ecosystem: "npm", Name: "d"}, Versions: []string{"1.0.0"}}}},
+		{ID: "", Affected: []Affected{{Package: Package{Ecosystem: "npm", Name: "e"}, Versions: []string{"1.0.0"}}}}, // bad-id (empty)
 	}
 	entries, st := Convert(records, Options{})
 	c1 := BuildCatalog(entries, Options{}, st)
@@ -207,5 +218,67 @@ func TestBuildCatalogCommentDeterministic(t *testing.T) {
 	}
 	if c1.Comment == "" {
 		t.Fatal("expected a provenance comment")
+	}
+	// Skip-reason breakdown must surface every non-zero bucket, in the
+	// fixed documented order.
+	for _, sub := range []string{
+		"1 non-malicious",
+		"1 unsupported-ecosystem",
+		"1 withdrawn",
+		"1 bad-id",
+	} {
+		if !strings.Contains(c1.Comment, sub) {
+			t.Errorf("comment missing %q:\n%s", sub, c1.Comment)
+		}
+	}
+	// And the optional source label must appear only when set.
+	cWithSrc := BuildCatalog(entries, Options{Source: "https://example/repo@abc"}, st)
+	if !strings.Contains(cWithSrc.Comment, "Source: https://example/repo@abc") {
+		t.Errorf("comment missing source stamp:\n%s", cWithSrc.Comment)
+	}
+	if strings.Contains(c1.Comment, "Source: ") {
+		t.Errorf("comment should not stamp source when unset:\n%s", c1.Comment)
+	}
+}
+
+// TestSeverityCritical verifies generated entries carry severity="critical",
+// matching hand-curated malicious-package catalogs in threat_intel/.
+func TestSeverityCritical(t *testing.T) {
+	recs := []Record{{ID: "MAL-sev", Affected: []Affected{{Package: Package{Ecosystem: "npm", Name: "x"}, Versions: []string{"1.0.0"}}}}}
+	entries, _ := Convert(recs, Options{})
+	if len(entries) != 1 || entries[0].Severity != "critical" {
+		t.Fatalf("severity = %q, want critical", entries[0].Severity)
+	}
+}
+
+// TestVSCodeMapsToEditorExtension confirms VSCode advisories (17 in the
+// current OSSF corpus) now produce editor-extension entries instead of
+// being silently skipped.
+func TestVSCodeMapsToEditorExtension(t *testing.T) {
+	recs := []Record{{ID: "MAL-vsce", Affected: []Affected{{Package: Package{Ecosystem: "VSCode", Name: "publisher.ext"}, Versions: []string{"1.0.0"}}}}}
+	entries, st := Convert(recs, Options{})
+	if len(entries) != 1 {
+		t.Fatalf("want 1 entry, got %d (skipped-eco=%d)", len(entries), st.SkippedEcosystem)
+	}
+	if entries[0].Ecosystem != "editor-extension" || entries[0].Package != "publisher.ext" {
+		t.Errorf("unexpected entry: %+v", entries[0])
+	}
+}
+
+// TestSkipBadIDShape ensures ids that could smuggle URL syntax into the
+// generated source are rejected before reaching the catalog.
+func TestSkipBadIDShape(t *testing.T) {
+	recs := []Record{
+		{ID: "MAL-good-1", Affected: []Affected{{Package: Package{Ecosystem: "npm", Name: "ok"}, Versions: []string{"1.0.0"}}}},
+		{ID: "MAL-bad id with spaces", Affected: []Affected{{Package: Package{Ecosystem: "npm", Name: "x"}, Versions: []string{"1.0.0"}}}},
+		{ID: "MAL-bad?q=1", Affected: []Affected{{Package: Package{Ecosystem: "npm", Name: "y"}, Versions: []string{"1.0.0"}}}},
+		{ID: "MAL-bad#frag", Affected: []Affected{{Package: Package{Ecosystem: "npm", Name: "z"}, Versions: []string{"1.0.0"}}}},
+	}
+	entries, st := Convert(recs, Options{})
+	if len(entries) != 1 || entries[0].ID != "MAL-good-1" {
+		t.Fatalf("want only MAL-good-1, got %+v", entries)
+	}
+	if st.SkippedBadID != 3 {
+		t.Errorf("SkippedBadID = %d, want 3", st.SkippedBadID)
 	}
 }
