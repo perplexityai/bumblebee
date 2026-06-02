@@ -8,10 +8,10 @@ by recent supply-chain incidents — see the [Why these ecosystems](#why-these-e
 section at the bottom for the reporting that informed it.
 
 The `ecosystem` field on every record matches OSV ecosystem identifiers
-where one exists (`npm`, `pypi`, `go`, `rubygems`, `packagist`, ...). `mcp`
-and `editor-extension` are project-local values for execution surfaces that
-do not map cleanly to a package registry; both are emitted without resolved
-package versions.
+where one exists (`npm`, `pypi`, `go`, `rubygems`, `packagist`, ...). `mcp`,
+`agent-skill`, and `editor-extension` are project-local values for
+execution surfaces that do not map cleanly to a package registry; all
+three are emitted without resolved package versions.
 
 ## `ecosystem` vs source toolchain
 
@@ -29,7 +29,7 @@ Each scan profile reads from a different slice of the sources below:
 
 | Profile     | Sources walked                                                                                                                                                                                                |
 |-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `baseline` | Homebrew `Cellar` / `Caskroom` install metadata and lib prefixes; `/Library/Python`; Linux system Python (`/usr/lib/python*`, plus `/usr/local/lib`); user Python (`~/.local/lib/python*`, `~/.local/share/pipx/venvs`, `pyenv`); language version managers (`asdf`, `nvm`, `rbenv`, `rvm`); `~/.cargo`; `~/go`; editor-extension trees; MCP config locations; per-profile browser-extension trees (Chromium-family + Firefox-family, including common snap/flatpak paths). No project trees.   |
+| `baseline` | Homebrew `Cellar` / `Caskroom` install metadata and lib prefixes; `/Library/Python`; Linux system Python (`/usr/lib/python*`, plus `/usr/local/lib`); user Python (`~/.local/lib/python*`, `~/.local/share/pipx/venvs`, `pyenv`); language version managers (`asdf`, `nvm`, `rbenv`, `rvm`); `~/.cargo`; `~/go`; editor-extension trees; MCP config locations; agent-skill lock locations (`~/.agents`, `$XDG_STATE_HOME/skills`); per-profile browser-extension trees (Chromium-family + Firefox-family, including common snap/flatpak paths). No project trees.   |
 | `project`   | Configured developer/project roots (`~/code`, `~/src`, `~/Developer`, `~/Projects`, `~/workspace`, and any explicit `--root`). All ecosystem parsers below apply within those trees.                            |
 | `deep`      | Operator-supplied roots, typically a bare home directory during a campaign. Same ecosystem parsers; recommended only in combination with `--exposure-catalog` to emit `record_type=finding` records.            |
 
@@ -405,6 +405,92 @@ References:
 - MCP introduction: <https://modelcontextprotocol.io/>
 - MCP server configuration: <https://modelcontextprotocol.io/quickstart/user>
 
+## Agent skills (skills.sh / vercel-labs/skills)
+
+Files read (JSON only):
+
+- `.skill-lock.json`: the global lock written by the `skills.sh` CLI.
+  Default location is `~/.agents/.skill-lock.json`; when
+  `XDG_STATE_HOME` is set, the CLI writes to
+  `$XDG_STATE_HOME/skills/.skill-lock.json` instead.
+- `skills-lock.json`: project-local lock file written at a repo root.
+
+Both basenames share one envelope:
+
+```json
+{
+  "version": <int>,
+  "skills": {
+    "<local-name>": {
+      "source": "<owner/repo or path>",
+      "sourceType": "github" | "mintlify" | "huggingface" | "local",
+      "ref": "<branch | tag | sha>",
+      "skillPath": "<subdir>"
+    }
+  }
+}
+```
+
+Schema versions v1 (legacy `computedHash`) and v3 (current
+`skillFolderHash`) are both accepted, and unknown top-level fields and
+unknown schema versions are tolerated so a future schema bump does not
+break inventory.
+
+### Package identity
+
+For each entry, `PackageName` is the upstream source slug
+(`vercel-labs/agent-skills`, `vercel/ai`, ...). The local alias from
+the lock file's map key is preserved in `server_name` so a renamed
+install still attributes back to the slot in the lock file. For
+`sourceType=local`, the on-disk path in `source` is deliberately not
+retained — only the local alias is recorded, so the operator's
+filesystem layout does not leak through inventory; `requested_spec`
+is set to `local:` in that case.
+
+`requested_spec` is otherwise a compact install-channel descriptor
+formatted as `<sourceType>:<source>[@<ref>][/<skillPath>]`, e.g.
+`github:vercel/ai@main` or `github:vercel-labs/agent-skills/react`.
+`version` stays empty because a `ref` may be a branch, tag, or commit
+SHA and v0.1's slim schema does not distinguish them.
+
+`source_type` is always `skill-lock` regardless of the file basename;
+the basename is recoverable from `source_file`. `root_kind` is
+`agent_skill_root` only when the file falls outside every configured
+root — under a project tree the enclosing `project_root` wins (same
+rule as MCP). `confidence` is recorded as `low` for all entries;
+these are configured references, not running installs.
+
+### Matching behavior
+
+Example jq filters:
+
+```
+# All agent-skill records
+jq 'select(.record_type == "package" and .ecosystem == "agent-skill")' inventory.ndjson
+
+# Agent skills pulled from a specific upstream
+jq 'select(.ecosystem == "agent-skill" and .normalized_name == "vercel-labs/agent-skills")
+    | {server_name, package_name, requested_spec, source_file}' inventory.ndjson
+```
+
+Exposure-catalog matches against agent-skill records work on name only,
+since `version` is intentionally empty. A catalog entry that pins a
+specific source slug (e.g. `vercel-labs/agent-skills`) with `versions`
+including `""` will match every install of that upstream regardless of
+local alias or ref.
+
+Loose skill directories without a lock file — for example
+`~/.claude/skills/<name>/SKILL.md` and similar — are not enumerated in
+v0.1. Without a manifest anchoring the install to an upstream identity
+there is no stable package_name to record. Operators who want skills
+that ship outside `skills.sh` covered can pin them by hand-copying their
+upstream slug into an exposure catalog and matching at `record_type=finding`.
+
+References:
+
+- skills.sh: <https://www.skills.sh>
+- skills CLI source: <https://github.com/vercel-labs/skills>
+
 ## Browser extensions (Chromium-family + Firefox)
 
 Files read:
@@ -575,3 +661,7 @@ strong installed-state correlation tooling today.
 - Safari extensions. Safari's on-disk layout
   (`~/Library/Safari/Extensions/`, `~/Library/Containers/<bundle-id>`)
   is TCC-protected and is not enumerated.
+- Loose agent-skill directories without a lock file (e.g.
+  `~/.claude/skills/<name>/SKILL.md`, Cursor rules, Continue agents).
+  Only `skills.sh` / `vercel-labs/skills` lock files are enumerated
+  under `ecosystem=agent-skill`; see the section above.
