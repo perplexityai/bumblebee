@@ -38,7 +38,9 @@ def _download_binary() -> bool:
         bin_dir = _bin_dir()
         bin_dir.mkdir(parents=True, exist_ok=True)
         with tempfile.NamedTemporaryFile(suffix=".tar.gz", delete=False) as tmp:
-            urllib.request.urlretrieve(url, tmp.name)
+            with urllib.request.urlopen(url, timeout=30) as resp:
+                shutil.copyfileobj(resp, tmp)
+            tmp.flush()
             with tarfile.open(tmp.name, "r:gz") as tf:
                 member = tf.getmember("bumblebee")
                 member.name = "bumblebee"
@@ -60,10 +62,11 @@ def _go_install() -> bool:
         subprocess.run(
             [go, "install", f"github.com/{REPO}/cmd/bumblebee@v{VERSION}"],
             check=True,
+            timeout=300,
             env={**os.environ, "GOBIN": str(bin_dir)},
         )
         return True
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
         return False
 
 
