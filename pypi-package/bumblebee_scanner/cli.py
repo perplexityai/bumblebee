@@ -10,8 +10,8 @@ import tempfile
 import urllib.request
 from pathlib import Path
 
-VERSION = "0.1.1"
-REPO = "perplexityai/bumblebee"
+VERSION = "0.1.4"
+REPO = "anonymousAAK/bumblebee"
 
 PLATFORM_MAP = {"Darwin": "darwin", "Linux": "linux"}
 ARCH_MAP = {"x86_64": "amd64", "AMD64": "amd64", "aarch64": "arm64", "arm64": "arm64"}

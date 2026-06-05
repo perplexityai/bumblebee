@@ -6,8 +6,8 @@ const path = require("path");
 const { execSync } = require("child_process");
 const zlib = require("zlib");
 
-const VERSION = "0.1.1";
-const REPO = "perplexityai/bumblebee";
+const VERSION = "0.1.4";
+const REPO = "anonymousAAK/bumblebee";
 
 const PLATFORM_MAP = {
   darwin: "darwin",
