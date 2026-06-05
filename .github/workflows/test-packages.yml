@@ -27,7 +27,11 @@ jobs:
           node-version: "20"
 
       - name: install local npm package
-        run: npm install -g ./npm-package
+        # --ignore-scripts skips the postinstall binary download: no GitHub
+        # release exists for an unmerged PR, and the network fetch/go-install
+        # fallback is non-deterministic in CI. This validates that the package
+        # is well-formed and links its bin entry.
+        run: npm install -g ./npm-package --ignore-scripts
 
       - name: verify bumblebee is on PATH
         run: which bumblebee || echo "binary not on PATH (expected if no GitHub release)"
@@ -53,7 +57,8 @@ jobs:
         run: pip install ./pypi-package
 
       - name: verify bumblebee entrypoint exists
+        # We only verify the entrypoint installs and is on PATH. Running
+        # `bumblebee --help` would force a binary download/go-install, which
+        # cannot succeed without a published release and is non-deterministic
+        # in CI.
         run: which bumblebee
-
-      - name: run bumblebee --help
-        run: bumblebee --help || echo "binary not available (expected if no GitHub release)"

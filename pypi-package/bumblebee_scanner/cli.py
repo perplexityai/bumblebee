@@ -11,7 +11,11 @@ import urllib.request
 from pathlib import Path
 
 VERSION = "0.1.4"
+# Prebuilt release binaries are published to this fork's GitHub releases.
 REPO = "anonymousAAK/bumblebee"
+# Canonical Go module path, used only by the `go install` source-build
+# fallback. It stays on the upstream module so the path is import-valid.
+MODULE = "github.com/perplexityai/bumblebee"
 
 PLATFORM_MAP = {"Darwin": "darwin", "Linux": "linux"}
 ARCH_MAP = {"x86_64": "amd64", "AMD64": "amd64", "aarch64": "arm64", "arm64": "arm64"}
@@ -60,7 +64,7 @@ def _go_install() -> bool:
     bin_dir.mkdir(parents=True, exist_ok=True)
     try:
         subprocess.run(
-            [go, "install", f"github.com/{REPO}/cmd/bumblebee@v{VERSION}"],
+            [go, "install", f"{MODULE}/cmd/bumblebee@v{VERSION}"],
             check=True,
             timeout=300,
             env={**os.environ, "GOBIN": str(bin_dir)},
@@ -91,7 +95,7 @@ def _ensure_binary() -> str:
     print(
         f"Could not install bumblebee automatically.\n"
         f"Install Go 1.25+ and run:\n"
-        f"  go install github.com/{REPO}/cmd/bumblebee@v{VERSION}",
+        f"  go install {MODULE}/cmd/bumblebee@v{VERSION}",
         file=sys.stderr,
     )
     sys.exit(1)

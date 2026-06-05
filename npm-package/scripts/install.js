@@ -7,7 +7,11 @@ const { execSync } = require("child_process");
 const zlib = require("zlib");
 
 const VERSION = "0.1.4";
+// Prebuilt release binaries are published to this fork's GitHub releases.
 const REPO = "anonymousAAK/bumblebee";
+// Canonical Go module path, used only by the `go install` source-build
+// fallback. It stays on the upstream module so the path is import-valid.
+const MODULE = "github.com/perplexityai/bumblebee";
 
 const PLATFORM_MAP = {
   darwin: "darwin",
@@ -25,7 +29,7 @@ const arch = ARCH_MAP[process.arch];
 if (!platform || !arch) {
   console.warn(
     `bumblebee-scan: unsupported platform ${process.platform}/${process.arch}. ` +
-      `Install manually: go install github.com/${REPO}/cmd/bumblebee@v${VERSION}`
+      `Install manually: go install ${MODULE}/cmd/bumblebee@v${VERSION}`
   );
   process.exit(0);
 }
@@ -87,7 +91,7 @@ function installFromGo() {
   console.log("bumblebee-scan: GitHub release not available, trying go install...");
   try {
     const gobin = path.join(binDir);
-    execSync(`go install github.com/${REPO}/cmd/bumblebee@v${VERSION}`, {
+    execSync(`go install ${MODULE}/cmd/bumblebee@v${VERSION}`, {
       stdio: "inherit",
       timeout: 300000,
       env: { ...process.env, GOBIN: gobin },
@@ -108,7 +112,7 @@ function installFromGo() {
     if (!installFromGo()) {
       console.warn(
         `bumblebee-scan: could not install binary automatically.\n` +
-          `Install Go 1.25+ and run: go install github.com/${REPO}/cmd/bumblebee@v${VERSION}\n` +
+          `Install Go 1.25+ and run: go install ${MODULE}/cmd/bumblebee@v${VERSION}\n` +
           `Then place the binary in: ${binDir}/`
       );
     }
