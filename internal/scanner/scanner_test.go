@@ -145,6 +145,67 @@ func TestEndToEndScan(t *testing.T) {
 	}
 }
 
+// TestEndToEndScanClaudeJSONFileRoot verifies that a `.claude.json`
+// passed as a single-file root is visited by the walker, dispatched to
+// the Claude config parser, and yields records for both the top-level
+// (user-scope) and per-project (local-scope) mcpServers maps.
+func TestEndToEndScanClaudeJSONFileRoot(t *testing.T) {
+	dir := t.TempDir()
+	claudeJSON := filepath.Join(dir, ".claude.json")
+	writeFile(t, claudeJSON, `{
+  "numStartups": 7,
+  "mcpServers": {
+    "github": {"command": "npx", "args": ["-y", "@modelcontextprotocol/server-github"]}
+  },
+  "projects": {
+    "/home/alice/proj": {
+      "mcpServers": {"time": {"command": "uvx", "args": ["mcp-server-time"]}}
+    }
+  }
+}`)
+
+	stdout := &bytes.Buffer{}
+	em := output.New(stdout, &bytes.Buffer{}, "runtest")
+	_, err := Run(context.Background(), Config{
+		Roots:       []Root{{Path: claudeJSON, Kind: model.RootKindMCPConfig}},
+		Profile:     model.ProfileBaseline,
+		MaxFileSize: 5 * 1024 * 1024,
+		Concurrency: 2,
+		BaseRecord: model.Record{
+			SchemaVersion:  model.SchemaVersion,
+			ScannerName:    model.ScannerName,
+			ScannerVersion: "test",
+			RunID:          "runtest",
+			ScanTime:       time.Now().UTC().Format(time.RFC3339Nano),
+		},
+		Emitter: em,
+	})
+	if err != nil {
+		t.Fatalf("Run: %v", err)
+	}
+
+	servers := map[string]string{} // ServerName -> ProjectPath
+	for _, line := range bytes.Split(bytes.TrimSpace(stdout.Bytes()), []byte("\n")) {
+		if len(line) == 0 {
+			continue
+		}
+		var r model.Record
+		if err := json.Unmarshal(line, &r); err != nil {
+			t.Fatalf("bad ndjson line: %v: %s", err, line)
+		}
+		if r.Ecosystem != model.EcosystemMCP {
+			t.Errorf("unexpected ecosystem %q", r.Ecosystem)
+		}
+		servers[r.ServerName] = r.ProjectPath
+	}
+	if got, ok := servers["github"]; !ok || got != dir {
+		t.Errorf("user-scope github: projectPath=%q ok=%v (servers=%v)", got, ok, servers)
+	}
+	if got, ok := servers["time"]; !ok || got != "/home/alice/proj" {
+		t.Errorf("local-scope time: projectPath=%q ok=%v (servers=%v)", got, ok, servers)
+	}
+}
+
 func TestDedupIdenticalRecords(t *testing.T) {
 	root := t.TempDir()
 	// Same lockfile contents emitted twice via separate Run calls would

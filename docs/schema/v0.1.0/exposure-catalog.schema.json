@@ -17,7 +17,7 @@
           "id": { "type": "string" },
           "name": { "type": "string" },
           "ecosystem": {
-            "enum": ["npm", "pypi", "go", "rubygems", "packagist", "mcp", "editor-extension", "browser-extension"]
+            "enum": ["npm", "pypi", "go", "rubygems", "packagist", "mcp", "editor-extension", "browser-extension", "homebrew"]
           },
           "package": { "type": "string" },
           "versions": {
