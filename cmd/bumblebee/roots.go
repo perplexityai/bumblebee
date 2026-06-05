@@ -141,7 +141,13 @@ func classifyRoot(path, profile string) string {
 		strings.HasSuffix(p, "/.config/Claude Code") ||
 		strings.HasSuffix(p, "/.continue"):
 		return model.RootKindMCPConfig
-	case p == "/opt/homebrew/lib" || p == "/usr/local/lib" || strings.HasSuffix(p, "/Library/Python"):
+	case strings.HasSuffix(p, "/.agents") || strings.HasSuffix(p, "/.local/state/skills"):
+		return model.RootKindAgentSkill
+	case p == "/opt/homebrew/lib" ||
+		p == "/usr/local/lib" ||
+		strings.HasSuffix(p, "/Cellar") ||
+		strings.HasSuffix(p, "/Caskroom") ||
+		strings.HasSuffix(p, "/Library/Python"):
 		return model.RootKindHomebrew
 	case isBroadHomeRoot(path):
 		return model.RootKindDeepHome
@@ -222,6 +228,13 @@ func baselineHomeCandidates(home string) []scanner.Root {
 	}
 	add(filepath.Join(home, ".local", "share", "pipx", "venvs"), model.RootKindUserPackage)
 
+	// Per-user Homebrew prefix. A non-sudo Homebrew install on Linux
+	// lands in ~/.linuxbrew rather than the shared /home/linuxbrew
+	// prefix that systemRoots covers; absent paths are dropped by
+	// filterExistingRoots.
+	add(filepath.Join(home, ".linuxbrew", "Cellar"), model.RootKindHomebrew)
+	add(filepath.Join(home, ".linuxbrew", "Caskroom"), model.RootKindHomebrew)
+
 	// Editor extension trees.
 	for _, seg := range []string{
 		".vscode/extensions",
@@ -245,6 +258,10 @@ func baselineHomeCandidates(home string) []scanner.Root {
 	add(filepath.Join(home, ".cursor"), model.RootKindMCPConfig)
 	add(filepath.Join(home, ".codeium", "windsurf"), model.RootKindMCPConfig)
 	add(filepath.Join(home, ".claude"), model.RootKindMCPConfig)
+	// Claude Code stores user-scope MCP servers (top-level `mcpServers`)
+	// and local-scope ones (`projects.<dir>.mcpServers`) in this single
+	// file, which sits beside the `.claude` dir rather than inside it.
+	add(filepath.Join(home, ".claude.json"), model.RootKindMCPConfig)
 	add(filepath.Join(home, ".codex"), model.RootKindMCPConfig)
 	add(filepath.Join(home, ".gemini"), model.RootKindMCPConfig)
 	switch runtime.GOOS {
@@ -254,6 +271,15 @@ func baselineHomeCandidates(home string) []scanner.Root {
 		add(filepath.Join(home, ".config", "Claude"), model.RootKindMCPConfig)
 		add(filepath.Join(home, ".config", "Claude Code"), model.RootKindMCPConfig)
 		add(filepath.Join(home, ".continue"), model.RootKindMCPConfig)
+	}
+
+	// Agent-skill lock locations. ~/.agents holds the global
+	// `.skill-lock.json` written by the skills.sh CLI; $XDG_STATE_HOME
+	// overrides that to <state>/skills/.skill-lock.json when set.
+	// Absent locations are dropped by filterExistingRoots.
+	add(filepath.Join(home, ".agents"), model.RootKindAgentSkill)
+	if xdg := os.Getenv("XDG_STATE_HOME"); xdg != "" {
+		add(filepath.Join(xdg, "skills"), model.RootKindAgentSkill)
 	}
 
 	// Browser extension trees. We point directly at the per-profile
@@ -289,13 +315,22 @@ func projectHomeCandidates(home string) []scanner.Root {
 func systemRoots() []scanner.Root {
 	switch runtime.GOOS {
 	case "darwin":
-		return []scanner.Root{
+		roots := []scanner.Root{
+			{Path: "/opt/homebrew/Cellar", Kind: model.RootKindHomebrew},
+			{Path: "/opt/homebrew/Caskroom", Kind: model.RootKindHomebrew},
 			{Path: "/opt/homebrew/lib", Kind: model.RootKindHomebrew},
+			{Path: "/usr/local/Cellar", Kind: model.RootKindHomebrew},
+			{Path: "/usr/local/Caskroom", Kind: model.RootKindHomebrew},
 			{Path: "/usr/local/lib", Kind: model.RootKindHomebrew},
 			{Path: "/Library/Python", Kind: model.RootKindHomebrew},
 		}
+		return roots
 	case "linux":
-		roots := []scanner.Root{{Path: "/usr/local/lib", Kind: model.RootKindGlobalPackage}}
+		roots := []scanner.Root{
+			{Path: "/usr/local/lib", Kind: model.RootKindGlobalPackage},
+			{Path: "/home/linuxbrew/.linuxbrew/Cellar", Kind: model.RootKindHomebrew},
+			{Path: "/home/linuxbrew/.linuxbrew/Caskroom", Kind: model.RootKindHomebrew},
+		}
 		for _, pattern := range []string{"/usr/lib/python*"} {
 			for _, p := range globExisting(pattern) {
 				roots = append(roots, scanner.Root{Path: p, Kind: model.RootKindGlobalPackage})
@@ -559,15 +594,18 @@ func browserExtensionCandidateRoots(home string) []string {
 	return roots
 }
 
-// filterExistingRoots returns the subset of candidate roots that exist
-// as directories, along with a short note describing how many were
-// skipped. Absent candidates are normal on most developer machines.
+// filterExistingRoots returns the subset of candidate roots that exist,
+// along with a short note describing how many were skipped. Absent
+// candidates are normal on most developer machines. Both directories and
+// regular files are kept: a handful of roots (e.g. `~/.claude.json`) are
+// single config files rather than trees, and the walker handles a file
+// root by visiting just that file.
 func filterExistingRoots(candidates []scanner.Root) ([]scanner.Root, []string) {
 	var present []scanner.Root
 	skipped := 0
 	for _, c := range candidates {
 		info, err := os.Stat(c.Path)
-		if err != nil || !info.IsDir() {
+		if err != nil || (!info.IsDir() && !info.Mode().IsRegular()) {
 			skipped++
 			continue
 		}

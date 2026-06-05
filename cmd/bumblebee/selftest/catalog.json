@@ -28,6 +28,24 @@
       "versions": ["0.0.0"],
       "severity": "critical",
       "source": "bumblebee selftest"
+    },
+    {
+      "id": "selftest-homebrew-formula-evil",
+      "name": "bumblebee selftest fixture (homebrew formula)",
+      "ecosystem": "homebrew",
+      "package": "bumblebee-selftest-brew",
+      "versions": ["0.0.0"],
+      "severity": "critical",
+      "source": "bumblebee selftest"
+    },
+    {
+      "id": "selftest-homebrew-cask-evil",
+      "name": "bumblebee selftest fixture (homebrew cask)",
+      "ecosystem": "homebrew",
+      "package": "bumblebee-selftest-cask",
+      "versions": ["0.0.0"],
+      "severity": "critical",
+      "source": "bumblebee selftest"
     }
   ]
 }

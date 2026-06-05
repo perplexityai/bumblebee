@@ -1,0 +1,421 @@
+{
+  "schema_version": "0.1.0",
+  "_comment": "Mini Shai-Hulud campaign compromise of Red Hat Cloud Services (@redhat-cloud-services) npm packages, reported by Socket on 2026-06-01. Self-replicating worm variant whose payload creates attacker-controlled GitHub repositories marked \"Miasma: The Spreading Blight\". Covers 32 packages / 95 package-version pairs, all npm under the @redhat-cloud-services scope. Intended for exact (ecosystem, package, version) presence checks, not network/file/process IOC checks.",
+  "entries": [
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-chrome",
+      "name": "@redhat-cloud-services/chrome (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/chrome",
+      "versions": [
+        "2.3.1",
+        "2.3.2",
+        "2.3.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-compliance-client",
+      "name": "@redhat-cloud-services/compliance-client (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/compliance-client",
+      "versions": [
+        "4.0.3",
+        "4.0.4",
+        "4.0.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-config-manager-client",
+      "name": "@redhat-cloud-services/config-manager-client (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/config-manager-client",
+      "versions": [
+        "5.0.4",
+        "5.0.5",
+        "5.0.7"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-entitlements-client",
+      "name": "@redhat-cloud-services/entitlements-client (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/entitlements-client",
+      "versions": [
+        "4.0.11",
+        "4.0.12",
+        "4.0.14"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-eslint-config-redhat-cloud-services",
+      "name": "@redhat-cloud-services/eslint-config-redhat-cloud-services (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/eslint-config-redhat-cloud-services",
+      "versions": [
+        "3.2.1",
+        "3.2.2",
+        "3.2.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-frontend-components",
+      "name": "@redhat-cloud-services/frontend-components (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/frontend-components",
+      "versions": [
+        "7.7.2",
+        "7.7.3",
+        "7.7.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-frontend-components-advisor-components",
+      "name": "@redhat-cloud-services/frontend-components-advisor-components (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/frontend-components-advisor-components",
+      "versions": [
+        "3.8.2",
+        "3.8.4",
+        "3.8.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-frontend-components-config",
+      "name": "@redhat-cloud-services/frontend-components-config (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/frontend-components-config",
+      "versions": [
+        "6.11.3",
+        "6.11.4",
+        "6.11.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-frontend-components-config-utilities",
+      "name": "@redhat-cloud-services/frontend-components-config-utilities (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/frontend-components-config-utilities",
+      "versions": [
+        "4.11.2",
+        "4.11.3",
+        "4.11.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-frontend-components-notifications",
+      "name": "@redhat-cloud-services/frontend-components-notifications (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/frontend-components-notifications",
+      "versions": [
+        "6.9.2",
+        "6.9.3",
+        "6.9.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-frontend-components-remediations",
+      "name": "@redhat-cloud-services/frontend-components-remediations (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/frontend-components-remediations",
+      "versions": [
+        "4.9.2",
+        "4.9.3",
+        "4.9.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-frontend-components-testing",
+      "name": "@redhat-cloud-services/frontend-components-testing (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/frontend-components-testing",
+      "versions": [
+        "1.2.1",
+        "1.2.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-frontend-components-translations",
+      "name": "@redhat-cloud-services/frontend-components-translations (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/frontend-components-translations",
+      "versions": [
+        "4.4.1",
+        "4.4.2",
+        "4.4.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-frontend-components-utilities",
+      "name": "@redhat-cloud-services/frontend-components-utilities (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/frontend-components-utilities",
+      "versions": [
+        "7.4.1",
+        "7.4.2",
+        "7.4.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-hcc-feo-mcp",
+      "name": "@redhat-cloud-services/hcc-feo-mcp (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/hcc-feo-mcp",
+      "versions": [
+        "0.3.1",
+        "0.3.2",
+        "0.3.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-hcc-kessel-mcp",
+      "name": "@redhat-cloud-services/hcc-kessel-mcp (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/hcc-kessel-mcp",
+      "versions": [
+        "0.3.1",
+        "0.3.2",
+        "0.3.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-hcc-pf-mcp",
+      "name": "@redhat-cloud-services/hcc-pf-mcp (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/hcc-pf-mcp",
+      "versions": [
+        "0.6.1",
+        "0.6.2",
+        "0.6.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-host-inventory-client",
+      "name": "@redhat-cloud-services/host-inventory-client (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/host-inventory-client",
+      "versions": [
+        "5.0.3",
+        "5.0.4",
+        "5.0.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-insights-client",
+      "name": "@redhat-cloud-services/insights-client (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/insights-client",
+      "versions": [
+        "4.0.4",
+        "4.0.5",
+        "4.0.7"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-integrations-client",
+      "name": "@redhat-cloud-services/integrations-client (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/integrations-client",
+      "versions": [
+        "6.0.4",
+        "6.0.5",
+        "6.0.7"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-javascript-clients-shared",
+      "name": "@redhat-cloud-services/javascript-clients-shared (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/javascript-clients-shared",
+      "versions": [
+        "2.0.8",
+        "2.0.9",
+        "2.0.11"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-notifications-client",
+      "name": "@redhat-cloud-services/notifications-client (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/notifications-client",
+      "versions": [
+        "6.1.4",
+        "6.1.5",
+        "6.1.7"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-patch-client",
+      "name": "@redhat-cloud-services/patch-client (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/patch-client",
+      "versions": [
+        "4.0.4",
+        "4.0.5",
+        "4.0.7"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-quickstarts-client",
+      "name": "@redhat-cloud-services/quickstarts-client (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/quickstarts-client",
+      "versions": [
+        "4.0.11",
+        "4.0.12",
+        "4.0.14"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-rbac-client",
+      "name": "@redhat-cloud-services/rbac-client (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/rbac-client",
+      "versions": [
+        "9.0.3",
+        "9.0.4",
+        "9.0.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-remediations-client",
+      "name": "@redhat-cloud-services/remediations-client (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/remediations-client",
+      "versions": [
+        "4.0.4",
+        "4.0.5",
+        "4.0.7"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-rule-components",
+      "name": "@redhat-cloud-services/rule-components (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/rule-components",
+      "versions": [
+        "4.7.2",
+        "4.7.3",
+        "4.7.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-sources-client",
+      "name": "@redhat-cloud-services/sources-client (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/sources-client",
+      "versions": [
+        "3.0.10",
+        "3.0.11",
+        "3.0.13"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-topological-inventory-client",
+      "name": "@redhat-cloud-services/topological-inventory-client (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/topological-inventory-client",
+      "versions": [
+        "3.0.10",
+        "3.0.11",
+        "3.0.13"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-tsc-transform-imports",
+      "name": "@redhat-cloud-services/tsc-transform-imports (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/tsc-transform-imports",
+      "versions": [
+        "1.2.2",
+        "1.2.4",
+        "1.2.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-types",
+      "name": "@redhat-cloud-services/types (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/types",
+      "versions": [
+        "3.6.1",
+        "3.6.2",
+        "3.6.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    },
+    {
+      "id": "mini-shai-hulud-redhat-2026-npm-redhat-cloud-services-vulnerabilities-client",
+      "name": "@redhat-cloud-services/vulnerabilities-client (Mini Shai-Hulud Red Hat Cloud Services compromise)",
+      "ecosystem": "npm",
+      "package": "@redhat-cloud-services/vulnerabilities-client",
+      "versions": [
+        "2.1.8",
+        "2.1.9",
+        "2.1.11"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages"
+    }
+  ]
+}

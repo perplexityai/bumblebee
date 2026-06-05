@@ -19,7 +19,7 @@ var Version = ""
 // info). Used by callers that need a single token, such as the records'
 // scanner_version field and the HTTP sink's User-Agent.
 func currentVersion() string {
-	const fileDefault = "0.1.1"
+	const fileDefault = "0.1.4"
 	if v := strings.TrimSpace(Version); v != "" {
 		return v
 	}

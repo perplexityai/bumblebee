@@ -6,8 +6,12 @@ const path = require("path");
 const { execSync } = require("child_process");
 const zlib = require("zlib");
 
-const VERSION = "0.1.1";
-const REPO = "perplexityai/bumblebee";
+const VERSION = "0.1.4";
+// Prebuilt release binaries are published to this fork's GitHub releases.
+const REPO = "anonymousAAK/bumblebee";
+// Canonical Go module path, used only by the `go install` source-build
+// fallback. It stays on the upstream module so the path is import-valid.
+const MODULE = "github.com/perplexityai/bumblebee";
 
 const PLATFORM_MAP = {
   darwin: "darwin",
@@ -25,7 +29,7 @@ const arch = ARCH_MAP[process.arch];
 if (!platform || !arch) {
   console.warn(
     `bumblebee-scan: unsupported platform ${process.platform}/${process.arch}. ` +
-      `Install manually: go install github.com/perplexityai/bumblebee/cmd/bumblebee@v${VERSION}`
+      `Install manually: go install ${MODULE}/cmd/bumblebee@v${VERSION}`
   );
   process.exit(0);
 }
@@ -42,9 +46,12 @@ function downloadFromRelease() {
   return new Promise((resolve, reject) => {
     const get = (u, redirects = 0) => {
       if (redirects > 5) return reject(new Error("Too many redirects"));
-      https
-        .get(u, { headers: { "User-Agent": "bumblebee-npm" } }, (res) => {
+      const req = https.get(
+        u,
+        { headers: { "User-Agent": "bumblebee-npm" }, timeout: 30000 },
+        (res) => {
           if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+            res.resume();
             return get(res.headers.location, redirects + 1);
           }
           if (res.statusCode !== 200) {
@@ -52,8 +59,10 @@ function downloadFromRelease() {
             return reject(new Error(`HTTP ${res.statusCode} from ${u}`));
           }
           resolve(res);
-        })
-        .on("error", reject);
+        }
+      );
+      req.on("timeout", () => req.destroy(new Error("request timed out")));
+      req.on("error", reject);
     };
     get(url);
   });
@@ -82,8 +91,9 @@ function installFromGo() {
   console.log("bumblebee-scan: GitHub release not available, trying go install...");
   try {
     const gobin = path.join(binDir);
-    execSync(`go install github.com/perplexityai/bumblebee/cmd/bumblebee@v${VERSION}`, {
+    execSync(`go install ${MODULE}/cmd/bumblebee@v${VERSION}`, {
       stdio: "inherit",
+      timeout: 300000,
       env: { ...process.env, GOBIN: gobin },
     });
     fs.chmodSync(binPath, 0o755);
@@ -102,7 +112,7 @@ function installFromGo() {
     if (!installFromGo()) {
       console.warn(
         `bumblebee-scan: could not install binary automatically.\n` +
-          `Install Go 1.25+ and run: go install github.com/perplexityai/bumblebee/cmd/bumblebee@v${VERSION}\n` +
+          `Install Go 1.25+ and run: go install ${MODULE}/cmd/bumblebee@v${VERSION}\n` +
           `Then place the binary in: ${binDir}/`
       );
     }

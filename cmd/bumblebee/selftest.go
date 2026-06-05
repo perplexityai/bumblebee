@@ -18,17 +18,17 @@ import (
 	"github.com/perplexityai/bumblebee/internal/scanner"
 )
 
-//go:embed selftest/fixtures selftest/catalog.json
+//go:embed all:selftest/fixtures selftest/catalog.json
 var selftestFS embed.FS
 
 // expectedSelftestFindings is the count of catalog-matched findings the
 // embedded fixtures must produce. One npm package-lock.json entry, one
-// PyPI dist-info METADATA file, and one MCP config naming a pinned
-// docker image — each matched against the embedded catalog: three
-// findings. The MCP fixture guards against regressions in the MCP
-// parser/scanner integration (basename dispatch, docker tag split,
-// catalog matching for the mcp ecosystem).
-const expectedSelftestFindings = 3
+// PyPI dist-info METADATA file, one MCP config naming a pinned docker
+// image, one Homebrew formula receipt, and one Homebrew cask metadata
+// marker — each matched against the embedded catalog: five findings. The
+// MCP and Homebrew fixtures guard scanner integration for basename/path
+// dispatch and catalog matching.
+const expectedSelftestFindings = 5
 
 // runSelftest extracts the embedded fixture tree to a temp directory,
 // runs the scanner with the embedded exposure catalog, and asserts the

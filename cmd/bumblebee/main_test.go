@@ -237,6 +237,117 @@ func TestResolveRootsBaselineSkipsAbsentClaudeCodexRoots(t *testing.T) {
 	}
 }
 
+// TestResolveRootsBaselineIncludesAgentSkillRoot verifies that ~/.agents
+// (and the XDG override) are picked up by baseline when present.
+func TestResolveRootsBaselineIncludesAgentSkillRoot(t *testing.T) {
+	if runtime.GOOS != "darwin" && runtime.GOOS != "linux" {
+		t.Skipf("profile defaults are darwin/linux specific")
+	}
+	home := t.TempDir()
+	xdg := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("XDG_STATE_HOME", xdg)
+
+	agents := filepath.Join(home, ".agents")
+	xdgSkills := filepath.Join(xdg, "skills")
+	for _, p := range []string{agents, xdgSkills} {
+		if err := os.MkdirAll(p, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	roots, _, err := resolveRoots(model.ProfileBaseline, nil, rootsOpts{})
+	if err != nil {
+		t.Fatalf("resolveRoots baseline: %v", err)
+	}
+	got := map[string]string{}
+	for _, r := range roots {
+		got[r.Path] = r.Kind
+	}
+	for _, p := range []string{agents, xdgSkills} {
+		kind, ok := got[p]
+		if !ok {
+			t.Errorf("baseline missing agent-skill root %q (got %v)", p, roots)
+			continue
+		}
+		if kind != model.RootKindAgentSkill {
+			t.Errorf("baseline root %q kind = %q, want %q", p, kind, model.RootKindAgentSkill)
+		}
+	}
+}
+
+func TestClassifyRootAgentSkill(t *testing.T) {
+	cases := []string{
+		"/Users/alice/.agents",
+		"/home/alice/.agents",
+		"/home/alice/.local/state/skills",
+	}
+	for _, p := range cases {
+		if got := classifyRoot(p, model.ProfileBaseline); got != model.RootKindAgentSkill {
+			t.Errorf("classifyRoot(%q) = %q, want %q", p, got, model.RootKindAgentSkill)
+		}
+	}
+}
+
+// TestResolveRootsBaselineIncludesClaudeJSONFileRoot verifies that the
+// `~/.claude.json` config file is included as a baseline MCP root when
+// present. Unlike the other MCP candidates it is a regular file, not a
+// directory, so this also exercises filterExistingRoots keeping files.
+func TestResolveRootsBaselineIncludesClaudeJSONFileRoot(t *testing.T) {
+	if runtime.GOOS != "darwin" && runtime.GOOS != "linux" {
+		t.Skipf("profile defaults are darwin/linux specific")
+	}
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	claudeJSON := filepath.Join(home, ".claude.json")
+	if err := os.WriteFile(claudeJSON, []byte(`{"mcpServers":{}}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	roots, _, err := resolveRoots(model.ProfileBaseline, nil, rootsOpts{})
+	if err != nil {
+		t.Fatalf("resolveRoots baseline: %v", err)
+	}
+	for _, r := range roots {
+		if r.Path == claudeJSON {
+			if r.Kind != model.RootKindMCPConfig {
+				t.Errorf("~/.claude.json root kind = %q, want %q", r.Kind, model.RootKindMCPConfig)
+			}
+			return
+		}
+	}
+	t.Errorf("baseline did not include file root %q (got %v)", claudeJSON, roots)
+}
+
+func TestResolveRootsBaselineIncludesUserLinuxbrew(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	cellar := filepath.Join(home, ".linuxbrew", "Cellar")
+	caskroom := filepath.Join(home, ".linuxbrew", "Caskroom")
+	for _, d := range []string{cellar, caskroom} {
+		if err := os.MkdirAll(d, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	roots, _, err := resolveRoots(model.ProfileBaseline, nil, rootsOpts{})
+	if err != nil {
+		t.Fatalf("resolveRoots baseline: %v", err)
+	}
+	found := map[string]string{}
+	for _, r := range roots {
+		found[r.Path] = r.Kind
+	}
+	for _, d := range []string{cellar, caskroom} {
+		kind, ok := found[d]
+		if !ok {
+			t.Errorf("baseline did not include per-user Homebrew root %q", d)
+			continue
+		}
+		if kind != model.RootKindHomebrew {
+			t.Errorf("%q root kind = %q, want %q", d, kind, model.RootKindHomebrew)
+		}
+	}
+}
+
 func TestClassifyRootClaudeCodexMCP(t *testing.T) {
 	cases := []string{
 		"/Users/alice/.claude",
@@ -323,6 +434,23 @@ func TestClassifyRootEditorExtension(t *testing.T) {
 	got = classifyRoot("/Users/alice/.cursor-server/extensions", model.ProfileBaseline)
 	if got != model.RootKindEditorExtension {
 		t.Errorf("classifyRoot cursor extensions = %q", got)
+	}
+}
+
+func TestClassifyRootHomebrewCellarAndCaskroom(t *testing.T) {
+	for _, p := range []string{
+		"/opt/homebrew/Cellar",
+		"/opt/homebrew/Caskroom",
+		"/usr/local/Cellar",
+		"/usr/local/Caskroom",
+		"/home/linuxbrew/.linuxbrew/Cellar",
+		"/home/linuxbrew/.linuxbrew/Caskroom",
+		"/custom/prefix/Cellar",
+		"/custom/prefix/Caskroom",
+	} {
+		if got := classifyRoot(p, model.ProfileBaseline); got != model.RootKindHomebrew {
+			t.Errorf("classifyRoot(%q) = %q, want %q", p, got, model.RootKindHomebrew)
+		}
 	}
 }
 

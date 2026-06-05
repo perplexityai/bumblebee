@@ -18,12 +18,20 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
     steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "20"
 
-      - name: install bumblebee-scan from npm
-        run: npm install -g bumblebee-scan
+      - name: install local npm package
+        # --ignore-scripts skips the postinstall binary download: no GitHub
+        # release exists for an unmerged PR, and the network fetch/go-install
+        # fallback is non-deterministic in CI. This validates that the package
+        # is well-formed and links its bin entry.
+        run: npm install -g ./npm-package --ignore-scripts
 
       - name: verify bumblebee is on PATH
         run: which bumblebee || echo "binary not on PATH (expected if no GitHub release)"
@@ -37,15 +45,20 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
     steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: "3.12"
 
-      - name: install bumblebee-scan from PyPI
-        run: pip install bumblebee-scan
+      - name: install local pip package
+        run: pip install ./pypi-package
 
       - name: verify bumblebee entrypoint exists
+        # We only verify the entrypoint installs and is on PATH. Running
+        # `bumblebee --help` would force a binary download/go-install, which
+        # cannot succeed without a published release and is non-deterministic
+        # in CI.
         run: which bumblebee
-
-      - name: run bumblebee --help
-        run: bumblebee --help || echo "binary not available (expected if no GitHub release)"
