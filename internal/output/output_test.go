@@ -110,6 +110,49 @@ func TestEmitSummaryWritesScanSummaryRecord(t *testing.T) {
 	}
 }
 
+func TestQuietSuppressesInfoDiag(t *testing.T) {
+	var diagBuf bytes.Buffer
+	e := New(io.Discard, &diagBuf, "run-q")
+	e.SetQuiet(true)
+	e.Diag("info", "", "this should be suppressed")
+	if diagBuf.Len() != 0 {
+		t.Fatalf("quiet mode: info diag written to stderr, want suppressed; got %q", diagBuf.String())
+	}
+	if e.Diagnostics != 1 {
+		t.Fatalf("Diagnostics counter should still be incremented; got %d", e.Diagnostics)
+	}
+}
+
+func TestQuietPassesThroughWarnAndError(t *testing.T) {
+	var diagBuf bytes.Buffer
+	e := New(io.Discard, &diagBuf, "run-q")
+	e.SetQuiet(true)
+	e.Diag("warn", "", "this warn should appear")
+	e.Diag("error", "", "this error should appear")
+	lines := strings.Split(strings.TrimSpace(diagBuf.String()), "\n")
+	if len(lines) != 2 {
+		t.Fatalf("expected 2 diagnostic lines (warn+error), got %d: %q", len(lines), diagBuf.String())
+	}
+	if !strings.Contains(lines[0], `"warn"`) {
+		t.Errorf("first line should be warn diag: %q", lines[0])
+	}
+	if !strings.Contains(lines[1], `"error"`) {
+		t.Errorf("second line should be error diag: %q", lines[1])
+	}
+}
+
+func TestDefaultModeEmitsInfoDiag(t *testing.T) {
+	var diagBuf bytes.Buffer
+	e := New(io.Discard, &diagBuf, "run-default")
+	e.Diag("info", "", "visible by default")
+	if diagBuf.Len() == 0 {
+		t.Fatal("default (non-quiet) mode must emit info diagnostics")
+	}
+	if !strings.Contains(diagBuf.String(), "visible by default") {
+		t.Fatalf("expected info message in output, got %q", diagBuf.String())
+	}
+}
+
 func TestObservePackageDedupsWithoutWriting(t *testing.T) {
 	e := New(io.Discard, io.Discard, "run-1")
 	rec := model.Record{
