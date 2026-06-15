@@ -168,8 +168,8 @@ type Stats struct {
 // (https://osv-vulnerabilities.storage.googleapis.com/ecosystems.txt) to
 // the lowercased values Bumblebee emits on records, so a generated entry
 // matches the scanner's output. Only the registries Bumblebee inventories
-// by package version are mapped; others (crates.io, NuGet, Maven, VSCode,
-// Linux distros, ...) have no equivalent and their records are skipped.
+// by package version are mapped; others (NuGet, Maven, Linux distros, ...)
+// have no equivalent and their records are skipped.
 var ecosystemMap = map[string]string{
 	"npm":       "npm",
 	"PyPI":      "pypi",
@@ -177,6 +177,7 @@ var ecosystemMap = map[string]string{
 	"RubyGems":  "rubygems",
 	"Packagist": "packagist",
 	"VSCode":    "editor-extension",
+	"crates.io": "crates.io",
 }
 
 // mapEcosystem returns the Bumblebee ecosystem for an OSV ecosystem

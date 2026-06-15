@@ -20,6 +20,7 @@ import (
 
 	"github.com/perplexityai/bumblebee/internal/ecosystem/browserext"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/bun"
+	"github.com/perplexityai/bumblebee/internal/ecosystem/cargo"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/composer"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/editorext"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/gomod"
@@ -253,6 +254,7 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 	extS := &editorext.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 	bxS := &browserext.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 	hbS := &homebrew.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
+	cgS := &cargo.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 
 	type job struct {
 		kind        string
@@ -326,6 +328,10 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 					err = hbS.ScanFormulaReceipt(j.path, j.extra1, j.extra2, j.projectPath, cfg.BaseRecord)
 				case "homebrew-cask":
 					err = hbS.ScanCaskMetadata(j.path, j.extra1, j.extra2, j.projectPath, cfg.BaseRecord)
+				case "cargo-lock":
+					err = cgS.ScanCargoLock(j.path, cfg.BaseRecord)
+				case "cargo-crates2":
+					err = cgS.ScanCrates2JSON(j.path, cfg.BaseRecord)
 				}
 				if err != nil {
 					cfg.Emitter.Diag("error", j.path, err.Error())
@@ -418,6 +424,10 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 			send(job{kind: "go-sum", path: path})
 		case enabled(model.EcosystemGo) && gomod.IsGoMod(base):
 			send(job{kind: "go-mod", path: path})
+		case enabled(model.EcosystemCargo) && cargo.IsCargoLock(base):
+			send(job{kind: "cargo-lock", path: path})
+		case enabled(model.EcosystemCargo) && base == ".crates2.json" && cargo.IsCrates2JSON(path):
+			send(job{kind: "cargo-crates2", path: path})
 		case enabled(model.EcosystemRubyGems) && rubygems.IsGemfileLock(base):
 			send(job{kind: "rb-lock", path: path})
 		case enabled(model.EcosystemRubyGems) && rubygems.IsGemspec(base):
