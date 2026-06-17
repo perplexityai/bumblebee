@@ -12,6 +12,7 @@ the entries against current advisories before production use.
 
 | File | Campaign | Source |
 |---|---|---|
+| [`mastra-2026-06-17.json`](mastra-2026-06-17.json) | Mastra npm supply-chain compromise (141 packages / 141 versions across `@mastra/*` plus `create-mastra` and the `easy-day-js@1.11.22` typosquat dependency that delivered a cross-platform infostealer via postinstall) | [Socket, 2026-06-17](https://socket.dev/blog/mastra-npm-packages-compromised) |
 | [`mini-shai-hulud.json`](mini-shai-hulud.json) | Mini/Shai-Hulud May 2026 npm and PyPI compromise (OX Security affected-package table) | Cross-checked against Fleet, Socket, Snyk, Mistral, TanStack, The Hacker News |
 | [`mini-shai-hulud-redhat-cloud-services.json`](mini-shai-hulud-redhat-cloud-services.json) | Mini Shai-Hulud compromise of Red Hat Cloud Services (`@redhat-cloud-services`) npm packages (32 packages / 95 versions; "Miasma: The Spreading Blight" worm marker) | [Socket, 2026-06-01](https://socket.dev/blog/mini-shai-hulud-campaign-hits-red-hat-cloud-services-npm-packages) |
 | [`laravel-lang-2026-05-23.json`](laravel-lang-2026-05-23.json) | Laravel Lang Composer/Packagist supply-chain compromise across `laravel-lang/lang`, `laravel-lang/http-statuses`, `laravel-lang/attributes`, and `laravel-lang/actions` | [Socket, 2026-05-23](https://socket.dev/blog/laravel-lang-compromise) |
