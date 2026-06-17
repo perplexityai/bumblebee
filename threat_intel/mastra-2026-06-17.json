@@ -1,28 +1,6 @@
 {
   "schema_version": "0.1.0",
   "_comment": "Mastra npm supply-chain compromise reported by Socket on 2026-06-17 (https://socket.dev/blog/mastra-npm-packages-compromised). A single npm publisher account mass-published malicious patch versions of @mastra/* packages that pulled in a typosquatted dependency, easy-day-js@1.11.22, whose postinstall hook ran a cross-platform infostealer/tasking implant. Covers 141 packages / 141 package-version pairs, all npm (the @mastra scope plus create-mastra and the easy-day-js typosquat that delivered the payload). Intended for exact (ecosystem, package, version) presence checks, not network/file/process IOC checks.",
-  "_indicators": {
-    "npm_publisher": "ehindero",
-    "malicious_dependency": "easy-day-js@1.11.22",
-    "stage1_loader_filename": "setup.cjs",
-    "stage2_implant_filename": "protocal.cjs",
-    "c2_hosts": [
-      "23.254.164.92:8000",
-      "23.254.164.123:443"
-    ],
-    "persistence": {
-      "windows_run_value": "NvmProtocal",
-      "macos_launchagent": "com.nvm.protocal",
-      "linux_systemd_unit": "nvmconf.service"
-    },
-    "sha256": [
-      "b122a9873bedf145ae2a7fd024b5f309007dbb025149f4dc4ac3f7e4f32a36a4",
-      "c38954e85bf5433e61e7c8f4230336695624ae88b6953afabf7bf817aa91b638",
-      "cdec8b20338beb708b5be8d3d7a3041a35a8b0fb92f9186262f312d55ff82066",
-      "9570f77a5e1511869f4e554e7166df9fde081f2583e293c2569621792ed7d9c9",
-      "221c45a790dec2a296af57969e1165a16f8f49733aeab64c0bbd768d9943badf"
-    ]
-  },
   "entries": [
     {
       "id": "mastra-2026-06-17-npm-mastra-acp",
