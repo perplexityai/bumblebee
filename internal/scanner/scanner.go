@@ -20,6 +20,7 @@ import (
 
 	"github.com/perplexityai/bumblebee/internal/ecosystem/browserext"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/bun"
+	"github.com/perplexityai/bumblebee/internal/ecosystem/cargo"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/composer"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/editorext"
 	"github.com/perplexityai/bumblebee/internal/ecosystem/gomod"
@@ -253,6 +254,7 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 	extS := &editorext.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 	bxS := &browserext.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 	hbS := &homebrew.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
+	cargoS := &cargo.Scanner{MaxFileSize: cfg.MaxFileSize, Emit: emit, Diag: diag}
 
 	type job struct {
 		kind        string
@@ -298,6 +300,8 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 					err = yarnS.ScanLockfile(j.path, cfg.BaseRecord)
 				case "bun-lock":
 					err = bunS.ScanTextLockfile(j.path, cfg.BaseRecord)
+				case "cargo-lock":
+					err = cargoS.ScanCargoLock(j.path, cfg.BaseRecord)
 				case "go-sum":
 					err = goS.ScanGoSum(j.path, cfg.BaseRecord)
 				case "go-mod":
@@ -414,6 +418,8 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 			send(job{kind: "bun-lock", path: path})
 		case enabled(model.EcosystemNPM) && bun.IsBinaryLockfile(base):
 			bunS.NoteBinaryLockfile(path)
+		case enabled(model.EcosystemCargo) && cargo.IsCargoLock(base):
+			send(job{kind: "cargo-lock", path: path})
 		case enabled(model.EcosystemGo) && gomod.IsGoSum(base):
 			send(job{kind: "go-sum", path: path})
 		case enabled(model.EcosystemGo) && gomod.IsGoMod(base):
