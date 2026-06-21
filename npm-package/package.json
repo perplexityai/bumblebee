@@ -1,6 +1,6 @@
 {
   "name": "bumblebee-scan",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "description": "Supply-chain inventory collector for package, extension, and developer-tool metadata on macOS and Linux.",
   "license": "Apache-2.0",
   "repository": {

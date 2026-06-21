@@ -10,7 +10,7 @@ import tempfile
 import urllib.request
 from pathlib import Path
 
-VERSION = "0.1.4"
+VERSION = "0.1.6"
 # Prebuilt release binaries are published to this fork's GitHub releases.
 REPO = "anonymousAAK/bumblebee"
 # Canonical Go module path, used only by the `go install` source-build

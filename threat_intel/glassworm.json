@@ -1,0 +1,2933 @@
+{
+  "schema_version": "0.1.0",
+  "_comment": "GlassWorm self-propagating supply-chain worm targeting developer IDE extensions on the Open VSX and Visual Studio Code marketplaces, with related hijacked npm packages. GlassWorm hides its loader in invisible Unicode characters and (in the 2026 transitive wave) abuses extensionPack/extensionDependencies manifest relationships to pull in a separate GlassWorm-linked extension via updates; it uses Solana transaction memos as dead-drop C2 stage discovery, Russian locale/timezone geofencing, staged in-memory JS execution, and steals npm/GitHub/Open VSX credentials and cryptocurrency wallets while deploying SOCKS proxy and hidden VNC for remote access. First disclosed by Koi Security (2025-10-18); the large 2026 wave is tracked on Socket's continuously updated GlassWorm v2 campaign page (see _indicators.primary_source) and detailed in Socket's 2026-03-13 transitive report, with corroboration from Checkmarx (2026-03) and Sonatype (2026-03-17, npm). The bulk of entries below are imported verbatim from the Socket v2 affected-artifact CSV (exact ecosystem/namespace/name/version), supplemented with earlier Koi and Checkmarx coordinates and the Sonatype npm hijacks. Bumblebee matches exact (ecosystem, name, version) only; the editor-extension ecosystem is the existing model.EcosystemEditorExtension family emitted for VS Code, Cursor, Windsurf, and VSCodium installs, and the scanner normalizes extension names to lowercase <publisher>.<name>, so identifiers match regardless of source case. Behavioral/network IOCs in _indicators are for analyst context and are not consumed by the scanner. The CSV labels every row 'vscode' (the artifact source marketplace); these are recorded as editor-extension since Bumblebee scans the same on-disk extension trees for VS Code, Open VSX-based forks, Cursor, Windsurf, and VSCodium.",
+  "_indicators": {
+    "campaign": "GlassWorm",
+    "primary_source": "https://socket.dev/supply-chain-attacks/glassworm-v2",
+    "primary_source_note": "Socket GlassWorm v2 campaign page; affected-artifact CSV imported as the authoritative versioned list.",
+    "transitive_report": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign",
+    "first_disclosure": "https://www.koi.ai/blog/glassworm-first-self-propagating-worm-using-invisible-code-hits-openvsx-marketplace",
+    "first_disclosure_date": "2025-10-18",
+    "marketplaces": "Open VSX (and VS Code-compatible editors: VS Code, Cursor, Windsurf, VSCodium) and Visual Studio Code Marketplace; related hijacked npm packages",
+    "techniques": "invisible-Unicode loader; extensionPack/extensionDependencies transitive delivery; Solana memo-transaction dead-drop C2; Russian locale/timezone geofencing; staged in-memory JS execution; RC4/base64/string-array obfuscation with decryption material in HTTP headers (ivbase64/secretkey)",
+    "capabilities": "theft of npm / GitHub / Open VSX credentials and Git tokens; cryptocurrency wallet drain; SOCKS proxy and hidden VNC for remote access / criminal proxying",
+    "solana_memo_program": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+    "solana_addresses": [
+      "BjVeAjPrSKFiingBn4vZvghsGj9KCE8AJVtbc9S8o8SC",
+      "6YGcuyFRJKZtcaYCCFba9fScNUvPkGXodXE1mJiSzqDJ",
+      "28PKnu7RzizxBzFPoLp69HLXp9bJL3JFtT2s5QzHsEA2"
+    ],
+    "ip_indicators": [
+      "45.32.150.251",
+      "45.32.151.157",
+      "70.34.242.255",
+      "217.69.3.218",
+      "199.247.10.166"
+    ],
+    "embedded_crypto_material": {
+      "aes_key": "wDO6YyTm6DL0T0zJ0SXhUql5Mo0pdlSz",
+      "aes_iv": "c4b9a3773e9dced6015a670855fd32b"
+    },
+    "c2_status": "Four known C2 channels reported dismantled by CrowdStrike, Google, and Shadowserver (2026-05); malware persists on any host that installed an affected extension/package — rotate GitHub, npm, and Open VSX tokens used on affected machines."
+  },
+  "entries": [
+    {
+      "id": "glassworm-editor-extension-96-studio-json-formatter",
+      "name": "96-studio.json-formatter (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "96-studio.json-formatter",
+      "versions": [
+        "0.0.4",
+        "0.0.2",
+        "0.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-aadarkcode-one-dark-material",
+      "name": "aadarkcode.one-dark-material (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "aadarkcode.one-dark-material",
+      "versions": [
+        "3.20.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2",
+      "indicators": {
+        "corroborating_sources": [
+          "https://checkmarx.com/zero-post/glassworm-targets-developer-ides-again-hiding-staged-malware-behind-runtime-rebuilt-loaders/"
+        ]
+      }
+    },
+    {
+      "id": "glassworm-editor-extension-aligntool-extension-align-professional-tool",
+      "name": "aligntool.extension-align-professional-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "aligntool.extension-align-professional-tool",
+      "versions": [
+        "1.4.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2",
+      "indicators": {
+        "corroborating_sources": [
+          "https://checkmarx.com/zero-post/glassworm-targets-developer-ides-again-hiding-staged-malware-behind-runtime-rebuilt-loaders/"
+        ]
+      }
+    },
+    {
+      "id": "glassworm-editor-extension-anessaeah-php-intelephense-language-support",
+      "name": "anessaeah.php-intelephense-language-support (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "anessaeah.php-intelephense-language-support",
+      "versions": [
+        "1.16.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-angular-studio-ng-angular-extension",
+      "name": "angular-studio.ng-angular-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "angular-studio.ng-angular-extension",
+      "versions": [
+        "21.1.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-awesome-codebase-codebase-dart-pro",
+      "name": "awesome-codebase.codebase-dart-pro (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "awesome-codebase.codebase-dart-pro",
+      "versions": [
+        "3.124.20251132"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-awesome-codespace-jinja-language-support",
+      "name": "awesome-codespace.jinja-language-support (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "awesome-codespace.jinja-language-support",
+      "versions": [
+        "0.3.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-awesomeco-wonder-for-vscode-icons",
+      "name": "awesomeco.wonder-for-vscode-icons (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "awesomeco.wonder-for-vscode-icons",
+      "versions": [
+        "0.10.3",
+        "0.10.2",
+        "0.10.1",
+        "0.10.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-awwwadem-language-professional-tools",
+      "name": "awwwadem.language-professional-tools (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "awwwadem.language-professional-tools",
+      "versions": [
+        "1.20.26",
+        "1.20.24"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-baksmink-vscode-quokka-extension",
+      "name": "baksmink.vscode-quokka-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "baksmink.vscode-quokka-extension",
+      "versions": [
+        "1.0.756",
+        "1.0.755"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-bansheejust22-retro-vhs-theme",
+      "name": "bansheejust22.retro-vhs-theme (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "bansheejust22.retro-vhs-theme",
+      "versions": [
+        "1.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-bersenev-mc-super-pilot",
+      "name": "bersenev.mc-super-pilot (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "bersenev.mc-super-pilot",
+      "versions": [
+        "4.0.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-bhbpbarn-vsce-python-indent-extension",
+      "name": "bhbpbarn.vsce-python-indent-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "bhbpbarn.vsce-python-indent-extension",
+      "versions": [
+        "1.21.2",
+        "1.21.1",
+        "1.21.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-blockstoks-easily-gitignore-manage",
+      "name": "blockstoks.easily-gitignore-manage (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "blockstoks.easily-gitignore-manage",
+      "versions": [
+        "0.10.2",
+        "0.10.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2",
+      "indicators": {
+        "corroborating_sources": [
+          "https://checkmarx.com/zero-post/glassworm-targets-developer-ides-again-hiding-staged-malware-behind-runtime-rebuilt-loaders/"
+        ]
+      }
+    },
+    {
+      "id": "glassworm-editor-extension-boulderzitunnel-vscode-buddies",
+      "name": "boulderzitunnel.vscode-buddies (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "boulderzitunnel.vscode-buddies",
+      "versions": [
+        "1.35.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-brategmaqendaalar-studio-pro-prettyxml-formatter",
+      "name": "brategmaqendaalar-studio.pro-prettyxml-formatter (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "brategmaqendaalar-studio.pro-prettyxml-formatter",
+      "versions": [
+        "6.4.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-breluven-html-smart-suite",
+      "name": "breluven.html-smart-suite (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "breluven.html-smart-suite",
+      "versions": [
+        "2.0.14"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-brenaven-cursor-rich-helper",
+      "name": "brenaven.cursor-rich-helper (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "brenaven.cursor-rich-helper",
+      "versions": [
+        "1.3.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-brixmundo-eca-easy-tool",
+      "name": "brixmundo.eca-easy-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "brixmundo.eca-easy-tool",
+      "versions": [
+        "0.47.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-brixovik-es7-quick-hub",
+      "name": "brixovik.es7-quick-hub (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "brixovik.es7-quick-hub",
+      "versions": [
+        "4.4.4",
+        "4.4.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-buryagin-openapi-easy-studio",
+      "name": "buryagin.openapi-easy-studio (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "buryagin.openapi-easy-studio",
+      "versions": [
+        "5.4.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-calow-dex-prisma-database-schema-tools",
+      "name": "calow-dex.prisma-database-schema-tools (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "calow-dex.prisma-database-schema-tools",
+      "versions": [
+        "7.0.5",
+        "7.0.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-carveltstone-chatbuddy-auto-suite",
+      "name": "carveltstone.chatbuddy-auto-suite (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "carveltstone.chatbuddy-auto-suite",
+      "versions": [
+        "0.2.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-catspace-studio-ng-angular-language",
+      "name": "catspace-studio.ng-angular-language (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "catspace-studio.ng-angular-language",
+      "versions": [
+        "21.1.1",
+        "21.1.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-cliagenball-cline-agent-extension",
+      "name": "cliagenball.cline-agent-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "cliagenball.cline-agent-extension",
+      "versions": [
+        "3.38.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-cline-ai-main-cline-ai-agent",
+      "name": "cline-ai-main.cline-ai-agent (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "cline-ai-main.cline-ai-agent",
+      "versions": [
+        "3.1.3"
+      ],
+      "severity": "critical",
+      "source": "https://www.koi.ai/blog/glassworm-first-self-propagating-worm-using-invisible-code-hits-openvsx-marketplace"
+    },
+    {
+      "id": "glassworm-editor-extension-clotomoto-code-way-editor",
+      "name": "clotomoto.code-way-editor (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "clotomoto.code-way-editor",
+      "versions": [
+        "0.19.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-cod-vok-arko-dev-devsecops",
+      "name": "cod-vok.arko-dev-devsecops (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "cod-vok.arko-dev-devsecops",
+      "versions": [
+        "1.0.4",
+        "1.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-codbro-dxp-explorer-xml-xquery",
+      "name": "codbro-dxp.explorer-xml-xquery (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "codbro-dxp.explorer-xml-xquery",
+      "versions": [
+        "1.0.4",
+        "1.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-codbroks-compile-runnner-extension",
+      "name": "codbroks.compile-runnner-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "codbroks.compile-runnner-extension",
+      "versions": [
+        "1.0.88",
+        "1.0.87",
+        "1.0.86",
+        "1.0.85"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-codeinklingon-git-worktree-menu",
+      "name": "CodeInKlingon.git-worktree-menu (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "CodeInKlingon.git-worktree-menu",
+      "versions": [
+        "1.0.9",
+        "1.0.91"
+      ],
+      "severity": "critical",
+      "source": "https://www.koi.ai/blog/glassworm-first-self-propagating-worm-using-invisible-code-hits-openvsx-marketplace"
+    },
+    {
+      "id": "glassworm-editor-extension-codejoy-codejoy-vscode-extension",
+      "name": "codejoy.codejoy-vscode-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "codejoy.codejoy-vscode-extension",
+      "versions": [
+        "1.8.3",
+        "1.8.4"
+      ],
+      "severity": "critical",
+      "source": "https://www.koi.ai/blog/glassworm-first-self-propagating-worm-using-invisible-code-hits-openvsx-marketplace"
+    },
+    {
+      "id": "glassworm-editor-extension-codevunm-tm-cluster-kuberntes-manager",
+      "name": "codevunm-tm.cluster-kuberntes-manager (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "codevunm-tm.cluster-kuberntes-manager",
+      "versions": [
+        "1.0.8",
+        "1.0.7",
+        "1.0.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-codevunmis-csv-sql-tsv-rainbow",
+      "name": "codevunmis.csv-sql-tsv-rainbow (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "codevunmis.csv-sql-tsv-rainbow",
+      "versions": [
+        "3.3.3",
+        "3.3.2",
+        "3.3.1",
+        "3.3.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-codwayexten-code-way-extension",
+      "name": "codwayexten.code-way-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "codwayexten.code-way-extension",
+      "versions": [
+        "0.19.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-coneditorfig-config-editor-extension",
+      "name": "coneditorfig.config-editor-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "coneditorfig.config-editor-extension",
+      "versions": [
+        "0.17.5",
+        "0.17.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-cosmic-themes-sql-formatter",
+      "name": "cosmic-themes.sql-formatter (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "cosmic-themes.sql-formatter",
+      "versions": [
+        "4.2.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-countrepresent49-code-image-preview",
+      "name": "countrepresent49.code-image-preview (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "countrepresent49.code-image-preview",
+      "versions": [
+        "0.32.3",
+        "0.32.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-craz2team-vscode-todo-extension",
+      "name": "craz2team.vscode-todo-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "craz2team.vscode-todo-extension",
+      "versions": [
+        "1.0.10",
+        "1.0.9",
+        "1.0.8",
+        "1.0.7",
+        "1.0.6",
+        "1.0.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-crazy-ndkilddmn-vim-smart-tool",
+      "name": "crazy-ndkilddmn.vim-smart-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "crazy-ndkilddmn.vim-smart-tool",
+      "versions": [
+        "1.32.2",
+        "1.32.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-croct-studio-antigravity-model-usage-dashboard",
+      "name": "croct-studio.antigravity-model-usage-dashboard (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "croct-studio.antigravity-model-usage-dashboard",
+      "versions": [
+        "2.1.35"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-crotoapp-vscode-xml-extension",
+      "name": "crotoapp.vscode-xml-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "crotoapp.vscode-xml-extension",
+      "versions": [
+        "1.0.3",
+        "1.0.2",
+        "1.0.1",
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-cubedivervolt-html-code-validate",
+      "name": "cubedivervolt.html-code-validate (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "cubedivervolt.html-code-validate",
+      "versions": [
+        "2.12.15"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-cud-dot-prod-studio-prettier-pro-vscode-extension",
+      "name": "cud-dot-prod-studio.prettier-pro-vscode-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "cud-dot-prod-studio.prettier-pro-vscode-extension",
+      "versions": [
+        "11.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-cudra-production-vsce-prettier-pro",
+      "name": "cudra-production.vsce-prettier-pro (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "cudra-production.vsce-prettier-pro",
+      "versions": [
+        "11.0.2",
+        "11.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-daeumer-web-align-format-tool",
+      "name": "daeumer-web.align-format-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "daeumer-web.align-format-tool",
+      "versions": [
+        "1.4.6",
+        "1.4.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-daeumer-web-es-linter-for-vs-code",
+      "name": "daeumer-web.es-linter-for-vs-code (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "daeumer-web.es-linter-for-vs-code",
+      "versions": [
+        "3.0.21"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-daeumer-web-style-align-extension",
+      "name": "daeumer-web.style-align-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "daeumer-web.style-align-extension",
+      "versions": [
+        "1.3.9"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-dalsoven-intellij-live-pilot",
+      "name": "dalsoven.intellij-live-pilot (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "dalsoven.intellij-live-pilot",
+      "versions": [
+        "1.7.7"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-dalsovik-dbclient-quick-suite",
+      "name": "dalsovik.dbclient-quick-suite (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "dalsovik.dbclient-quick-suite",
+      "versions": [
+        "1.4.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-dark-code-studio-flutter-extension",
+      "name": "dark-code-studio.flutter-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "dark-code-studio.flutter-extension",
+      "versions": [
+        "3.122.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-densy-little-studio-wonder-for-vscode-icons",
+      "name": "densy-little-studio.wonder-for-vscode-icons (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "densy-little-studio.wonder-for-vscode-icons",
+      "versions": [
+        "0.10.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-dep-labs-studio-dep-proffesinal-extension",
+      "name": "dep-labs-studio.dep-proffesinal-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "dep-labs-studio.dep-proffesinal-extension",
+      "versions": [
+        "0.7.22"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-dev-studio-sense-php-comp-tools-vscode",
+      "name": "dev-studio-sense.php-comp-tools-vscode (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "dev-studio-sense.php-comp-tools-vscode",
+      "versions": [
+        "1.63.18156"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-dev-tm-code-python-indent-helper",
+      "name": "dev-tm.code-python-indent-helper (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "dev-tm.code-python-indent-helper",
+      "versions": [
+        "1.21.4",
+        "1.21.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-devmidu-studio-svg-better-extension",
+      "name": "devmidu-studio.svg-better-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "devmidu-studio.svg-better-extension",
+      "versions": [
+        "0.4.41"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-dopbop-studio-vscode-tailwindcss-extension-toolkit",
+      "name": "dopbop-studio.vscode-tailwindcss-extension-toolkit (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "dopbop-studio.vscode-tailwindcss-extension-toolkit",
+      "versions": [
+        "0.14.29"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2",
+      "indicators": {
+        "corroborating_sources": [
+          "https://checkmarx.com/zero-post/glassworm-targets-developer-ides-again-hiding-staged-malware-behind-runtime-rebuilt-loaders/"
+        ]
+      }
+    },
+    {
+      "id": "glassworm-editor-extension-draconzal-phpstan-easy-hub",
+      "name": "draconzal.phpstan-easy-hub (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "draconzal.phpstan-easy-hub",
+      "versions": [
+        "4.0.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-dranaven-flask-live-craft",
+      "name": "dranaven.flask-live-craft (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "dranaven.flask-live-craft",
+      "versions": [
+        "0.1.4",
+        "0.1.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-drobnyak-angular-auto-helper",
+      "name": "drobnyak.angular-auto-helper (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "drobnyak.angular-auto-helper",
+      "versions": [
+        "18.92.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-drovenko-data-live-suite",
+      "name": "drovenko.data-live-suite (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "drovenko.data-live-suite",
+      "versions": [
+        "1.0.32",
+        "1.0.31"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-ellacrity-recoil",
+      "name": "ellacrity.recoil (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "ellacrity.recoil",
+      "versions": [
+        "0.7.4"
+      ],
+      "severity": "critical",
+      "source": "https://www.koi.ai/blog/glassworm-first-self-propagating-worm-using-invisible-code-hits-openvsx-marketplace"
+    },
+    {
+      "id": "glassworm-editor-extension-emotionkyoseparate-turkish-language-pack",
+      "name": "emotionkyoseparate.turkish-language-pack (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "emotionkyoseparate.turkish-language-pack",
+      "versions": [
+        "1.110.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-epichipporedeem-prettier-eslint-formatter",
+      "name": "epichipporedeem.prettier-eslint-formatter (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "epichipporedeem.prettier-eslint-formatter",
+      "versions": [
+        "5.1.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-errlenscre-error-lens-finder-ex",
+      "name": "errlenscre.error-lens-finder-ex (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "errlenscre.error-lens-finder-ex",
+      "versions": [
+        "3.28.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-exss-studio-yaml-professional-extension",
+      "name": "exss-studio.yaml-professional-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "exss-studio.yaml-professional-extension",
+      "versions": [
+        "1.20.24",
+        "1.20.23",
+        "1.20.22",
+        "1.20.21"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-faldenko-explorer-auto-hub",
+      "name": "faldenko.explorer-auto-hub (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "faldenko.explorer-auto-hub",
+      "versions": [
+        "1.50.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-federicanc-dotenv-syntax-highlighting",
+      "name": "federicanc.dotenv-syntax-highlighting (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "federicanc.dotenv-syntax-highlighting",
+      "versions": [
+        "1.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2",
+      "indicators": {
+        "corroborating_sources": [
+          "https://checkmarx.com/zero-post/glassworm-targets-developer-ides-again-hiding-staged-malware-behind-runtime-rebuilt-loaders/"
+        ]
+      }
+    },
+    {
+      "id": "glassworm-editor-extension-federicanc-envglow-syntax-highlighting",
+      "name": "federicanc.envglow-syntax-highlighting (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "federicanc.envglow-syntax-highlighting",
+      "versions": [
+        "1.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-flape-osx-align-code-format-tool",
+      "name": "flape-osx.align-code-format-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "flape-osx.align-code-format-tool",
+      "versions": [
+        "1.4.8",
+        "1.4.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-floktokbok-autoimport-smart-tool",
+      "name": "floktokbok.autoimport-smart-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "floktokbok.autoimport-smart-tool",
+      "versions": [
+        "1.5.9",
+        "1.5.8"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-flutxvs-vscode-kuberntes-extension",
+      "name": "flutxvs.vscode-kuberntes-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "flutxvs.vscode-kuberntes-extension",
+      "versions": [
+        "1.0.2",
+        "1.0.1",
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-forkelbat-supersigil-rich-hub",
+      "name": "forkelbat.supersigil-rich-hub (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "forkelbat.supersigil-rich-hub",
+      "versions": [
+        "0.8.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-frelovin-gitpod-deep-helper",
+      "name": "frelovin.gitpod-deep-helper (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "frelovin.gitpod-deep-helper",
+      "versions": [
+        "0.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-fyltroven-gitchat-fast-tool",
+      "name": "fyltroven.gitchat-fast-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "fyltroven.gitchat-fast-tool",
+      "versions": [
+        "1.0.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-galushko-vsclassic-auto-pilot",
+      "name": "galushko.vsclassic-auto-pilot (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "galushko.vsclassic-auto-pilot",
+      "versions": [
+        "1.2.7",
+        "1.2.6",
+        "1.2.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-gastholve-shell-pro-kit",
+      "name": "gastholve.shell-pro-kit (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "gastholve.shell-pro-kit",
+      "versions": [
+        "7.2.8"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-ginfuru-better-nunjucks",
+      "name": "ginfuru.better-nunjucks (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "ginfuru.better-nunjucks",
+      "versions": [
+        "0.3.2"
+      ],
+      "severity": "critical",
+      "source": "https://www.koi.ai/blog/glassworm-first-self-propagating-worm-using-invisible-code-hits-openvsx-marketplace"
+    },
+    {
+      "id": "glassworm-editor-extension-goltikov-auto-rich-forge",
+      "name": "goltikov.auto-rich-forge (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "goltikov.auto-rich-forge",
+      "versions": [
+        "0.5.15"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-gorth-tm-your-project-manager-organizer",
+      "name": "gorth-tm.your-project-manager-organizer (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "gorth-tm.your-project-manager-organizer",
+      "versions": [
+        "13.0.6",
+        "13.0.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-grisaven-markdown-live-kit",
+      "name": "grisaven.markdown-live-kit (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "grisaven.markdown-live-kit",
+      "versions": [
+        "1.32.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-gronarin-auto-super-kit",
+      "name": "gronarin.auto-super-kit (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "gronarin.auto-super-kit",
+      "versions": [
+        "0.1.10"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-grozdarov-jinjahtml-easy-studio",
+      "name": "grozdarov.jinjahtml-easy-studio (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "grozdarov.jinjahtml-easy-studio",
+      "versions": [
+        "0.20.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-grrrck-positron-plus-1-e",
+      "name": "grrrck.positron-plus-1-e (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "grrrck.positron-plus-1-e",
+      "versions": [
+        "0.0.71"
+      ],
+      "severity": "critical",
+      "source": "https://www.koi.ai/blog/glassworm-first-self-propagating-worm-using-invisible-code-hits-openvsx-marketplace"
+    },
+    {
+      "id": "glassworm-editor-extension-gusarev-mermaid-super-studio",
+      "name": "gusarev.mermaid-super-studio (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "gusarev.mermaid-super-studio",
+      "versions": [
+        "2.6.6",
+        "2.6.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-gvotcha-claude-code-extension",
+      "name": "gvotcha.claude-code-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "gvotcha.claude-code-extension",
+      "versions": [
+        "2.1.46",
+        "2.1.45",
+        "2.1.44",
+        "2.1.43",
+        "2.1.42"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-gvotcha-claude-code-extensions",
+      "name": "gvotcha.claude-code-extensions (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "gvotcha.claude-code-extensions",
+      "versions": [
+        "2.1.45"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-haelthorn-fractal-fast-studio",
+      "name": "haelthorn.fractal-fast-studio (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "haelthorn.fractal-fast-studio",
+      "versions": [
+        "0.195.673"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-icepower1997-glacier-cave-theme",
+      "name": "icepower1997.glacier-cave-theme (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "icepower1997.glacier-cave-theme",
+      "versions": [
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-ilvvilab-php-composr-tool-extension",
+      "name": "ilvvilab.php-composr-tool-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "ilvvilab.php-composr-tool-extension",
+      "versions": [
+        "1.63.18165",
+        "1.63.18155"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-inangalek-project-manager-extension",
+      "name": "inangalek.project-manager-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "inangalek.project-manager-extension",
+      "versions": [
+        "13.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-intellipro-extension-json-intelligence",
+      "name": "intellipro.extension-json-intelligence (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "intellipro.extension-json-intelligence",
+      "versions": [
+        "1.0.5",
+        "1.0.4",
+        "1.0.3",
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-jeronimo-self-dev-smart-color-picker",
+      "name": "jeronimo-self-dev.smart-color-picker (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "jeronimo-self-dev.smart-color-picker",
+      "versions": [
+        "2.8.92",
+        "2.8.91",
+        "2.8.9"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-jeronimoekerdt-color-picker-universal",
+      "name": "jeronimoekerdt.color-picker-universal (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "jeronimoekerdt.color-picker-universal",
+      "versions": [
+        "2.8.91"
+      ],
+      "severity": "critical",
+      "source": "https://www.koi.ai/blog/glassworm-first-self-propagating-worm-using-invisible-code-hits-openvsx-marketplace"
+    },
+    {
+      "id": "glassworm-editor-extension-jscearcy-rust-doc-viewer",
+      "name": "JScearcy.rust-doc-viewer (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "JScearcy.rust-doc-viewer",
+      "versions": [
+        "4.2.1"
+      ],
+      "severity": "critical",
+      "source": "https://www.koi.ai/blog/glassworm-first-self-propagating-worm-using-invisible-code-hits-openvsx-marketplace"
+    },
+    {
+      "id": "glassworm-editor-extension-jupstudio-dotenv-tools-dev",
+      "name": "jupstudio.dotenv-tools-dev (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "jupstudio.dotenv-tools-dev",
+      "versions": [
+        "1.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-juptool-jupyter-pro-tool-extension",
+      "name": "juptool.jupyter-pro-tool-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "juptool.jupyter-pro-tool-extension",
+      "versions": [
+        "2025.9.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-kalinka-shellcheck-auto-craft",
+      "name": "kalinka.shellcheck-auto-craft (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "kalinka.shellcheck-auto-craft",
+      "versions": [
+        "0.39.4",
+        "0.39.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-karnikov-better-rich-studio",
+      "name": "karnikov.better-rich-studio (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "karnikov.better-rich-studio",
+      "versions": [
+        "1.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-keltarin-android-deep-hub",
+      "name": "keltarin.android-deep-hub (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "keltarin.android-deep-hub",
+      "versions": [
+        "0.4.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-keyacrosslaud-auto-loop-for-antigravity",
+      "name": "keyacrosslaud.auto-loop-for-antigravity (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "keyacrosslaud.auto-loop-for-antigravity",
+      "versions": [
+        "0.6.6",
+        "0.6.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-kharizma-vscode-extension-wakatime",
+      "name": "kharizma.vscode-extension-wakatime (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "kharizma.vscode-extension-wakatime",
+      "versions": [
+        "25.5.7",
+        "25.5.3",
+        "25.5.2",
+        "25.5.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-khromok-react-deep-tool",
+      "name": "khromok.react-deep-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "khromok.react-deep-tool",
+      "versions": [
+        "1.13.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-kleinesfilmroellchen-serenity-dsl-syntaxhighlight",
+      "name": "kleinesfilmroellchen.serenity-dsl-syntaxhighlight (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "kleinesfilmroellchen.serenity-dsl-syntaxhighlight",
+      "versions": [
+        "0.3.2"
+      ],
+      "severity": "critical",
+      "source": "https://www.koi.ai/blog/glassworm-first-self-propagating-worm-using-invisible-code-hits-openvsx-marketplace"
+    },
+    {
+      "id": "glassworm-editor-extension-ko-zu-gun-studio-synchronization-settings-vscode",
+      "name": "ko-zu-gun-studio.synchronization-settings-vscode (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "ko-zu-gun-studio.synchronization-settings-vscode",
+      "versions": [
+        "0.18.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-kotpot-modern-css-toolkit",
+      "name": "kotpot.modern-css-toolkit (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "kotpot.modern-css-toolkit",
+      "versions": [
+        "0.14.28"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-krosaven-dot-live-forge",
+      "name": "krosaven.dot-live-forge (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "krosaven.dot-live-forge",
+      "versions": [
+        "0.6.1",
+        "0.6.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-krosovik-laravel-quick-pilot",
+      "name": "krosovik.laravel-quick-pilot (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "krosovik.laravel-quick-pilot",
+      "versions": [
+        "1.7.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-kuldaran-search-smart-forge",
+      "name": "kuldaran.search-smart-forge (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "kuldaran.search-smart-forge",
+      "versions": [
+        "0.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-kwinsolin-act-extension",
+      "name": "kwinsolin.act-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "kwinsolin.act-extension",
+      "versions": [
+        "0.5.16"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-kwinsolin-better-cpp-tool",
+      "name": "kwinsolin.better-cpp-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "kwinsolin.better-cpp-tool",
+      "versions": [
+        "1.27.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-kwitch-studio-auto-run-command-extension",
+      "name": "kwitch-studio.auto-run-command-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "kwitch-studio.auto-run-command-extension",
+      "versions": [
+        "1.6.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2",
+      "indicators": {
+        "corroborating_sources": [
+          "https://checkmarx.com/zero-post/glassworm-targets-developer-ides-again-hiding-staged-malware-behind-runtime-rebuilt-loaders/"
+        ]
+      }
+    },
+    {
+      "id": "glassworm-editor-extension-l-igh-t-vscode-theme-seti-folder",
+      "name": "l-igh-t.vscode-theme-seti-folder (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "l-igh-t.vscode-theme-seti-folder",
+      "versions": [
+        "1.2.3"
+      ],
+      "severity": "critical",
+      "source": "https://www.koi.ai/blog/glassworm-first-self-propagating-worm-using-invisible-code-hits-openvsx-marketplace"
+    },
+    {
+      "id": "glassworm-editor-extension-lairinspectortrek70-todo-highlighter",
+      "name": "lairinspectortrek70.todo-highlighter (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "lairinspectortrek70.todo-highlighter",
+      "versions": [
+        "1.0.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-lauracode-wrap-selected-code",
+      "name": "lauracode.wrap-selected-code (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "lauracode.wrap-selected-code",
+      "versions": [
+        "0.0.2",
+        "0.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-lavender-studio-theme-lavender-dreams",
+      "name": "lavender-studio.theme-lavender-dreams (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "lavender-studio.theme-lavender-dreams",
+      "versions": [
+        "1.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-lavrentev-project-live-studio",
+      "name": "lavrentev.project-live-studio (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "lavrentev.project-live-studio",
+      "versions": [
+        "13.1.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-lesnitsky-tikbook-easy-lens",
+      "name": "lesnitsky.tikbook-easy-lens (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "lesnitsky.tikbook-easy-lens",
+      "versions": [
+        "0.5.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-littensy-studio-magical-icons",
+      "name": "littensy-studio.magical-icons (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "littensy-studio.magical-icons",
+      "versions": [
+        "0.10.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-ll-service-vm-studio-vscode-clangd-cross-platform",
+      "name": "ll-service-vm-studio.vscode-clangd-cross-platform (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "ll-service-vm-studio.vscode-clangd-cross-platform",
+      "versions": [
+        "0.3.21"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-lyu-wen-studio-web-han-better-formatter-vscode",
+      "name": "lyu-wen-studio-web-han.better-formatter-vscode (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "lyu-wen-studio-web-han.better-formatter-vscode",
+      "versions": [
+        "1.1.5",
+        "1.1.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2",
+      "indicators": {
+        "corroborating_sources": [
+          "https://checkmarx.com/zero-post/glassworm-targets-developer-ides-again-hiding-staged-malware-behind-runtime-rebuilt-loaders/"
+        ]
+      }
+    },
+    {
+      "id": "glassworm-editor-extension-marabenov-graphql-super-craft",
+      "name": "marabenov.graphql-super-craft (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "marabenov.graphql-super-craft",
+      "versions": [
+        "0.13.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-marcus-tm-ruby-intelligence-toolkit",
+      "name": "marcus-tm.ruby-intelligence-toolkit (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "marcus-tm.ruby-intelligence-toolkit",
+      "versions": [
+        "0.10.3",
+        "0.10.2",
+        "0.10.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-markvalid-vscode-mdvalidator-extension",
+      "name": "markvalid.vscode-mdvalidator-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "markvalid.vscode-mdvalidator-extension",
+      "versions": [
+        "0.61.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-martyev-turbo-deep-tool",
+      "name": "martyev.turbo-deep-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "martyev.turbo-deep-tool",
+      "versions": [
+        "3.21.1",
+        "3.21.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-mashulin-vue-easy-studio",
+      "name": "mashulin.vue-easy-studio (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "mashulin.vue-easy-studio",
+      "versions": [
+        "0.0.7"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-mecreation-studio-pyrefly-pro-extension",
+      "name": "mecreation-studio.pyrefly-pro-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "mecreation-studio.pyrefly-pro-extension",
+      "versions": [
+        "0.48.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-meltovik-bookmark-rich-tool",
+      "name": "meltovik.bookmark-rich-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "meltovik.bookmark-rich-tool",
+      "versions": [
+        "0.0.23"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-meltuven-graphql-pro-tool",
+      "name": "meltuven.graphql-pro-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "meltuven.graphql-pro-tool",
+      "versions": [
+        "1.3.8"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-mitrokhin-vsc-easy-studio",
+      "name": "mitrokhin.vsc-easy-studio (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "mitrokhin.vsc-easy-studio",
+      "versions": [
+        "1.21.2",
+        "1.21.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-mlechevik-nunjucks-rich-pilot",
+      "name": "mlechevik.nunjucks-rich-pilot (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "mlechevik.nunjucks-rich-pilot",
+      "versions": [
+        "0.5.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-mokridin-material-pro-suite",
+      "name": "mokridin.material-pro-suite (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "mokridin.material-pro-suite",
+      "versions": [
+        "3.19.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-mrekelid-manpages-fast-kit",
+      "name": "mrekelid.manpages-fast-kit (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "mrekelid.manpages-fast-kit",
+      "versions": [
+        "0.2.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-msw-tm-component-vetur-toolkit",
+      "name": "msw-tm.component-vetur-toolkit (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "msw-tm.component-vetur-toolkit",
+      "versions": [
+        "0.37.4",
+        "0.37.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-mswincx-antigravity-cockpit",
+      "name": "mswincx.antigravity-cockpit (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "mswincx.antigravity-cockpit",
+      "versions": [
+        "2.1.31",
+        "2.1.30",
+        "2.1.29"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-mswincx-antigravity-cockpit-extension",
+      "name": "mswincx.antigravity-cockpit-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "mswincx.antigravity-cockpit-extension",
+      "versions": [
+        "2.1.34",
+        "2.1.33",
+        "2.1.32",
+        "2.1.29"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-myexttool-my-command-palette-extension",
+      "name": "myexttool.my-command-palette-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "myexttool.my-command-palette-extension",
+      "versions": [
+        "0.0.4",
+        "0.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2",
+      "indicators": {
+        "corroborating_sources": [
+          "https://checkmarx.com/zero-post/glassworm-targets-developer-ides-again-hiding-staged-malware-behind-runtime-rebuilt-loaders/"
+        ]
+      }
+    },
+    {
+      "id": "glassworm-editor-extension-namop-dex-claude-code-assistant",
+      "name": "namop-dex.claude-code-assistant (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "namop-dex.claude-code-assistant",
+      "versions": [
+        "2.1.47",
+        "2.1.46"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-namopins-prettier-pro-vscode-extension",
+      "name": "namopins.prettier-pro-vscode-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "namopins.prettier-pro-vscode-extension",
+      "versions": [
+        "11.0.3",
+        "11.0.2",
+        "11.0.1",
+        "11.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-nazarov-errorlens-fast-suite",
+      "name": "nazarov.errorlens-fast-suite (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "nazarov.errorlens-fast-suite",
+      "versions": [
+        "3.28.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-oigotm-my-command-palette-extension",
+      "name": "oigotm.my-command-palette-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "oigotm.my-command-palette-extension",
+      "versions": [
+        "0.0.4",
+        "0.0.3",
+        "0.0.2",
+        "0.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-oorzc-i18n-tools-plus",
+      "name": "oorzc.i18n-tools-plus (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "oorzc.i18n-tools-plus",
+      "versions": [
+        "1.6.8"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-oorzc-mind-map",
+      "name": "oorzc.mind-map (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "oorzc.mind-map",
+      "versions": [
+        "1.0.61"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-oorzc-scss-to-css-compile",
+      "name": "oorzc.scss-to-css-compile (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "oorzc.scss-to-css-compile",
+      "versions": [
+        "1.3.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-oorzc-ssh-tools",
+      "name": "oorzc.ssh-tools (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "oorzc.ssh-tools",
+      "versions": [
+        "0.5.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-otobo-vs-csv-query-tsv-rainbow",
+      "name": "otobo-vs.csv-query-tsv-rainbow (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "otobo-vs.csv-query-tsv-rainbow",
+      "versions": [
+        "3.3.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-otoboss-autoimport-extension",
+      "name": "otoboss.autoimport-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "otoboss.autoimport-extension",
+      "versions": [
+        "1.5.7",
+        "1.5.6",
+        "1.5.5",
+        "1.5.4",
+        "1.5.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-ovchinin-markdown-live-craft",
+      "name": "ovchinin.markdown-live-craft (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "ovchinin.markdown-live-craft",
+      "versions": [
+        "3.6.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-ovixcode-vscode-better-comments",
+      "name": "ovixcode.vscode-better-comments (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "ovixcode.vscode-better-comments",
+      "versions": [
+        "3.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-oxigener-tmp-sql-turbo-manager",
+      "name": "oxigener-tmp.sql-turbo-manager (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "oxigener-tmp.sql-turbo-manager",
+      "versions": [
+        "0.28.10"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-peldravix-rpgiv2free-live-tool",
+      "name": "peldravix.rpgiv2free-live-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "peldravix.rpgiv2free-live-tool",
+      "versions": [
+        "1.12.21"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-peschanov-dbcode-smart-suite",
+      "name": "peschanov.dbcode-smart-suite (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "peschanov.dbcode-smart-suite",
+      "versions": [
+        "1.30.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-pessa07tm-my-js-ts-auto-commands",
+      "name": "pessa07tm.my-js-ts-auto-commands (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "pessa07tm.my-js-ts-auto-commands",
+      "versions": [
+        "1.0.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2",
+      "indicators": {
+        "corroborating_sources": [
+          "https://checkmarx.com/zero-post/glassworm-targets-developer-ides-again-hiding-staged-malware-behind-runtime-rebuilt-loaders/"
+        ]
+      }
+    },
+    {
+      "id": "glassworm-editor-extension-platarov-podmanager-pro-craft",
+      "name": "platarov.podmanager-pro-craft (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "platarov.podmanager-pro-craft",
+      "versions": [
+        "3.0.8"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-polikash-pretty-deep-kit",
+      "name": "polikash.pretty-deep-kit (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "polikash.pretty-deep-kit",
+      "versions": [
+        "0.8.9"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-porzhnev-swiftformat-deep-hub",
+      "name": "porzhnev.swiftformat-deep-hub (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "porzhnev.swiftformat-deep-hub",
+      "versions": [
+        "1.7.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-potstok-dotnet-runtime-extension",
+      "name": "potstok.dotnet-runtime-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "potstok.dotnet-runtime-extension",
+      "versions": [
+        "3.0.2",
+        "3.0.1",
+        "3.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-pranlokev-topmodel-fast-suite",
+      "name": "pranlokev.topmodel-fast-suite (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "pranlokev.topmodel-fast-suite",
+      "versions": [
+        "4.1.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-prednovik-php-super-pilot",
+      "name": "prednovik.php-super-pilot (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "prednovik.php-super-pilot",
+      "versions": [
+        "1.40.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-pretty-studio-advisor-prettyxml-formatter",
+      "name": "pretty-studio-advisor.prettyxml-formatter (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "pretty-studio-advisor.prettyxml-formatter",
+      "versions": [
+        "6.4.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-prismapp-prisma-vs-code-extension",
+      "name": "prismapp.prisma-vs-code-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "prismapp.prisma-vs-code-extension",
+      "versions": [
+        "7.0.3",
+        "7.0.2",
+        "7.0.1",
+        "7.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-projmanager-your-project-manager-extension",
+      "name": "projmanager.your-project-manager-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "projmanager.your-project-manager-extension",
+      "versions": [
+        "13.0.4",
+        "13.0.3",
+        "13.0.2",
+        "13.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-pubruncode-ccoderunner",
+      "name": "pubruncode.ccoderunner (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "pubruncode.ccoderunner",
+      "versions": [
+        "9.4.8"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-pulselireckon-code-usage-stats",
+      "name": "pulselireckon.code-usage-stats (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "pulselireckon.code-usage-stats",
+      "versions": [
+        "1.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-pyflowpyr-py-flowpyright-extension",
+      "name": "pyflowpyr.py-flowpyright-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "pyflowpyr.py-flowpyright-extension",
+      "versions": [
+        "1.1.329",
+        "1.1.327"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-pyscopexte-pyscope-extension",
+      "name": "pyscopexte.pyscope-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "pyscopexte.pyscope-extension",
+      "versions": [
+        "1.1.403"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2",
+      "indicators": {
+        "corroborating_sources": [
+          "https://checkmarx.com/zero-post/glassworm-targets-developer-ides-again-hiding-staged-malware-behind-runtime-rebuilt-loaders/"
+        ]
+      }
+    },
+    {
+      "id": "glassworm-editor-extension-quickrunn-auto-run-command-quick",
+      "name": "quickrunn.auto-run-command-quick (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "quickrunn.auto-run-command-quick",
+      "versions": [
+        "1.6.2",
+        "1.6.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-randevtek-dev-extension-thunder-client-free",
+      "name": "randevtek-dev.extension-thunder-client-free (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "randevtek-dev.extension-thunder-client-free",
+      "versions": [
+        "2.38.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-razinov-spell-rich-hub",
+      "name": "razinov.spell-rich-hub (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "razinov.spell-rich-hub",
+      "versions": [
+        "2.2.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-redcapcollective-vscode-quarkus-elite-suite",
+      "name": "redcapcollective.vscode-quarkus-elite-suite (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "redcapcollective.vscode-quarkus-elite-suite",
+      "versions": [
+        "1.21.2025112809"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-reditorsupporter-r-vscode",
+      "name": "reditorsupporter.r-vscode (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "reditorsupporter.r-vscode",
+      "versions": [
+        "2.8.8"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-rubyideext-ruby-ide-extension",
+      "name": "rubyideext.ruby-ide-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "rubyideext.ruby-ide-extension",
+      "versions": [
+        "0.10.0-alpha.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2",
+      "indicators": {
+        "corroborating_sources": [
+          "https://checkmarx.com/zero-post/glassworm-targets-developer-ides-again-hiding-staged-malware-behind-runtime-rebuilt-loaders/"
+        ]
+      }
+    },
+    {
+      "id": "glassworm-editor-extension-runnerpost-runner-your-code",
+      "name": "runnerpost.runner-your-code (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "runnerpost.runner-your-code",
+      "versions": [
+        "0.13.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2",
+      "indicators": {
+        "corroborating_sources": [
+          "https://checkmarx.com/zero-post/glassworm-targets-developer-ides-again-hiding-staged-malware-behind-runtime-rebuilt-loaders/"
+        ]
+      }
+    },
+    {
+      "id": "glassworm-editor-extension-rusakov-indent-quick-pilot",
+      "name": "rusakov.indent-quick-pilot (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "rusakov.indent-quick-pilot",
+      "versions": [
+        "8.3.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-saoudrizvsce-claude-devsce",
+      "name": "saoudrizvsce.claude-devsce (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "saoudrizvsce.claude-devsce",
+      "versions": [
+        "3.38.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-seldovik-cmake-smart-pilot",
+      "name": "seldovik.cmake-smart-pilot (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "seldovik.cmake-smart-pilot",
+      "versions": [
+        "0.0.17"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-shinypy-pycode-formatter",
+      "name": "shinypy.pycode-formatter (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "shinypy.pycode-formatter",
+      "versions": [
+        "2025.2.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-shinypy-shiny-extension-for-vscode",
+      "name": "shinypy.shiny-extension-for-vscode (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "shinypy.shiny-extension-for-vscode",
+      "versions": [
+        "1.3.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-shiverov-open-smart-suite",
+      "name": "shiverov.open-smart-suite (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "shiverov.open-smart-suite",
+      "versions": [
+        "0.0.49"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-shulgin-deno-rich-lens",
+      "name": "shulgin.deno-rich-lens (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "shulgin.deno-rich-lens",
+      "versions": [
+        "3.52.1",
+        "3.52.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-silvia68-console-log-generator",
+      "name": "silvia68.console-log-generator (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "silvia68.console-log-generator",
+      "versions": [
+        "1.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2",
+      "indicators": {
+        "corroborating_sources": [
+          "https://checkmarx.com/zero-post/glassworm-targets-developer-ides-again-hiding-staged-malware-behind-runtime-rebuilt-loaders/"
+        ]
+      }
+    },
+    {
+      "id": "glassworm-editor-extension-sirilmp-dark-theme-sm",
+      "name": "SIRILMP.dark-theme-sm (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "SIRILMP.dark-theme-sm",
+      "versions": [
+        "3.11.4"
+      ],
+      "severity": "critical",
+      "source": "https://www.koi.ai/blog/glassworm-first-self-propagating-worm-using-invisible-code-hits-openvsx-marketplace"
+    },
+    {
+      "id": "glassworm-editor-extension-sissel-shopify-liquid",
+      "name": "sissel.shopify-liquid (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "sissel.shopify-liquid",
+      "versions": [
+        "4.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://www.koi.ai/blog/glassworm-first-self-propagating-worm-using-invisible-code-hits-openvsx-marketplace"
+    },
+    {
+      "id": "glassworm-editor-extension-skorzenko-office-deep-studio",
+      "name": "skorzenko.office-deep-studio (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "skorzenko.office-deep-studio",
+      "versions": [
+        "3.5.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-smolyak-slog-smart-studio",
+      "name": "smolyak.slog-smart-studio (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "smolyak.slog-smart-studio",
+      "versions": [
+        "1.6.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-sol-studio-solidity-extension",
+      "name": "sol-studio.solidity-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "sol-studio.solidity-extension",
+      "versions": [
+        "0.0.188"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-spacetoow-vsc-python-indent",
+      "name": "spacetoow.vsc-python-indent (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "spacetoow.vsc-python-indent",
+      "versions": [
+        "1.21.6",
+        "1.21.5",
+        "1.21.4",
+        "1.21.3",
+        "1.21.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-specstudio-code-wakatime-activity-tracker",
+      "name": "specstudio.code-wakatime-activity-tracker (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "specstudio.code-wakatime-activity-tracker",
+      "versions": [
+        "25.5.9"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-spikearshock-csv-rainbow",
+      "name": "spikearshock.csv-rainbow (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "spikearshock.csv-rainbow",
+      "versions": [
+        "3.24.3",
+        "3.24.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-srcery-colors-srcery-colors",
+      "name": "srcery-colors.srcery-colors (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "srcery-colors.srcery-colors",
+      "versions": [
+        "0.3.9"
+      ],
+      "severity": "critical",
+      "source": "https://www.koi.ai/blog/glassworm-first-self-propagating-worm-using-invisible-code-hits-openvsx-marketplace"
+    },
+    {
+      "id": "glassworm-editor-extension-sremekov-javascriptsnippets-rich-craft",
+      "name": "sremekov.javascriptsnippets-rich-craft (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "sremekov.javascriptsnippets-rich-craft",
+      "versions": [
+        "1.8.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-sremovik-dendron-deep-hub",
+      "name": "sremovik.dendron-deep-hub (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "sremovik.dendron-deep-hub",
+      "versions": [
+        "0.1.7",
+        "0.1.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-sremuven-beautify-super-lens",
+      "name": "sremuven.beautify-super-lens (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "sremuven.beautify-super-lens",
+      "versions": [
+        "1.4.11"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-ssgwysc-volar-vscode",
+      "name": "ssgwysc.volar-vscode (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "ssgwysc.volar-vscode",
+      "versions": [
+        "3.1.9",
+        "3.1.8",
+        "3.1.7",
+        "3.1.6",
+        "3.1.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-stackmason1-synesthesia-theme",
+      "name": "stackmason1.synesthesia-theme (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "stackmason1.synesthesia-theme",
+      "versions": [
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-starodub-kodio-smart-forge",
+      "name": "starodub.kodio-smart-forge (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "starodub.kodio-smart-forge",
+      "versions": [
+        "0.9.23"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-stelbavik-hledger-fast-tool",
+      "name": "stelbavik.hledger-fast-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "stelbavik.hledger-fast-tool",
+      "versions": [
+        "0.5.17"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-studio-jja-laire-quarto-advanced-suite",
+      "name": "studio-jja-laire.quarto-advanced-suite (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "studio-jja-laire.quarto-advanced-suite",
+      "versions": [
+        "1.127.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-studio-jjalaire-team-professional-quarto-extension",
+      "name": "studio-jjalaire-team.professional-quarto-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "studio-jjalaire-team.professional-quarto-extension",
+      "versions": [
+        "1.126.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-studio-velte-distributor-pro-svelte-extension",
+      "name": "studio-velte-distributor.pro-svelte-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "studio-velte-distributor.pro-svelte-extension",
+      "versions": [
+        "109.12.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-sun-shine-studio-shiny-extension-for-vscode",
+      "name": "sun-shine-studio.shiny-extension-for-vscode (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "sun-shine-studio.shiny-extension-for-vscode",
+      "versions": [
+        "1.3.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-sv-codex-gitlens-code-history-explorer",
+      "name": "sv-codex.gitlens-code-history-explorer (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "sv-codex.gitlens-code-history-explorer",
+      "versions": [
+        "2026.2.2806"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-svetelin-industrious-live-hub",
+      "name": "svetelin.industrious-live-hub (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "svetelin.industrious-live-hub",
+      "versions": [
+        "0.0.11"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-sweaty-toys-stuios-extension-volar-tool-kit",
+      "name": "sweaty-toys-stuios.extension-volar-tool-kit (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "sweaty-toys-stuios.extension-volar-tool-kit",
+      "versions": [
+        "0.0.15"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-sweaty-tstudio-quarto-report-studio",
+      "name": "sweaty-tstudio.quarto-report-studio (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "sweaty-tstudio.quarto-report-studio",
+      "versions": [
+        "1.127.2",
+        "1.127.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-sxatvo-tm-compile-runnner-build",
+      "name": "sxatvo-tm.compile-runnner-build (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "sxatvo-tm.compile-runnner-build",
+      "versions": [
+        "1.0.90",
+        "1.0.89"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-sxatvo-jinja-extension",
+      "name": "sxatvo.jinja-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "sxatvo.jinja-extension",
+      "versions": [
+        "0.2.2",
+        "0.2.1",
+        "0.1.9",
+        "0.1.8"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-tagovich-zener-pro-craft",
+      "name": "tagovich.zener-pro-craft (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "tagovich.zener-pro-craft",
+      "versions": [
+        "2.1.29"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-tamokill12-foundry-pdf-extension",
+      "name": "tamokill12.foundry-pdf-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "tamokill12.foundry-pdf-extension",
+      "versions": [
+        "1.9.9",
+        "1.9.8",
+        "1.9.7",
+        "1.9.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-tamokill12-pdf-extension",
+      "name": "tamokill12.pdf-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "tamokill12.pdf-extension",
+      "versions": [
+        "1.2.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-tarasenya-todo-rich-hub",
+      "name": "tarasenya.todo-rich-hub (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "tarasenya.todo-rich-hub",
+      "versions": [
+        "0.0.218"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-tettetrouse0t-geode-amethyst-theme",
+      "name": "tettetrouse0t.geode-amethyst-theme (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "tettetrouse0t.geode-amethyst-theme",
+      "versions": [
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-thing-mn-your-flow-extension-for-icons",
+      "name": "thing-mn.your-flow-extension-for-icons (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "thing-mn.your-flow-extension-for-icons",
+      "versions": [
+        "1.3.2",
+        "1.3.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-thunderprosecutor-autopep8-formatter",
+      "name": "thunderprosecutor.autopep8-formatter (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "thunderprosecutor.autopep8-formatter",
+      "versions": [
+        "2025.2.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-tima-web-wang-shell-check-utils",
+      "name": "tima-web-wang.shell-check-utils (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "tima-web-wang.shell-check-utils",
+      "versions": [
+        "0.38.61"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-tokcodes-import-cost-extension",
+      "name": "tokcodes.import-cost-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "tokcodes.import-cost-extension",
+      "versions": [
+        "3.3.3",
+        "3.3.2",
+        "3.3.1",
+        "3.3.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-tool-studio-prettier-pro-code-format",
+      "name": "tool-studio.prettier-pro-code-format (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "tool-studio.prettier-pro-code-format",
+      "versions": [
+        "11.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-toowespace-worksets-extension",
+      "name": "toowespace.worksets-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "toowespace.worksets-extension",
+      "versions": [
+        "0.2.41"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-tormekov-htmlmustache-fast-craft",
+      "name": "tormekov.htmlmustache-fast-craft (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "tormekov.htmlmustache-fast-craft",
+      "versions": [
+        "0.8.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-tossbers-browser-open-tool",
+      "name": "tossbers.browser-open-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "tossbers.browser-open-tool",
+      "versions": [
+        "2.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-tralarin-firefox-rich-lens",
+      "name": "tralarin.firefox-rich-lens (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "tralarin.firefox-rich-lens",
+      "versions": [
+        "2.15.1",
+        "2.15.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-tralaven-c-easy-tool",
+      "name": "tralaven.c-easy-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "tralaven.c-easy-tool",
+      "versions": [
+        "9.4.7"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-treedotree-tree-do-todoextension",
+      "name": "treedotree.tree-do-todoextension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "treedotree.tree-do-todoextension",
+      "versions": [
+        "0.0.216"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-trenarin-autodocstring-auto-studio",
+      "name": "trenarin.autodocstring-auto-studio (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "trenarin.autodocstring-auto-studio",
+      "versions": [
+        "0.6.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-tretinv3-forts-api-extention",
+      "name": "TretinV3.forts-api-extention (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "TretinV3.forts-api-extention",
+      "versions": [
+        "0.3.1"
+      ],
+      "severity": "critical",
+      "source": "https://www.koi.ai/blog/glassworm-first-self-propagating-worm-using-invisible-code-hits-openvsx-marketplace"
+    },
+    {
+      "id": "glassworm-editor-extension-trikarin-database-super-tool",
+      "name": "trikarin.database-super-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "trikarin.database-super-tool",
+      "versions": [
+        "8.4.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-trovizno-arko-extension",
+      "name": "trovizno.arko-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "trovizno.arko-extension",
+      "versions": [
+        "1.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-tucyzirille-studio-angular-pro-tools-extension",
+      "name": "tucyzirille-studio.angular-pro-tools-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "tucyzirille-studio.angular-pro-tools-extension",
+      "versions": [
+        "7.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-turbobase-sql-turbo-tool",
+      "name": "turbobase.sql-turbo-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "turbobase.sql-turbo-tool",
+      "versions": [
+        "0.28.9",
+        "0.28.7",
+        "0.28.6",
+        "0.28.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-twilkbilk-color-highlight-css",
+      "name": "twilkbilk.color-highlight-css (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "twilkbilk.color-highlight-css",
+      "versions": [
+        "2.8.2",
+        "2.8.1",
+        "2.8.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-vadim-studio-cn-extension-lldb-pro-vscode",
+      "name": "vadim-studio-cn.extension-lldb-pro-vscode (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "vadim-studio-cn.extension-lldb-pro-vscode",
+      "versions": [
+        "1.12.31",
+        "1.12.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-vce-brendan-studio-eich-js-debuger-vscode",
+      "name": "vce-brendan-studio-eich.js-debuger-vscode (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "vce-brendan-studio-eich.js-debuger-vscode",
+      "versions": [
+        "1.105.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-veldekov-csv-pro-suite",
+      "name": "veldekov.csv-pro-suite (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "veldekov.csv-pro-suite",
+      "versions": [
+        "1.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-veltarik-duplicate-fast-helper",
+      "name": "veltarik.duplicate-fast-helper (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "veltarik.duplicate-fast-helper",
+      "versions": [
+        "1.2.2",
+        "1.2.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-vendrakos-rumdl-pro-kit",
+      "name": "vendrakos.rumdl-pro-kit (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "vendrakos.rumdl-pro-kit",
+      "versions": [
+        "0.0.221"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-victorbetweenhose-agent-auto-accept",
+      "name": "victorbetweenhose.agent-auto-accept (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "victorbetweenhose.agent-auto-accept",
+      "versions": [
+        "13.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-vornovin-ionic-easy-kit",
+      "name": "vornovin.ionic-easy-kit (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "vornovin.ionic-easy-kit",
+      "versions": [
+        "2.2.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-weldforick-brightscript-pro-kit",
+      "name": "weldforick.brightscript-pro-kit (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "weldforick.brightscript-pro-kit",
+      "versions": [
+        "2.63.7"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-winnerdomain17-version-lens-tool",
+      "name": "winnerdomain17.version-lens-tool (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "winnerdomain17.version-lens-tool",
+      "versions": [
+        "1.28.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-yamal-dext-wonder-workspace-icons",
+      "name": "yamal-dext.wonder-workspace-icons (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "yamal-dext.wonder-workspace-icons",
+      "versions": [
+        "0.10.5",
+        "0.10.4",
+        "0.10.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-yamaprolas-revature-labs-extension",
+      "name": "yamaprolas.revature-labs-extension (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "yamaprolas.revature-labs-extension",
+      "versions": [
+        "1.0.20",
+        "1.0.19",
+        "1.0.18",
+        "1.0.17"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-yelzunik-sqltools-smart-forge",
+      "name": "yelzunik.sqltools-smart-forge (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "yelzunik.sqltools-smart-forge",
+      "versions": [
+        "0.5.8"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-editor-extension-zubarets-latex-quick-suite",
+      "name": "zubarets.latex-quick-suite (GlassWorm)",
+      "ecosystem": "editor-extension",
+      "package": "zubarets.latex-quick-suite",
+      "versions": [
+        "10.14.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/supply-chain-attacks/glassworm-v2"
+    },
+    {
+      "id": "glassworm-npm-react-native-country-select",
+      "name": "react-native-country-select (GlassWorm)",
+      "ecosystem": "npm",
+      "package": "react-native-country-select",
+      "versions": [
+        "0.3.91"
+      ],
+      "severity": "critical",
+      "source": "https://www.sonatype.com/blog/hijacked-npm-packages-deliver-malware-via-solana-linked-to-glassworm"
+    },
+    {
+      "id": "glassworm-npm-react-native-international-phone-number",
+      "name": "react-native-international-phone-number (GlassWorm)",
+      "ecosystem": "npm",
+      "package": "react-native-international-phone-number",
+      "versions": [
+        "0.11.8"
+      ],
+      "severity": "critical",
+      "source": "https://www.sonatype.com/blog/hijacked-npm-packages-deliver-malware-via-solana-linked-to-glassworm"
+    }
+  ]
+}
