@@ -1,0 +1,1557 @@
+{
+  "schema_version": "0.1.0",
+  "_comment": "Mastra npm supply-chain compromise reported by Socket on 2026-06-17 (https://socket.dev/blog/mastra-npm-packages-compromised). A single npm publisher account mass-published malicious patch versions of @mastra/* packages that pulled in a typosquatted dependency, easy-day-js@1.11.22, whose postinstall hook ran a cross-platform infostealer/tasking implant. Covers 141 packages / 141 package-version pairs, all npm (the @mastra scope plus create-mastra and the easy-day-js typosquat that delivered the payload). Intended for exact (ecosystem, package, version) presence checks, not network/file/process IOC checks.",
+  "entries": [
+    {
+      "id": "mastra-2026-06-17-npm-mastra-acp",
+      "name": "@mastra/acp (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/acp",
+      "versions": [
+        "0.2.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-agent-browser",
+      "name": "@mastra/agent-browser (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/agent-browser",
+      "versions": [
+        "0.3.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-agent-builder",
+      "name": "@mastra/agent-builder (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/agent-builder",
+      "versions": [
+        "1.0.42"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-agentcore",
+      "name": "@mastra/agentcore (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/agentcore",
+      "versions": [
+        "0.2.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-agentfs",
+      "name": "@mastra/agentfs (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/agentfs",
+      "versions": [
+        "0.1.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-ai-sdk",
+      "name": "@mastra/ai-sdk (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/ai-sdk",
+      "versions": [
+        "1.4.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-arize",
+      "name": "@mastra/arize (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/arize",
+      "versions": [
+        "1.2.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-arthur",
+      "name": "@mastra/arthur (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/arthur",
+      "versions": [
+        "0.3.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-astra",
+      "name": "@mastra/astra (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/astra",
+      "versions": [
+        "1.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-auth",
+      "name": "@mastra/auth (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/auth",
+      "versions": [
+        "1.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-auth-auth0",
+      "name": "@mastra/auth-auth0 (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/auth-auth0",
+      "versions": [
+        "1.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-auth-better-auth",
+      "name": "@mastra/auth-better-auth (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/auth-better-auth",
+      "versions": [
+        "1.0.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-auth-clerk",
+      "name": "@mastra/auth-clerk (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/auth-clerk",
+      "versions": [
+        "1.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-auth-cloud",
+      "name": "@mastra/auth-cloud (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/auth-cloud",
+      "versions": [
+        "1.1.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-auth-firebase",
+      "name": "@mastra/auth-firebase (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/auth-firebase",
+      "versions": [
+        "1.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-auth-okta",
+      "name": "@mastra/auth-okta (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/auth-okta",
+      "versions": [
+        "0.0.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-auth-studio",
+      "name": "@mastra/auth-studio (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/auth-studio",
+      "versions": [
+        "1.2.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-auth-supabase",
+      "name": "@mastra/auth-supabase (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/auth-supabase",
+      "versions": [
+        "1.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-auth-workos",
+      "name": "@mastra/auth-workos (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/auth-workos",
+      "versions": [
+        "1.5.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-azure",
+      "name": "@mastra/azure (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/azure",
+      "versions": [
+        "0.2.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-blaxel",
+      "name": "@mastra/blaxel (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/blaxel",
+      "versions": [
+        "0.4.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-braintrust",
+      "name": "@mastra/braintrust (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/braintrust",
+      "versions": [
+        "1.1.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-brightdata",
+      "name": "@mastra/brightdata (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/brightdata",
+      "versions": [
+        "0.2.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-browser-firecrawl",
+      "name": "@mastra/browser-firecrawl (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/browser-firecrawl",
+      "versions": [
+        "0.1.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-browser-viewer",
+      "name": "@mastra/browser-viewer (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/browser-viewer",
+      "versions": [
+        "0.1.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-chroma",
+      "name": "@mastra/chroma (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/chroma",
+      "versions": [
+        "1.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-claude",
+      "name": "@mastra/claude (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/claude",
+      "versions": [
+        "1.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-clickhouse",
+      "name": "@mastra/clickhouse (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/clickhouse",
+      "versions": [
+        "1.10.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-client-js",
+      "name": "@mastra/client-js (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/client-js",
+      "versions": [
+        "1.24.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-cloud",
+      "name": "@mastra/cloud (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/cloud",
+      "versions": [
+        "0.1.24"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-cloudflare",
+      "name": "@mastra/cloudflare (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/cloudflare",
+      "versions": [
+        "1.4.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-cloudflare-d1",
+      "name": "@mastra/cloudflare-d1 (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/cloudflare-d1",
+      "versions": [
+        "1.0.7"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-codemod",
+      "name": "@mastra/codemod (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/codemod",
+      "versions": [
+        "1.0.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-convex",
+      "name": "@mastra/convex (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/convex",
+      "versions": [
+        "1.2.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-core",
+      "name": "@mastra/core (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/core",
+      "versions": [
+        "1.42.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-couchbase",
+      "name": "@mastra/couchbase (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/couchbase",
+      "versions": [
+        "1.0.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-cursor",
+      "name": "@mastra/cursor (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/cursor",
+      "versions": [
+        "0.2.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-dane",
+      "name": "@mastra/dane (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/dane",
+      "versions": [
+        "1.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-datadog",
+      "name": "@mastra/datadog (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/datadog",
+      "versions": [
+        "1.2.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-daytona",
+      "name": "@mastra/daytona (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/daytona",
+      "versions": [
+        "0.4.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-deployer",
+      "name": "@mastra/deployer (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/deployer",
+      "versions": [
+        "1.42.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-deployer-cloud",
+      "name": "@mastra/deployer-cloud (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/deployer-cloud",
+      "versions": [
+        "1.42.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-deployer-cloudflare",
+      "name": "@mastra/deployer-cloudflare (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/deployer-cloudflare",
+      "versions": [
+        "1.1.44"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-deployer-netlify",
+      "name": "@mastra/deployer-netlify (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/deployer-netlify",
+      "versions": [
+        "1.1.20"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-deployer-vercel",
+      "name": "@mastra/deployer-vercel (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/deployer-vercel",
+      "versions": [
+        "1.1.38"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-docker",
+      "name": "@mastra/docker (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/docker",
+      "versions": [
+        "0.3.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-dsql",
+      "name": "@mastra/dsql (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/dsql",
+      "versions": [
+        "1.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-duckdb",
+      "name": "@mastra/duckdb (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/duckdb",
+      "versions": [
+        "1.4.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-dynamodb",
+      "name": "@mastra/dynamodb (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/dynamodb",
+      "versions": [
+        "1.0.9"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-e2b",
+      "name": "@mastra/e2b (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/e2b",
+      "versions": [
+        "0.3.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-editor",
+      "name": "@mastra/editor (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/editor",
+      "versions": [
+        "0.11.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-elasticsearch",
+      "name": "@mastra/elasticsearch (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/elasticsearch",
+      "versions": [
+        "1.2.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-engine",
+      "name": "@mastra/engine (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/engine",
+      "versions": [
+        "0.1.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-evals",
+      "name": "@mastra/evals (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/evals",
+      "versions": [
+        "1.3.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-express",
+      "name": "@mastra/express (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/express",
+      "versions": [
+        "1.3.31"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-fastembed",
+      "name": "@mastra/fastembed (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/fastembed",
+      "versions": [
+        "1.1.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-fastify",
+      "name": "@mastra/fastify (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/fastify",
+      "versions": [
+        "1.3.31"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-files-sdk",
+      "name": "@mastra/files-sdk (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/files-sdk",
+      "versions": [
+        "0.2.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-gcs",
+      "name": "@mastra/gcs (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/gcs",
+      "versions": [
+        "0.2.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-github-signals",
+      "name": "@mastra/github-signals (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/github-signals",
+      "versions": [
+        "0.1.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-google-cloud-pubsub",
+      "name": "@mastra/google-cloud-pubsub (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/google-cloud-pubsub",
+      "versions": [
+        "1.0.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-google-drive",
+      "name": "@mastra/google-drive (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/google-drive",
+      "versions": [
+        "0.1.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-hono",
+      "name": "@mastra/hono (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/hono",
+      "versions": [
+        "1.4.26"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-inngest",
+      "name": "@mastra/inngest (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/inngest",
+      "versions": [
+        "1.5.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-koa",
+      "name": "@mastra/koa (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/koa",
+      "versions": [
+        "1.5.14"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-laminar",
+      "name": "@mastra/laminar (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/laminar",
+      "versions": [
+        "1.2.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-lance",
+      "name": "@mastra/lance (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/lance",
+      "versions": [
+        "1.0.7"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-langfuse",
+      "name": "@mastra/langfuse (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/langfuse",
+      "versions": [
+        "1.3.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-langsmith",
+      "name": "@mastra/langsmith (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/langsmith",
+      "versions": [
+        "1.2.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-libsql",
+      "name": "@mastra/libsql (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/libsql",
+      "versions": [
+        "1.13.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-loggers",
+      "name": "@mastra/loggers (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/loggers",
+      "versions": [
+        "1.1.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-longmemeval",
+      "name": "@mastra/longmemeval (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/longmemeval",
+      "versions": [
+        "1.0.50"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-mcp",
+      "name": "@mastra/mcp (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/mcp",
+      "versions": [
+        "1.10.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-mcp-docs-server",
+      "name": "@mastra/mcp-docs-server (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/mcp-docs-server",
+      "versions": [
+        "1.1.47"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-mcp-registry-registry",
+      "name": "@mastra/mcp-registry-registry (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/mcp-registry-registry",
+      "versions": [
+        "1.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-mem0",
+      "name": "@mastra/mem0 (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/mem0",
+      "versions": [
+        "0.1.14"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-memory",
+      "name": "@mastra/memory (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/memory",
+      "versions": [
+        "1.20.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-modal",
+      "name": "@mastra/modal (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/modal",
+      "versions": [
+        "0.2.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-mongodb",
+      "name": "@mastra/mongodb (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/mongodb",
+      "versions": [
+        "1.9.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-mssql",
+      "name": "@mastra/mssql (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/mssql",
+      "versions": [
+        "1.3.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-mysql",
+      "name": "@mastra/mysql (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/mysql",
+      "versions": [
+        "0.1.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-nestjs",
+      "name": "@mastra/nestjs (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/nestjs",
+      "versions": [
+        "0.1.15"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-node-audio",
+      "name": "@mastra/node-audio (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/node-audio",
+      "versions": [
+        "0.1.8"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-observability",
+      "name": "@mastra/observability (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/observability",
+      "versions": [
+        "1.14.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-openai",
+      "name": "@mastra/openai (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/openai",
+      "versions": [
+        "1.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-opencode",
+      "name": "@mastra/opencode (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/opencode",
+      "versions": [
+        "0.0.47"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-opensearch",
+      "name": "@mastra/opensearch (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/opensearch",
+      "versions": [
+        "1.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-otel-bridge",
+      "name": "@mastra/otel-bridge (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/otel-bridge",
+      "versions": [
+        "1.2.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-otel-exporter",
+      "name": "@mastra/otel-exporter (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/otel-exporter",
+      "versions": [
+        "1.2.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-perplexity",
+      "name": "@mastra/perplexity (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/perplexity",
+      "versions": [
+        "0.1.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-pg",
+      "name": "@mastra/pg (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/pg",
+      "versions": [
+        "1.13.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-pinecone",
+      "name": "@mastra/pinecone (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/pinecone",
+      "versions": [
+        "1.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-playground-ui",
+      "name": "@mastra/playground-ui (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/playground-ui",
+      "versions": [
+        "33.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-posthog",
+      "name": "@mastra/posthog (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/posthog",
+      "versions": [
+        "1.0.29"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-qdrant",
+      "name": "@mastra/qdrant (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/qdrant",
+      "versions": [
+        "1.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-rag",
+      "name": "@mastra/rag (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/rag",
+      "versions": [
+        "2.2.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-railway",
+      "name": "@mastra/railway (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/railway",
+      "versions": [
+        "0.1.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-react",
+      "name": "@mastra/react (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/react",
+      "versions": [
+        "1.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-redis",
+      "name": "@mastra/redis (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/redis",
+      "versions": [
+        "1.1.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-redis-streams",
+      "name": "@mastra/redis-streams (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/redis-streams",
+      "versions": [
+        "0.0.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-s3",
+      "name": "@mastra/s3 (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/s3",
+      "versions": [
+        "0.5.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-schema-compat",
+      "name": "@mastra/schema-compat (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/schema-compat",
+      "versions": [
+        "1.2.12"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-sentry",
+      "name": "@mastra/sentry (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/sentry",
+      "versions": [
+        "1.1.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-server",
+      "name": "@mastra/server (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/server",
+      "versions": [
+        "2.1.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-slack",
+      "name": "@mastra/slack (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/slack",
+      "versions": [
+        "1.3.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-spanner",
+      "name": "@mastra/spanner (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/spanner",
+      "versions": [
+        "1.1.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-speech-azure",
+      "name": "@mastra/speech-azure (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/speech-azure",
+      "versions": [
+        "0.2.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-speech-elevenlabs",
+      "name": "@mastra/speech-elevenlabs (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/speech-elevenlabs",
+      "versions": [
+        "0.2.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-speech-google",
+      "name": "@mastra/speech-google (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/speech-google",
+      "versions": [
+        "0.2.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-speech-ibm",
+      "name": "@mastra/speech-ibm (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/speech-ibm",
+      "versions": [
+        "0.2.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-speech-murf",
+      "name": "@mastra/speech-murf (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/speech-murf",
+      "versions": [
+        "0.2.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-speech-openai",
+      "name": "@mastra/speech-openai (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/speech-openai",
+      "versions": [
+        "0.2.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-speech-replicate",
+      "name": "@mastra/speech-replicate (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/speech-replicate",
+      "versions": [
+        "0.2.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-speech-speechify",
+      "name": "@mastra/speech-speechify (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/speech-speechify",
+      "versions": [
+        "0.2.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-stagehand",
+      "name": "@mastra/stagehand (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/stagehand",
+      "versions": [
+        "0.2.5"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-tavily",
+      "name": "@mastra/tavily (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/tavily",
+      "versions": [
+        "1.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-temporal",
+      "name": "@mastra/temporal (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/temporal",
+      "versions": [
+        "0.1.14"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-turbopuffer",
+      "name": "@mastra/turbopuffer (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/turbopuffer",
+      "versions": [
+        "1.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-twilio",
+      "name": "@mastra/twilio (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/twilio",
+      "versions": [
+        "1.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-upstash",
+      "name": "@mastra/upstash (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/upstash",
+      "versions": [
+        "1.1.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-vectorize",
+      "name": "@mastra/vectorize (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/vectorize",
+      "versions": [
+        "1.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-vercel",
+      "name": "@mastra/vercel (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/vercel",
+      "versions": [
+        "1.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-aws-nova-sonic",
+      "name": "@mastra/voice-aws-nova-sonic (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-aws-nova-sonic",
+      "versions": [
+        "0.1.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-azure",
+      "name": "@mastra/voice-azure (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-azure",
+      "versions": [
+        "0.11.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-cloudflare",
+      "name": "@mastra/voice-cloudflare (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-cloudflare",
+      "versions": [
+        "0.12.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-deepgram",
+      "name": "@mastra/voice-deepgram (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-deepgram",
+      "versions": [
+        "0.12.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-elevenlabs",
+      "name": "@mastra/voice-elevenlabs (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-elevenlabs",
+      "versions": [
+        "0.12.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-gladia",
+      "name": "@mastra/voice-gladia (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-gladia",
+      "versions": [
+        "0.12.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-google",
+      "name": "@mastra/voice-google (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-google",
+      "versions": [
+        "0.12.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-google-gemini-live",
+      "name": "@mastra/voice-google-gemini-live (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-google-gemini-live",
+      "versions": [
+        "0.12.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-inworld",
+      "name": "@mastra/voice-inworld (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-inworld",
+      "versions": [
+        "0.3.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-modelslab",
+      "name": "@mastra/voice-modelslab (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-modelslab",
+      "versions": [
+        "0.1.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-murf",
+      "name": "@mastra/voice-murf (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-murf",
+      "versions": [
+        "0.12.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-openai",
+      "name": "@mastra/voice-openai (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-openai",
+      "versions": [
+        "0.12.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-openai-realtime",
+      "name": "@mastra/voice-openai-realtime (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-openai-realtime",
+      "versions": [
+        "0.12.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-playai",
+      "name": "@mastra/voice-playai (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-playai",
+      "versions": [
+        "0.12.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-sarvam",
+      "name": "@mastra/voice-sarvam (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-sarvam",
+      "versions": [
+        "1.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-speechify",
+      "name": "@mastra/voice-speechify (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-speechify",
+      "versions": [
+        "0.12.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-mastra-voice-xai-realtime",
+      "name": "@mastra/voice-xai-realtime (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "@mastra/voice-xai-realtime",
+      "versions": [
+        "0.1.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-create-mastra",
+      "name": "create-mastra (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "create-mastra",
+      "versions": [
+        "1.13.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    },
+    {
+      "id": "mastra-2026-06-17-npm-easy-day-js",
+      "name": "easy-day-js (Mastra npm supply-chain compromise)",
+      "ecosystem": "npm",
+      "package": "easy-day-js",
+      "versions": [
+        "1.11.22"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/mastra-npm-packages-compromised"
+    }
+  ]
+}
