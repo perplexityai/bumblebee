@@ -1,0 +1,303 @@
+{
+  "schema_version": "0.1.0",
+  "_comment": "Mini Shai-Hulud / Miasma (Hades-variant) supply-chain compromise of the LeoPlatform / RStreams npm ecosystem, wave reported on 2026-06-24 by Socket (https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem) and OX Security (https://www.ox.security/blog/alright-lets-see-if-this-works-shai-hulud-miasma-hades-variant-spreads-on-npm/). A compromised npm maintainer account (czirker) mass-published malicious patch/pre-release versions of LeoPlatform and RStreams packages that execute at install time via a node-gyp binding.gyp command-substitution hook (the \"Phantom Gyp\" technique), staging an obfuscated multi-stage infostealer under the Bun runtime that exfiltrates secrets to attacker-controlled GitHub repos marked \"Alright Lets See If This Works\". This catalog covers the full reported union: 26 npm packages (20 core czirker packages confirmed by both Socket and OX; 3 pre-release leo-connector-* packages reported by OX only; and 3 packages \u2014 hexo-deployer-wrangler, hexo-shoka-swiper, prism-silq \u2014 published by the related npm account llxlr per Socket) plus 1 Go module (github.com/verana-labs/verana-blockchain), each at the single reported compromised version (27 package-version pairs total). Intended for exact (ecosystem, package, version) presence checks, not network/file/process IOC checks.",
+  "entries": [
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-hexo-deployer-wrangler",
+      "name": "hexo-deployer-wrangler (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "hexo-deployer-wrangler",
+      "versions": [
+        "1.0.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-hexo-shoka-swiper",
+      "name": "hexo-shoka-swiper (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "hexo-shoka-swiper",
+      "versions": [
+        "0.1.10"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-auth",
+      "name": "leo-auth (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-auth",
+      "versions": [
+        "4.0.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-aws",
+      "name": "leo-aws (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-aws",
+      "versions": [
+        "2.0.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-cache",
+      "name": "leo-cache (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-cache",
+      "versions": [
+        "1.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-cdk-lib",
+      "name": "leo-cdk-lib (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-cdk-lib",
+      "versions": [
+        "0.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-cli",
+      "name": "leo-cli (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-cli",
+      "versions": [
+        "3.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-config",
+      "name": "leo-config (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-config",
+      "versions": [
+        "1.1.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-connector-common",
+      "name": "leo-connector-common (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-connector-common",
+      "versions": [
+        "4.0.11-rc"
+      ],
+      "severity": "critical",
+      "source": "https://www.ox.security/blog/alright-lets-see-if-this-works-shai-hulud-miasma-hades-variant-spreads-on-npm/"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-connector-elasticsearch",
+      "name": "leo-connector-elasticsearch (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-connector-elasticsearch",
+      "versions": [
+        "2.0.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-connector-entity-table",
+      "name": "leo-connector-entity-table (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-connector-entity-table",
+      "versions": [
+        "3.0.22-rc"
+      ],
+      "severity": "critical",
+      "source": "https://www.ox.security/blog/alright-lets-see-if-this-works-shai-hulud-miasma-hades-variant-spreads-on-npm/"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-connector-mongo",
+      "name": "leo-connector-mongo (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-connector-mongo",
+      "versions": [
+        "3.0.8"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-connector-mysql",
+      "name": "leo-connector-mysql (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-connector-mysql",
+      "versions": [
+        "3.0.3"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-connector-oracle",
+      "name": "leo-connector-oracle (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-connector-oracle",
+      "versions": [
+        "2.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-connector-postgres",
+      "name": "leo-connector-postgres (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-connector-postgres",
+      "versions": [
+        "4.0.19-beta"
+      ],
+      "severity": "critical",
+      "source": "https://www.ox.security/blog/alright-lets-see-if-this-works-shai-hulud-miasma-hades-variant-spreads-on-npm/"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-connector-redshift",
+      "name": "leo-connector-redshift (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-connector-redshift",
+      "versions": [
+        "3.0.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-cron",
+      "name": "leo-cron (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-cron",
+      "versions": [
+        "2.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-logger",
+      "name": "leo-logger (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-logger",
+      "versions": [
+        "1.0.8"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-sdk",
+      "name": "leo-sdk (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-sdk",
+      "versions": [
+        "6.0.19"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-leo-streams",
+      "name": "leo-streams (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "leo-streams",
+      "versions": [
+        "2.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-prism-silq",
+      "name": "prism-silq (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "prism-silq",
+      "versions": [
+        "1.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-rstreams-metrics",
+      "name": "rstreams-metrics (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "rstreams-metrics",
+      "versions": [
+        "2.0.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-rstreams-shard-util",
+      "name": "rstreams-shard-util (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "rstreams-shard-util",
+      "versions": [
+        "1.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-serverless-convention",
+      "name": "serverless-convention (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "serverless-convention",
+      "versions": [
+        "2.0.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-serverless-leo",
+      "name": "serverless-leo (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "serverless-leo",
+      "versions": [
+        "3.0.14"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-npm-solo-nav",
+      "name": "solo-nav (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "npm",
+      "package": "solo-nav",
+      "versions": [
+        "1.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    },
+    {
+      "id": "mini-shai-hulud-leoplatform-2026-06-24-go-github-com-verana-labs-verana-blockchain",
+      "name": "github.com/verana-labs/verana-blockchain (Mini Shai-Hulud / Miasma LeoPlatform compromise)",
+      "ecosystem": "go",
+      "package": "github.com/verana-labs/verana-blockchain",
+      "versions": [
+        "v0.10.1-dev.20"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/miasma-mini-shai-hulud-hits-leoplatform-npm-packages-go-ecosystem"
+    }
+  ]
+}
