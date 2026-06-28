@@ -36,10 +36,11 @@ type Emitter struct {
 	diags   io.Writer
 	runID   string
 
-	mu   sync.Mutex
-	enc  *json.Encoder
-	denc *json.Encoder
-	seen map[string]struct{}
+	mu    sync.Mutex
+	enc   *json.Encoder
+	denc  *json.Encoder
+	seen  map[string]struct{}
+	quiet bool
 
 	RecordsEmitted int
 	Duplicates     int
@@ -128,10 +129,22 @@ func (e *Emitter) EmitSummary(s model.ScanSummary) error {
 	return e.enc.Encode(s)
 }
 
+// SetQuiet enables quiet mode. When quiet is true, info-level diagnostics
+// are not written to the diagnostics writer; warn and error diagnostics
+// are always written regardless of this setting.
+func (e *Emitter) SetQuiet(q bool) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.quiet = q
+}
+
 func (e *Emitter) Diag(level, path, msg string) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	e.Diagnostics++
+	if e.quiet && level == "info" {
+		return
+	}
 	d := model.Diagnostic{
 		RecordType: model.RecordTypeDiagnostic,
 		RunID:      e.runID,
