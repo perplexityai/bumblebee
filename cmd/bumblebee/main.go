@@ -296,9 +296,17 @@ func runScan(args []string) int {
 		for _, r := range roots {
 			summaryRoots = append(summaryRoots, model.SummaryRoot{Path: r.Path, Kind: r.Kind})
 		}
-		counts := map[string]int{
+		// counts is deterministically ordered by model.Counts.MarshalJSON:
+		// "package", "finding", then each ecosystem in
+		// model.SupportedEcosystems() order (only keys actually present).
+		counts := model.Counts{
 			model.RecordTypePackage: res.RecordsEmitted,
 			model.RecordTypeFinding: res.FindingsEmitted,
+		}
+		for _, eco := range model.SupportedEcosystems() {
+			if n := res.RecordsByEcosystem[eco]; n > 0 {
+				counts[eco] = n
+			}
 		}
 		if err := emitter.EmitSummary(model.ScanSummary{
 			SchemaVersion:            model.SchemaVersion,

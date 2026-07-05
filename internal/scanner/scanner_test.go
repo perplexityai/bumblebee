@@ -145,6 +145,141 @@ func TestEndToEndScan(t *testing.T) {
 	}
 }
 
+// TestRecordsByEcosystem verifies that Result.RecordsByEcosystem counts
+// package records per ecosystem using the same written==true semantics
+// as RecordsEmitted: dedup-suppressed records and records skipped by
+// --findings-only must not inflate the counts.
+func TestRecordsByEcosystem(t *testing.T) {
+	root := t.TempDir()
+
+	// npm: one lockfile with two packages.
+	writeFile(t, filepath.Join(root, "proj", "package-lock.json"), `{
+  "lockfileVersion": 3,
+  "packages": {
+    "": {"name":"proj","version":"1.0.0"},
+    "node_modules/lodash": {"version":"4.17.21","integrity":"sha512-a"},
+    "node_modules/chalk": {"version":"5.3.0","integrity":"sha512-b"}
+  }
+}`)
+
+	// go: go.sum with two modules.
+	writeFile(t, filepath.Join(root, "gomod", "go.sum"), `github.com/example/foo v1.2.3 h1:abc=
+github.com/example/foo v1.2.3/go.mod h1:def=
+github.com/example/bar v0.0.0-20240101000000-abcdef h1:bar=
+github.com/example/bar v0.0.0-20240101000000-abcdef/go.mod h1:bar2=
+`)
+
+	// rubygems: Gemfile.lock with three gems.
+	writeFile(t, filepath.Join(root, "rb", "Gemfile.lock"), `GEM
+  remote: https://rubygems.org/
+  specs:
+    rack (3.0.8)
+    rails (7.1.2)
+      actionpack (= 7.1.2)
+    actionpack (7.1.2)
+      rack (>= 2.2.4)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  rails
+
+BUNDLED WITH
+   2.5.0
+`)
+
+	run := func(em *output.Emitter, stdout *bytes.Buffer, findingsOnly bool) (Result, []model.Record) {
+		stdout.Reset()
+		res, err := Run(context.Background(), Config{
+			Roots:        []Root{{Path: root, Kind: model.RootKindProject}},
+			Profile:      model.ProfileProject,
+			MaxFileSize:  5 * 1024 * 1024,
+			Concurrency:  2,
+			FindingsOnly: findingsOnly,
+			BaseRecord: model.Record{
+				SchemaVersion:  model.SchemaVersion,
+				ScannerName:    model.ScannerName,
+				ScannerVersion: "test",
+				RunID:          "runtest",
+				ScanTime:       time.Now().UTC().Format(time.RFC3339Nano),
+			},
+			Emitter: em,
+		})
+		if err != nil {
+			t.Fatalf("Run: %v", err)
+		}
+		var records []model.Record
+		for _, line := range bytes.Split(bytes.TrimSpace(stdout.Bytes()), []byte("\n")) {
+			if len(line) == 0 {
+				continue
+			}
+			var r model.Record
+			if err := json.Unmarshal(line, &r); err != nil {
+				t.Fatalf("bad ndjson line: %v: %s", err, line)
+			}
+			records = append(records, r)
+		}
+		return res, records
+	}
+
+	want := map[string]int{
+		model.EcosystemNPM:      2, // lodash + chalk
+		model.EcosystemGo:       2, // foo + bar
+		model.EcosystemRubyGems: 3, // rack + rails + actionpack
+	}
+
+	stdout := &bytes.Buffer{}
+	em := output.New(stdout, &bytes.Buffer{}, "runtest")
+
+	res, records := run(em, stdout, false)
+	if len(res.RecordsByEcosystem) != len(want) {
+		t.Fatalf("RecordsByEcosystem = %+v, want %+v", res.RecordsByEcosystem, want)
+	}
+	for eco, n := range want {
+		if res.RecordsByEcosystem[eco] != n {
+			t.Errorf("RecordsByEcosystem[%q] = %d, want %d", eco, res.RecordsByEcosystem[eco], n)
+		}
+	}
+
+	// The emitted package records must match RecordsByEcosystem exactly.
+	gotByEco := map[string]int{}
+	for _, r := range records {
+		if r.RecordType == model.RecordTypePackage {
+			gotByEco[r.Ecosystem]++
+		}
+	}
+	for eco, n := range want {
+		if gotByEco[eco] != n {
+			t.Errorf("emitted package records[%q] = %d, want %d", eco, gotByEco[eco], n)
+		}
+	}
+
+	// Re-running the exact same scan against the SAME emitter must hit
+	// the emitter's within-run dedup for every record (identical source
+	// files, so identical record identities) and therefore must not add
+	// anything to RecordsByEcosystem.
+	dedupRes, _ := run(em, stdout, false)
+	if len(dedupRes.RecordsByEcosystem) != 0 {
+		t.Errorf("deduped re-scan RecordsByEcosystem = %+v, want empty", dedupRes.RecordsByEcosystem)
+	}
+
+	// --findings-only must suppress package records entirely, so no
+	// ecosystem should accrue any counts even though the records are
+	// still walked and observed.
+	foStdout := &bytes.Buffer{}
+	foEm := output.New(foStdout, &bytes.Buffer{}, "runtest2")
+	foRes, foRecords := run(foEm, foStdout, true)
+	if len(foRes.RecordsByEcosystem) != 0 {
+		t.Errorf("findings-only RecordsByEcosystem = %+v, want empty", foRes.RecordsByEcosystem)
+	}
+	for _, r := range foRecords {
+		if r.RecordType == model.RecordTypePackage {
+			t.Errorf("findings-only scan emitted a package record: %+v", r)
+		}
+	}
+}
+
 // TestEndToEndScanClaudeJSONFileRoot verifies that a `.claude.json`
 // passed as a single-file root is visited by the walker, dispatched to
 // the Claude config parser, and yields records for both the top-level

@@ -125,6 +125,11 @@ type Result struct {
 	Diagnostics              int
 	TimedOut                 bool
 	Duration                 time.Duration
+	// RecordsByEcosystem counts, per ecosystem, the package records that
+	// were actually written to the records sink. It mirrors RecordEmitted
+	// semantics exactly: deduplicated/suppressed records and records
+	// skipped by --findings-only are not counted.
+	RecordsByEcosystem map[string]int
 }
 
 // Run executes one scan and returns aggregate counters. It blocks until
@@ -148,6 +153,8 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 	var findingsMu sync.Mutex
 	var packageRecordsSuppressed int
 	var suppressedMu sync.Mutex
+	recordsByEcosystem := make(map[string]int)
+	var recordsByEcosystemMu sync.Mutex
 	var emitErr error
 	var emitErrMu sync.Mutex
 	setEmitErr := func(err error) {
@@ -187,6 +194,9 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 					setEmitErr(fmt.Errorf("emit package record: %w", err))
 					return
 				}
+				recordsByEcosystemMu.Lock()
+				recordsByEcosystem[r.Ecosystem]++
+				recordsByEcosystemMu.Unlock()
 			}
 		}
 		if !written {
@@ -501,6 +511,9 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 	suppressedMu.Lock()
 	res.PackageRecordsSuppressed = packageRecordsSuppressed
 	suppressedMu.Unlock()
+	recordsByEcosystemMu.Lock()
+	res.RecordsByEcosystem = recordsByEcosystem
+	recordsByEcosystemMu.Unlock()
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 		res.TimedOut = true
 	}

@@ -4,6 +4,7 @@ package model
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"sort"
 	"strconv"
 	"strings"
@@ -204,37 +205,95 @@ type Finding struct {
 	Evidence       string   `json:"evidence,omitempty"`
 }
 
+// Counts is a per-record-type/per-ecosystem count map used in
+// ScanSummary.Counts. It always marshals its keys in a deterministic
+// order — "package", "finding", then each ecosystem in
+// supportedEcosystemOrder (only keys actually present are emitted),
+// then any remaining unrecognized keys sorted alphabetically — so
+// scan_summary.counts key order is stable across runs and hosts
+// regardless of Go's randomized native map iteration order.
+type Counts map[string]int
+
+// MarshalJSON implements a deterministic key order for Counts. Standard
+// map[string]int marshaling sorts keys alphabetically, which would put
+// ecosystem keys (e.g. "go", "npm") out of the intended
+// package/finding/ecosystem-order shape; this override fixes that.
+func (c Counts) MarshalJSON() ([]byte, error) {
+	if c == nil {
+		return []byte("null"), nil
+	}
+	order := make([]string, 0, len(c))
+	seen := make(map[string]bool, len(c))
+	for _, k := range []string{RecordTypePackage, RecordTypeFinding} {
+		if _, ok := c[k]; ok {
+			order = append(order, k)
+			seen[k] = true
+		}
+	}
+	for _, k := range supportedEcosystemOrder {
+		if _, ok := c[k]; ok {
+			order = append(order, k)
+			seen[k] = true
+		}
+	}
+	var rest []string
+	for k := range c {
+		if !seen[k] {
+			rest = append(rest, k)
+		}
+	}
+	sort.Strings(rest)
+	order = append(order, rest...)
+
+	var buf strings.Builder
+	buf.WriteByte('{')
+	for i, k := range order {
+		if i > 0 {
+			buf.WriteByte(',')
+		}
+		kb, err := json.Marshal(k)
+		if err != nil {
+			return nil, err
+		}
+		buf.Write(kb)
+		buf.WriteByte(':')
+		buf.WriteString(strconv.Itoa(c[k]))
+	}
+	buf.WriteByte('}')
+	return []byte(buf.String()), nil
+}
+
 // ScanSummary is a per-run terminator record emitted to the same sink as
 // package and finding records. Receivers should only promote a run to
 // current state after a matching scan_summary with status=complete has
 // arrived.
 type ScanSummary struct {
-	RecordType               string         `json:"record_type"`
-	RecordID                 string         `json:"record_id"`
-	SchemaVersion            string         `json:"schema_version"`
-	ScannerName              string         `json:"scanner_name"`
-	ScannerVersion           string         `json:"scanner_version"`
-	RunID                    string         `json:"run_id"`
-	ScanTime                 string         `json:"scan_time"`
-	EndTime                  string         `json:"end_time"`
-	Endpoint                 Endpoint       `json:"endpoint"`
-	Profile                  string         `json:"profile"`
-	Status                   string         `json:"status"`
-	Roots                    []SummaryRoot  `json:"roots,omitempty"`
-	Counts                   map[string]int `json:"counts,omitempty"`
-	PackageRecordsEmitted    int            `json:"package_records_emitted"`
-	PackageRecordsSuppressed int            `json:"package_records_suppressed,omitempty"`
-	FindingsEmitted          int            `json:"findings_emitted"`
-	Duplicates               int            `json:"duplicates"`
-	DiagnosticsCount         int            `json:"diagnostics_count"`
-	FilesConsidered          int            `json:"files_considered"`
-	TimedOut                 bool           `json:"timed_out"`
-	DurationMS               int64          `json:"duration_ms"`
-	HTTPBatchesAttempted     int            `json:"http_batches_attempted,omitempty"`
-	HTTPBatchesSucceeded     int            `json:"http_batches_succeeded,omitempty"`
-	HTTPBatchesFailed        int            `json:"http_batches_failed,omitempty"`
-	HTTPLastStatus           int            `json:"http_last_status,omitempty"`
-	Error                    string         `json:"error,omitempty"`
+	RecordType               string        `json:"record_type"`
+	RecordID                 string        `json:"record_id"`
+	SchemaVersion            string        `json:"schema_version"`
+	ScannerName              string        `json:"scanner_name"`
+	ScannerVersion           string        `json:"scanner_version"`
+	RunID                    string        `json:"run_id"`
+	ScanTime                 string        `json:"scan_time"`
+	EndTime                  string        `json:"end_time"`
+	Endpoint                 Endpoint      `json:"endpoint"`
+	Profile                  string        `json:"profile"`
+	Status                   string        `json:"status"`
+	Roots                    []SummaryRoot `json:"roots,omitempty"`
+	Counts                   Counts        `json:"counts,omitempty"`
+	PackageRecordsEmitted    int           `json:"package_records_emitted"`
+	PackageRecordsSuppressed int           `json:"package_records_suppressed,omitempty"`
+	FindingsEmitted          int           `json:"findings_emitted"`
+	Duplicates               int           `json:"duplicates"`
+	DiagnosticsCount         int           `json:"diagnostics_count"`
+	FilesConsidered          int           `json:"files_considered"`
+	TimedOut                 bool          `json:"timed_out"`
+	DurationMS               int64         `json:"duration_ms"`
+	HTTPBatchesAttempted     int           `json:"http_batches_attempted,omitempty"`
+	HTTPBatchesSucceeded     int           `json:"http_batches_succeeded,omitempty"`
+	HTTPBatchesFailed        int           `json:"http_batches_failed,omitempty"`
+	HTTPLastStatus           int           `json:"http_last_status,omitempty"`
+	Error                    string        `json:"error,omitempty"`
 }
 
 // SummaryRoot is one entry in ScanSummary.Roots — path plus the root kind
@@ -368,7 +427,11 @@ func joinSorted(values []string) string {
 	return joinWithUnitSeparator(sorted)
 }
 
-func canonicalCounts(counts map[string]int) string {
+// canonicalCounts renders counts in a stable, alphabetically-sorted form
+// for hashing purposes only. This is independent of Counts.MarshalJSON's
+// display order: the StableID hash just needs any deterministic order,
+// not the human-facing package/finding/ecosystem order.
+func canonicalCounts(counts Counts) string {
 	if len(counts) == 0 {
 		return ""
 	}
