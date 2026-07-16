@@ -126,7 +126,7 @@ func TestConvertMultiPackageUniqueIDsAndAliasMalicious(t *testing.T) {
 	if len(entries) != 2 {
 		t.Fatalf("want 2 entries, got %d", len(entries))
 	}
-	// Sorted by ecosystem then package: pypi/pkg-a, npm/pkg-b.
+	// Sorted by ecosystem then package: npm/pkg-b, pypi/pkg-a.
 	if entries[0].Ecosystem != "npm" || entries[0].Package != "pkg-b" {
 		t.Errorf("entry[0] = %+v", entries[0])
 	}

@@ -1,0 +1,39 @@
+{
+  "name": "bumblebee-scan",
+  "version": "0.1.4",
+  "description": "Supply-chain inventory collector for package, extension, and developer-tool metadata on macOS and Linux.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/perplexityai/bumblebee"
+  },
+  "homepage": "https://github.com/perplexityai/bumblebee",
+  "keywords": [
+    "supply-chain",
+    "security",
+    "sbom",
+    "inventory",
+    "scanner",
+    "bumblebee",
+    "perplexity"
+  ],
+  "bin": {
+    "bumblebee": "bin/bumblebee.js"
+  },
+  "scripts": {
+    "postinstall": "node scripts/install.js"
+  },
+  "os": [
+    "darwin",
+    "linux"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "files": [
+    "bin/",
+    "scripts/",
+    "README.md",
+    "LICENSE"
+  ]
+}

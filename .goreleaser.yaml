@@ -43,8 +43,12 @@ snapshot:
   version_template: "{{ incpatch .Version }}-next"
 
 release:
-  draft: true
+  draft: false
   prerelease: auto
+  # Replace artifacts on an existing release for the tag instead of
+  # failing. This keeps the publish pipeline working when a release was
+  # pre-created in the UI or the workflow is re-run on the same tag.
+  mode: replace
 
 changelog:
   use: github
