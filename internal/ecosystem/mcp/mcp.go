@@ -402,7 +402,8 @@ func looksUnresolvedShellVar(s string) bool {
 // Supported launchers:
 //
 //	npx / bunx                          -> first non-flag arg
-//	pnpm/yarn/bun/npm dlx|exec|x|run    -> first non-flag arg past sub
+//	pnpm/yarn/bun/npm dlx|exec|x        -> first non-flag arg past sub
+//	  (run/bare <script>, create/init   -> no spec; caller uses server id)
 //	uvx / pipx                          -> first non-flag arg
 //	uv / uv tool run                    -> first non-flag arg past sub,
 //	                                       also honors --from <pkg>
@@ -427,23 +428,30 @@ func inferPackageFromArgs(cmd string, args []string) (spec, launcher string) {
 		}
 		return firstNonFlag(args, nil, npmValueTakingFlags), ""
 	case "pnpm", "yarn", "bun", "npm":
-		// These wrappers take a subcommand (dlx, exec, x, run) before the
-		// package. Skip the subcommand so we return the actual package
-		// argument rather than "dlx" / "exec" / "x". Honor
-		// "npm exec --package=<pkg>" / "npm exec --package <pkg>" since
-		// those configs name the package explicitly via flag rather than
-		// positional.
+		// We read a package identity only from an executor subcommand:
+		// dlx/exec/x (or the separate npx/bunx handled above). The positional
+		// after it — or --package — is the spec.
 		//
-		// Restrict the --package scan to args before "--": npm does not
-		// parse options past "--", so `npm exec foo -- --package @npmcli/bar`
-		// must resolve to foo, not @npmcli/bar.
-		subcommands := map[string]bool{
-			"dlx": true, "exec": true, "x": true, "run": true,
+		// Any other first token gets no package identity: return an empty
+		// spec and let the caller fall back to the server id at low
+		// confidence, like "uv run <script>" below. That stops a local-script
+		// launcher (`run <script>`, `npm start`, bare `yarn dev`) from leaking
+		// its script name as a package — the reported bug where
+		// `bun run … start` became the package "start". create/init get the
+		// same treatment: they name a create-<name> package we deliberately
+		// don't resolve (initializers don't launch servers). See mcp_test.go
+		// for these and the flag-ordering edge case.
+		//
+		// scanExplicitPackage / firstNonFlag honor "npm exec --package=<pkg>"
+		// and stop at "--", so `npm exec foo -- --package @npmcli/bar` -> foo.
+		execSubcommands := map[string]bool{"dlx": true, "exec": true, "x": true}
+		if !execSubcommands[firstNonFlag(args, nil, npmValueTakingFlags)] {
+			return "", ""
 		}
-		if spec := scanExplicitPackage(args, subcommands); spec != "" {
+		if spec := scanExplicitPackage(args, execSubcommands); spec != "" {
 			return spec, ""
 		}
-		return firstNonFlag(args, subcommands, npmValueTakingFlags), ""
+		return firstNonFlag(args, execSubcommands, npmValueTakingFlags), ""
 	case "uvx":
 		return firstNonFlag(args, nil, nil), "uv"
 	case "uv":
