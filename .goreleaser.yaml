@@ -43,7 +43,7 @@ snapshot:
   version_template: "{{ incpatch .Version }}-next"
 
 release:
-  draft: true
+  draft: false
   prerelease: auto
 
 changelog:

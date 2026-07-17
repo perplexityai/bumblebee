@@ -135,14 +135,21 @@ func loadPath(path string, maxSize int64, stderr io.Writer) ([]osv.Record, error
 	case info.IsDir():
 		var records []osv.Record
 		err := filepath.WalkDir(path, func(p string, d os.DirEntry, err error) error {
-			if err != nil || d.IsDir() {
-				return err
+			// Per the contract, unreadable entries are reported and skipped
+			// rather than aborting the whole import.
+			if err != nil {
+				fmt.Fprintf(stderr, "osvcatalog: skipping %s: %v\n", p, err)
+				return nil
+			}
+			if d.IsDir() {
+				return nil
 			}
 			switch strings.ToLower(filepath.Ext(p)) {
 			case ".zip":
 				recs, zerr := loadZip(p, maxSize, stderr)
 				if zerr != nil {
-					return zerr
+					fmt.Fprintf(stderr, "osvcatalog: skipping %s: %v\n", p, zerr)
+					return nil
 				}
 				records = append(records, recs...)
 			case ".json":

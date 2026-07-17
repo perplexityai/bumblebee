@@ -318,6 +318,36 @@ func TestResolveRootsBaselineIncludesClaudeJSONFileRoot(t *testing.T) {
 	t.Errorf("baseline did not include file root %q (got %v)", claudeJSON, roots)
 }
 
+func TestResolveRootsBaselineIncludesUserLinuxbrew(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	cellar := filepath.Join(home, ".linuxbrew", "Cellar")
+	caskroom := filepath.Join(home, ".linuxbrew", "Caskroom")
+	for _, d := range []string{cellar, caskroom} {
+		if err := os.MkdirAll(d, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	roots, _, err := resolveRoots(model.ProfileBaseline, nil, rootsOpts{})
+	if err != nil {
+		t.Fatalf("resolveRoots baseline: %v", err)
+	}
+	found := map[string]string{}
+	for _, r := range roots {
+		found[r.Path] = r.Kind
+	}
+	for _, d := range []string{cellar, caskroom} {
+		kind, ok := found[d]
+		if !ok {
+			t.Errorf("baseline did not include per-user Homebrew root %q", d)
+			continue
+		}
+		if kind != model.RootKindHomebrew {
+			t.Errorf("%q root kind = %q, want %q", d, kind, model.RootKindHomebrew)
+		}
+	}
+}
+
 func TestClassifyRootClaudeCodexMCP(t *testing.T) {
 	cases := []string{
 		"/Users/alice/.claude",

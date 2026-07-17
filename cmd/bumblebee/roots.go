@@ -228,6 +228,13 @@ func baselineHomeCandidates(home string) []scanner.Root {
 	}
 	add(filepath.Join(home, ".local", "share", "pipx", "venvs"), model.RootKindUserPackage)
 
+	// Per-user Homebrew prefix. A non-sudo Homebrew install on Linux
+	// lands in ~/.linuxbrew rather than the shared /home/linuxbrew
+	// prefix that systemRoots covers; absent paths are dropped by
+	// filterExistingRoots.
+	add(filepath.Join(home, ".linuxbrew", "Cellar"), model.RootKindHomebrew)
+	add(filepath.Join(home, ".linuxbrew", "Caskroom"), model.RootKindHomebrew)
+
 	// Editor extension trees.
 	for _, seg := range []string{
 		".vscode/extensions",

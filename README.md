@@ -53,6 +53,20 @@ Per-ecosystem detail: [docs/inventory-sources.md](docs/inventory-sources.md).
 
 ## Install
 
+### npm
+
+```sh
+npm install -g bumblebee-scan
+```
+
+### pip
+
+```sh
+pip install bumblebee-scan
+```
+
+### Go
+
 Requires Go 1.25+. Zero non-stdlib dependencies.
 
 ```sh
@@ -286,6 +300,10 @@ supply-chain campaigns, assembled with
 via PRs as new campaigns are reported. See
 [`threat_intel/README.md`](threat_intel/README.md) for the current
 catalog list and review guidance.
+
+## Fork
+
+This is a fork of [perplexityai/bumblebee](https://github.com/perplexityai/bumblebee) that adds npm and pip installation support via the [`bumblebee-scan`](https://www.npmjs.com/package/bumblebee-scan) npm package and [`bumblebee-scan`](https://pypi.org/project/bumblebee-scan/) pip package.
 
 ## License
 

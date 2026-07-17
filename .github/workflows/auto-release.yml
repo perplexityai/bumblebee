@@ -1,0 +1,49 @@
+name: auto-release
+
+# Continuous deployment: when the VERSION file changes on main, cut a
+# release automatically. This only dispatches the existing release
+# workflow (which creates the tag, builds binaries, and publishes to npm
+# + PyPI), so all build/publish logic lives in one place. Manual releases
+# via a v* tag push or the release workflow's "Run workflow" button still
+# work unchanged.
+#
+# Dispatching another workflow via workflow_dispatch is the documented
+# exception to the rule that GITHUB_TOKEN-triggered events do not start
+# new runs, so no personal access token is required.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - VERSION
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  dispatch:
+    name: dispatch release on version bump
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: dispatch release when VERSION is new
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="$(tr -d ' \t\r\n' < VERSION)"
+          VERSION="${VERSION#v}"
+          if [ -z "$VERSION" ]; then
+            echo "VERSION file is empty" >&2
+            exit 1
+          fi
+          if gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/v${VERSION}" >/dev/null 2>&1; then
+            echo "v${VERSION} already released; nothing to do"
+            exit 0
+          fi
+          echo "VERSION bumped to ${VERSION}; dispatching release workflow"
+          gh workflow run release.yml -f version="${VERSION}"
