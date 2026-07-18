@@ -55,3 +55,23 @@ changelog:
       - "^chore:"
       - "^ci:"
       - "^test:"
+
+brews:
+  - name: bumblebee
+    repository:
+      owner: perplexityai
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    directory: Formula
+    homepage: "https://github.com/perplexityai/bumblebee"
+    description: "Read-only developer endpoint scanner for supply-chain exposure"
+    license: "Apache-2.0"
+    install: |
+      bin.install "bumblebee"
+      pkgshare.install "threat_intel"
+    test: |
+      assert_match version.to_s, shell_output("#{bin}/bumblebee version")
+      assert_match "selftest OK", shell_output("#{bin}/bumblebee selftest")
+    commit_author:
+      name: github-actions[bot]
+      email: 41898282+github-actions[bot]@users.noreply.github.com
