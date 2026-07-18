@@ -56,11 +56,10 @@ Per-ecosystem detail: [docs/inventory-sources.md](docs/inventory-sources.md).
 Requires Go 1.25+. Zero non-stdlib dependencies.
 
 ```sh
-# Install the latest tagged release into $GOBIN.
-go install github.com/perplexityai/bumblebee/cmd/bumblebee@latest
-
-# Or pin a specific tag.
+# Install a tagged release into $GOBIN.
 go install github.com/perplexityai/bumblebee/cmd/bumblebee@v0.1.1
+
+# Replace v0.1.1 with the tagged release you trust.
 ```
 
 To build from a checkout:
@@ -81,6 +80,9 @@ time, and Go runtime — so a record emitted in production can be traced
 back to a specific build. Version precedence: `-ldflags` override,
 module version recorded by `go install`, then the in-tree default
 tracked in `VERSION`.
+
+Release archives published by GoReleaser include checksums and SBOMs
+alongside the binary artifacts.
 
 ### Self-test
 
