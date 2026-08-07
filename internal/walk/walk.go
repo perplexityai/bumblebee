@@ -180,7 +180,7 @@ var ErrSkip = filepath.SkipDir
 // (matched by basename or by suffix path component) are skipped entirely.
 func Walk(opts Options, visit Visitor) error {
 	excludes := normalizeExcludes(opts.Excludes)
-	seen := make(map[string]struct{})
+	seen := make(map[dirIdent]struct{})
 
 	for _, root := range opts.Roots {
 		root = filepath.Clean(root)
@@ -193,7 +193,7 @@ func Walk(opts Options, visit Visitor) error {
 	return nil
 }
 
-func walkOne(root string, excludes map[string]struct{}, seen map[string]struct{}, onErr func(string, error), visit Visitor) error {
+func walkOne(root string, excludes map[string]struct{}, seen map[dirIdent]struct{}, onErr func(string, error), visit Visitor) error {
 	return filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			if onErr != nil {
