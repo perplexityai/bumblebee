@@ -212,9 +212,8 @@ func walkOne(root string, excludes excludeSet, seen map[dirIdent]struct{}, onErr
 			// Directory symlinks are never descended into. filepath.WalkDir
 			// does not follow them on its own, and we explicitly skip any
 			// directory-shaped symlink we encounter so the walker never
-			// crosses into an unrelated subtree by indirection. The same
-			// Lstat result then feeds the device+inode loop guard, so each
-			// directory costs one stat syscall, not two.
+			// crosses into an unrelated subtree by indirection. Reuse this
+			// Lstat result for the loop-guard key; do not stat again.
 			info, lerr := os.Lstat(path)
 			if lerr == nil && info.Mode()&os.ModeSymlink != 0 {
 				return filepath.SkipDir
