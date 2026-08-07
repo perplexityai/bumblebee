@@ -133,6 +133,25 @@ func TestDirKeyFromInfoMatchesDirKey(t *testing.T) {
 	}
 }
 
+// TestSeparatorOnlyExcludeMatchesRootByName pins that an exclude which
+// cleans to the bare separator ("/", "//") stays a name-matched entry:
+// it matches a root directory whose base name is the separator, exactly
+// as it did when all excludes lived in one flat map.
+func TestSeparatorOnlyExcludeMatchesRootByName(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("path-separator semantics differ on Windows")
+	}
+	for _, raw := range []string{"/", "//"} {
+		ex := normalizeExcludes([]string{raw})
+		if !isExcluded("/", "/", ex) {
+			t.Errorf("exclude %q does not match the root path", raw)
+		}
+		if isExcluded("/Users/u/proj", "proj", ex) {
+			t.Errorf("exclude %q wrongly matches a non-root directory", raw)
+		}
+	}
+}
+
 // benchTree builds a deterministic tree of dirs directories with files
 // plain files each.
 func benchTree(b *testing.B, dirs, files int) string {

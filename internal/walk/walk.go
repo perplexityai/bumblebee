@@ -265,7 +265,10 @@ func normalizeExcludes(in []string) excludeSet {
 			continue
 		}
 		x = filepath.Clean(x)
-		if !strings.ContainsRune(x, filepath.Separator) {
+		// A separator-only exclude has no usable suffix form; keep it
+		// name-matched so it still matches a root whose base name is
+		// the separator itself.
+		if !strings.ContainsRune(x, filepath.Separator) || x == string(filepath.Separator) {
 			out.names[x] = struct{}{}
 			continue
 		}
