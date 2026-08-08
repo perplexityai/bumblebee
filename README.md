@@ -147,8 +147,9 @@ optional for the other profiles. `--ecosystem` is repeatable and
 comma-separated. `--exposure-catalog` accepts a JSON file or a directory
 of `*.json` catalogs (merged non-recursively, all files must share
 `schema_version`). `--findings-only` requires `--exposure-catalog` and
-suppresses package records while keeping findings. `bumblebee scan --help`
-lists every flag.
+suppresses package records while keeping findings. `--quiet` suppresses
+info-level diagnostics on stderr while keeping warn and error diagnostics.
+`bumblebee scan --help` lists every flag.
 
 ## Output
 
