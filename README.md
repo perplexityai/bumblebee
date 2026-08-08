@@ -89,7 +89,7 @@ fixtures:
 
 ```sh
 bumblebee selftest
-# selftest OK (2 findings in 1ms)
+# selftest OK (3 findings in 1ms)
 ```
 
 The fixtures live inside the binary, use deliberately fake package
