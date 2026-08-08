@@ -1,0 +1,663 @@
+{
+  "schema_version": "0.1.0",
+  "_comment": "GlassWorm v2 campaign targeting VS Code / Cursor / Windsurf / VSCodium via Open VSX. 72 extensions identified by Socket.dev and Koi Security in March-April 2026, cloning popular extensions with invisible Unicode PUA-character payloads and Solana blockchain C2. Six confirmed malicious; remaining acted as sleeper packages. All entries use ecosystem 'editor-extension' and match the normalized <publisher>.<name> format emitted by the editorext scanner. Versions are set to '*' via a single-element array because the malicious publisher accounts are entirely attacker-controlled (no legitimate versions exist). Sources: Socket.dev (72 Open VSX extensions, March 2026), The Hacker News (73 fake extensions, April 2026), Aikido.dev (GlassWorm Zig dropper, April 2026). Additionally includes the Anivia Stealer/OctoRAT Prettier impersonation (publishingsofficial.prettier-vscode-plus, November 2025) and the fake Solidity extension used in the $500K Cursor crypto theft (July 2026).",
+  "entries": [
+    {
+      "id": "glassworm-v2-aadarkcode-one-dark-material",
+      "name": "GlassWorm v2: aadarkcode.one-dark-material",
+      "ecosystem": "editor-extension",
+      "package": "aadarkcode.one-dark-material",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-aligntool-extension-align-professional-tool",
+      "name": "GlassWorm v2: aligntool.extension-align-professional-tool",
+      "ecosystem": "editor-extension",
+      "package": "aligntool.extension-align-professional-tool",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-angular-studio-ng-angular-extension",
+      "name": "GlassWorm v2: angular-studio.ng-angular-extension",
+      "ecosystem": "editor-extension",
+      "package": "angular-studio.ng-angular-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-awesome-codebase-codebase-dart-pro",
+      "name": "GlassWorm v2: awesome-codebase.codebase-dart-pro",
+      "ecosystem": "editor-extension",
+      "package": "awesome-codebase.codebase-dart-pro",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-awesomeco-wonder-for-vscode-icons",
+      "name": "GlassWorm v2: awesomeco.wonder-for-vscode-icons",
+      "ecosystem": "editor-extension",
+      "package": "awesomeco.wonder-for-vscode-icons",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-bhbpbarn-vsce-python-indent-extension",
+      "name": "GlassWorm v2: bhbpbarn.vsce-python-indent-extension",
+      "ecosystem": "editor-extension",
+      "package": "bhbpbarn.vsce-python-indent-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-blockstoks-easily-gitignore-manage",
+      "name": "GlassWorm v2: blockstoks.easily-gitignore-manage",
+      "ecosystem": "editor-extension",
+      "package": "blockstoks.easily-gitignore-manage",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-brategmaqendaalar-studio-pro-prettyxml-formatter",
+      "name": "GlassWorm v2: brategmaqendaalar-studio.pro-prettyxml-formatter",
+      "ecosystem": "editor-extension",
+      "package": "brategmaqendaalar-studio.pro-prettyxml-formatter",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-codbroks-compile-runnner-extension",
+      "name": "GlassWorm v2: codbroks.compile-runnner-extension",
+      "ecosystem": "editor-extension",
+      "package": "codbroks.compile-runnner-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-codevunmis-csv-sql-tsv-rainbow",
+      "name": "GlassWorm v2: codevunmis.csv-sql-tsv-rainbow",
+      "ecosystem": "editor-extension",
+      "package": "codevunmis.csv-sql-tsv-rainbow",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-codwayexten-code-way-extension",
+      "name": "GlassWorm v2: codwayexten.code-way-extension",
+      "ecosystem": "editor-extension",
+      "package": "codwayexten.code-way-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-cosmic-themes-sql-formatter",
+      "name": "GlassWorm v2: cosmic-themes.sql-formatter",
+      "ecosystem": "editor-extension",
+      "package": "cosmic-themes.sql-formatter",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-craz2team-vscode-todo-extension",
+      "name": "GlassWorm v2: craz2team.vscode-todo-extension",
+      "ecosystem": "editor-extension",
+      "package": "craz2team.vscode-todo-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-crotoapp-vscode-xml-extension",
+      "name": "GlassWorm v2: crotoapp.vscode-xml-extension",
+      "ecosystem": "editor-extension",
+      "package": "crotoapp.vscode-xml-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-cudra-production-vsce-prettier-pro",
+      "name": "GlassWorm v2: cudra-production.vsce-prettier-pro",
+      "ecosystem": "editor-extension",
+      "package": "cudra-production.vsce-prettier-pro",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-daeumer-web-es-linter-for-vs-code",
+      "name": "GlassWorm v2: daeumer-web.es-linter-for-vs-code (ESLint typosquat)",
+      "ecosystem": "editor-extension",
+      "package": "daeumer-web.es-linter-for-vs-code",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-dark-code-studio-flutter-extension",
+      "name": "GlassWorm v2: dark-code-studio.flutter-extension",
+      "ecosystem": "editor-extension",
+      "package": "dark-code-studio.flutter-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-densy-little-studio-wonder-for-vscode-icons",
+      "name": "GlassWorm v2: densy-little-studio.wonder-for-vscode-icons",
+      "ecosystem": "editor-extension",
+      "package": "densy-little-studio.wonder-for-vscode-icons",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-dep-labs-studio-dep-proffesinal-extension",
+      "name": "GlassWorm v2: dep-labs-studio.dep-proffesinal-extension",
+      "ecosystem": "editor-extension",
+      "package": "dep-labs-studio.dep-proffesinal-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-dev-studio-sense-php-comp-tools-vscode",
+      "name": "GlassWorm v2: dev-studio-sense.php-comp-tools-vscode",
+      "ecosystem": "editor-extension",
+      "package": "dev-studio-sense.php-comp-tools-vscode",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-devmidu-studio-svg-better-extension",
+      "name": "GlassWorm v2: devmidu-studio.svg-better-extension",
+      "ecosystem": "editor-extension",
+      "package": "devmidu-studio.svg-better-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-dopbop-studio-vscode-tailwindcss-extension-toolkit",
+      "name": "GlassWorm v2: dopbop-studio.vscode-tailwindcss-extension-toolkit",
+      "ecosystem": "editor-extension",
+      "package": "dopbop-studio.vscode-tailwindcss-extension-toolkit",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-errlenscre-error-lens-finder-ex",
+      "name": "GlassWorm v2: errlenscre.error-lens-finder-ex",
+      "ecosystem": "editor-extension",
+      "package": "errlenscre.error-lens-finder-ex",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-exss-studio-yaml-professional-extension",
+      "name": "GlassWorm v2: exss-studio.yaml-professional-extension",
+      "ecosystem": "editor-extension",
+      "package": "exss-studio.yaml-professional-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-federicanc-dotenv-syntax-highlighting",
+      "name": "GlassWorm v2: federicanc.dotenv-syntax-highlighting",
+      "ecosystem": "editor-extension",
+      "package": "federicanc.dotenv-syntax-highlighting",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-flutxvs-vscode-kuberntes-extension",
+      "name": "GlassWorm v2: flutxvs.vscode-kuberntes-extension (Kubernetes typosquat)",
+      "ecosystem": "editor-extension",
+      "package": "flutxvs.vscode-kuberntes-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-gvotcha-claude-code-extension",
+      "name": "GlassWorm v2: gvotcha.claude-code-extension (fake Claude Code)",
+      "ecosystem": "editor-extension",
+      "package": "gvotcha.claude-code-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-gvotcha-claude-code-extensions",
+      "name": "GlassWorm v2: gvotcha.claude-code-extensions (fake Claude Code plural)",
+      "ecosystem": "editor-extension",
+      "package": "gvotcha.claude-code-extensions",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-intellipro-extension-json-intelligence",
+      "name": "GlassWorm v2: intellipro.extension-json-intelligence",
+      "ecosystem": "editor-extension",
+      "package": "intellipro.extension-json-intelligence",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-kharizma-vscode-extension-wakatime",
+      "name": "GlassWorm v2: kharizma.vscode-extension-wakatime (WakaTime typosquat)",
+      "ecosystem": "editor-extension",
+      "package": "kharizma.vscode-extension-wakatime",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-ko-zu-gun-studio-synchronization-settings-vscode",
+      "name": "GlassWorm v2: ko-zu-gun-studio.synchronization-settings-vscode",
+      "ecosystem": "editor-extension",
+      "package": "ko-zu-gun-studio.synchronization-settings-vscode",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-kwitch-studio-auto-run-command-extension",
+      "name": "GlassWorm v2: kwitch-studio.auto-run-command-extension",
+      "ecosystem": "editor-extension",
+      "package": "kwitch-studio.auto-run-command-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-lavender-studio-theme-lavender-dreams",
+      "name": "GlassWorm v2: lavender-studio.theme-lavender-dreams",
+      "ecosystem": "editor-extension",
+      "package": "lavender-studio.theme-lavender-dreams",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-littensy-studio-magical-icons",
+      "name": "GlassWorm v2: littensy-studio.magical-icons",
+      "ecosystem": "editor-extension",
+      "package": "littensy-studio.magical-icons",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-lyu-wen-studio-web-han-better-formatter-vscode",
+      "name": "GlassWorm v2: lyu-wen-studio-web-han.better-formatter-vscode",
+      "ecosystem": "editor-extension",
+      "package": "lyu-wen-studio-web-han.better-formatter-vscode",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-markvalid-vscode-mdvalidator-extension",
+      "name": "GlassWorm v2: markvalid.vscode-mdvalidator-extension",
+      "ecosystem": "editor-extension",
+      "package": "markvalid.vscode-mdvalidator-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-mecreation-studio-pyrefly-pro-extension",
+      "name": "GlassWorm v2: mecreation-studio.pyrefly-pro-extension",
+      "ecosystem": "editor-extension",
+      "package": "mecreation-studio.pyrefly-pro-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-mswincx-antigravity-cockpit",
+      "name": "GlassWorm v2: mswincx.antigravity-cockpit (fake Google Antigravity)",
+      "ecosystem": "editor-extension",
+      "package": "mswincx.antigravity-cockpit",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-mswincx-antigravity-cockpit-extension",
+      "name": "GlassWorm v2: mswincx.antigravity-cockpit-extension",
+      "ecosystem": "editor-extension",
+      "package": "mswincx.antigravity-cockpit-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-namopins-prettier-pro-vscode-extension",
+      "name": "GlassWorm v2: namopins.prettier-pro-vscode-extension",
+      "ecosystem": "editor-extension",
+      "package": "namopins.prettier-pro-vscode-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-oigotm-my-command-palette-extension",
+      "name": "GlassWorm v2: oigotm.my-command-palette-extension",
+      "ecosystem": "editor-extension",
+      "package": "oigotm.my-command-palette-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-otoboss-autoimport-extension",
+      "name": "GlassWorm v2: otoboss.autoimport-extension",
+      "ecosystem": "editor-extension",
+      "package": "otoboss.autoimport-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-ovixcode-vscode-better-comments",
+      "name": "GlassWorm v2: ovixcode.vscode-better-comments (Better Comments typosquat)",
+      "ecosystem": "editor-extension",
+      "package": "ovixcode.vscode-better-comments",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-pessa07tm-my-js-ts-auto-commands",
+      "name": "GlassWorm v2: pessa07tm.my-js-ts-auto-commands",
+      "ecosystem": "editor-extension",
+      "package": "pessa07tm.my-js-ts-auto-commands",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-potstok-dotnet-runtime-extension",
+      "name": "GlassWorm v2: potstok.dotnet-runtime-extension",
+      "ecosystem": "editor-extension",
+      "package": "potstok.dotnet-runtime-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-pretty-studio-advisor-prettyxml-formatter",
+      "name": "GlassWorm v2: pretty-studio-advisor.prettyxml-formatter",
+      "ecosystem": "editor-extension",
+      "package": "pretty-studio-advisor.prettyxml-formatter",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-prismapp-prisma-vs-code-extension",
+      "name": "GlassWorm v2: prismapp.prisma-vs-code-extension (Prisma typosquat)",
+      "ecosystem": "editor-extension",
+      "package": "prismapp.prisma-vs-code-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-projmanager-your-project-manager-extension",
+      "name": "GlassWorm v2: projmanager.your-project-manager-extension",
+      "ecosystem": "editor-extension",
+      "package": "projmanager.your-project-manager-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-pubruncode-ccoderunner",
+      "name": "GlassWorm v2: pubruncode.ccoderunner (Code Runner typosquat)",
+      "ecosystem": "editor-extension",
+      "package": "pubruncode.ccoderunner",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-pyflowpyr-py-flowpyright-extension",
+      "name": "GlassWorm v2: pyflowpyr.py-flowpyright-extension (Pyright typosquat)",
+      "ecosystem": "editor-extension",
+      "package": "pyflowpyr.py-flowpyright-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-pyscopexte-pyscope-extension",
+      "name": "GlassWorm v2: pyscopexte.pyscope-extension",
+      "ecosystem": "editor-extension",
+      "package": "pyscopexte.pyscope-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-redcapcollective-vscode-quarkus-elite-suite",
+      "name": "GlassWorm v2: redcapcollective.vscode-quarkus-elite-suite",
+      "ecosystem": "editor-extension",
+      "package": "redcapcollective.vscode-quarkus-elite-suite",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-rubyideext-ruby-ide-extension",
+      "name": "GlassWorm v2: rubyideext.ruby-ide-extension",
+      "ecosystem": "editor-extension",
+      "package": "rubyideext.ruby-ide-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-runnerpost-runner-your-code",
+      "name": "GlassWorm v2: runnerpost.runner-your-code",
+      "ecosystem": "editor-extension",
+      "package": "runnerpost.runner-your-code",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-shinypy-shiny-extension-for-vscode",
+      "name": "GlassWorm v2: shinypy.shiny-extension-for-vscode",
+      "ecosystem": "editor-extension",
+      "package": "shinypy.shiny-extension-for-vscode",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-sol-studio-solidity-extension",
+      "name": "GlassWorm v2: sol-studio.solidity-extension",
+      "ecosystem": "editor-extension",
+      "package": "sol-studio.solidity-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-ssgwysc-volar-vscode",
+      "name": "GlassWorm v2: ssgwysc.volar-vscode (Vue Volar typosquat)",
+      "ecosystem": "editor-extension",
+      "package": "ssgwysc.volar-vscode",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-studio-jjalaire-team-professional-quarto-extension",
+      "name": "GlassWorm v2: studio-jjalaire-team.professional-quarto-extension",
+      "ecosystem": "editor-extension",
+      "package": "studio-jjalaire-team.professional-quarto-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-studio-velte-distributor-pro-svelte-extension",
+      "name": "GlassWorm v2: studio-velte-distributor.pro-svelte-extension",
+      "ecosystem": "editor-extension",
+      "package": "studio-velte-distributor.pro-svelte-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-sun-shine-studio-shiny-extension-for-vscode",
+      "name": "GlassWorm v2: sun-shine-studio.shiny-extension-for-vscode",
+      "ecosystem": "editor-extension",
+      "package": "sun-shine-studio.shiny-extension-for-vscode",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-sxatvo-jinja-extension",
+      "name": "GlassWorm v2: sxatvo.jinja-extension",
+      "ecosystem": "editor-extension",
+      "package": "sxatvo.jinja-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-tamokill12-foundry-pdf-extension",
+      "name": "GlassWorm v2: tamokill12.foundry-pdf-extension",
+      "ecosystem": "editor-extension",
+      "package": "tamokill12.foundry-pdf-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-thing-mn-your-flow-extension-for-icons",
+      "name": "GlassWorm v2: thing-mn.your-flow-extension-for-icons",
+      "ecosystem": "editor-extension",
+      "package": "thing-mn.your-flow-extension-for-icons",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-tima-web-wang-shell-check-utils",
+      "name": "GlassWorm v2: tima-web-wang.shell-check-utils",
+      "ecosystem": "editor-extension",
+      "package": "tima-web-wang.shell-check-utils",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-tokcodes-import-cost-extension",
+      "name": "GlassWorm v2: tokcodes.import-cost-extension (Import Cost typosquat)",
+      "ecosystem": "editor-extension",
+      "package": "tokcodes.import-cost-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-toowespace-worksets-extension",
+      "name": "GlassWorm v2: toowespace.worksets-extension",
+      "ecosystem": "editor-extension",
+      "package": "toowespace.worksets-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-treedotree-tree-do-todoextension",
+      "name": "GlassWorm v2: treedotree.tree-do-todoextension (TODO Tree typosquat)",
+      "ecosystem": "editor-extension",
+      "package": "treedotree.tree-do-todoextension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-tucyzirille-studio-angular-pro-tools-extension",
+      "name": "GlassWorm v2: tucyzirille-studio.angular-pro-tools-extension",
+      "ecosystem": "editor-extension",
+      "package": "tucyzirille-studio.angular-pro-tools-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-turbobase-sql-turbo-tool",
+      "name": "GlassWorm v2: turbobase.sql-turbo-tool",
+      "ecosystem": "editor-extension",
+      "package": "turbobase.sql-turbo-tool",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-twilkbilk-color-highlight-css",
+      "name": "GlassWorm v2: twilkbilk.color-highlight-css",
+      "ecosystem": "editor-extension",
+      "package": "twilkbilk.color-highlight-css",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-vce-brendan-studio-eich-js-debuger-vscode",
+      "name": "GlassWorm v2: vce-brendan-studio-eich.js-debuger-vscode (JS debugger typosquat)",
+      "ecosystem": "editor-extension",
+      "package": "vce-brendan-studio-eich.js-debuger-vscode",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "glassworm-v2-yamaprolas-revature-labs-extension",
+      "name": "GlassWorm v2: yamaprolas.revature-labs-extension",
+      "ecosystem": "editor-extension",
+      "package": "yamaprolas.revature-labs-extension",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+    },
+    {
+      "id": "anivia-stealer-publishingsofficial-prettier-vscode-plus",
+      "name": "Anivia Stealer: publishingsofficial.prettier-vscode-plus (fake Prettier)",
+      "ecosystem": "editor-extension",
+      "package": "publishingsofficial.prettier-vscode-plus",
+      "versions": ["*"],
+      "severity": "critical",
+      "source": "https://hackread.com/prettier-extension-vscode-marketplace-anivia-stealer/"
+    }
+  ]
+}
