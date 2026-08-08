@@ -52,6 +52,7 @@ func TestMapEcosystem(t *testing.T) {
 		"RubyGems":     "rubygems",
 		"Packagist":    "packagist",
 		"VSCode":       "editor-extension",
+		"crates.io":    "crates.io",
 		"Go:something": "go", // suffix after ':' is ignored
 	}
 	for osvEco, want := range supported {
@@ -62,7 +63,7 @@ func TestMapEcosystem(t *testing.T) {
 	}
 	// OSV identifiers are case-sensitive and several ecosystems have no
 	// Bumblebee equivalent; none of these must map.
-	for _, osvEco := range []string{"pypi", "NPM", "crates.io", "NuGet", "Maven", "vscode", "Debian:11", ""} {
+	for _, osvEco := range []string{"pypi", "NPM", "NuGet", "Maven", "vscode", "Debian:11", ""} {
 		if got, ok := mapEcosystem(osvEco); ok {
 			t.Errorf("mapEcosystem(%q) = (%q, true), want no mapping", osvEco, got)
 		}
@@ -88,7 +89,7 @@ func TestConvertDropsNonMaliciousVuln(t *testing.T) {
 func TestConvertSkipsWithdrawnUnsupportedAndRangeOnly(t *testing.T) {
 	records := []Record{
 		{ID: "MAL-withdrawn", Withdrawn: "2026-01-01T00:00:00Z", Affected: []Affected{{Package: Package{Ecosystem: "npm", Name: "x"}, Versions: []string{"1.0.0"}}}},
-		{ID: "MAL-cargo", Affected: []Affected{{Package: Package{Ecosystem: "crates.io", Name: "y"}, Versions: []string{"1.0.0"}}}},
+		{ID: "MAL-nuget", Affected: []Affected{{Package: Package{Ecosystem: "NuGet", Name: "y"}, Versions: []string{"1.0.0"}}}},
 		{ID: "MAL-rangeonly", Affected: []Affected{{Package: Package{Ecosystem: "npm", Name: "z"}}}},
 		// Empty package name must be dropped: an entry with an empty
 		// package would make exposure.Load reject the whole catalog.
@@ -206,7 +207,7 @@ func TestBuildCatalogCommentDeterministic(t *testing.T) {
 		// Non-malicious + unsupported eco + withdrawn + bad id so all
 		// skip counters are exercised in the comment.
 		{ID: "GHSA-vuln", Affected: []Affected{{Package: Package{Ecosystem: "npm", Name: "b"}, Versions: []string{"1.0.0"}}}},
-		{ID: "MAL-crates", Affected: []Affected{{Package: Package{Ecosystem: "crates.io", Name: "c"}, Versions: []string{"1.0.0"}}}},
+		{ID: "MAL-nuget", Affected: []Affected{{Package: Package{Ecosystem: "NuGet", Name: "c"}, Versions: []string{"1.0.0"}}}},
 		{ID: "MAL-withdrawn", Withdrawn: "2026-01-01T00:00:00Z", Affected: []Affected{{Package: Package{Ecosystem: "npm", Name: "d"}, Versions: []string{"1.0.0"}}}},
 		{ID: "", Affected: []Affected{{Package: Package{Ecosystem: "npm", Name: "e"}, Versions: []string{"1.0.0"}}}}, // bad-id (empty)
 	}

@@ -231,6 +231,51 @@ References:
 - `go.sum` and `go.mod` reference: <https://go.dev/ref/mod#go-sum-files>
 - Module cache layout: <https://go.dev/ref/mod#module-cache>
 
+## Cargo (Rust)
+
+Files read:
+
+- `~/.cargo/.crates2.json` — Cargo's JSON record of every binary installed
+  via `cargo install`. Each `installs` entry's key is a
+  `"<name> <version> (<source>)"` triple that produces a high-confidence
+  record marked `direct_dependency=true` (every entry was an explicit
+  `cargo install` invocation). Dispatch is path-aware: the file is parsed
+  only when its parent directory is named `.cargo`.
+- `Cargo.lock` — Cargo's TOML lockfile. Each `[[package]]` block with a
+  non-empty `source` produces a high-confidence record; this covers
+  registry crates as well as `git+…` and other sourced dependencies.
+  Blocks without a `source` are workspace-local crates (the root package
+  and any path dependencies) and are skipped: they have no registry
+  coordinate and cannot match a published-package exposure catalog entry.
+
+Captured fields emitted on the record: `package_name`, `version`,
+`package_manager=cargo`, `source_type` (`cargo-crates2-installs` or
+`cargo-lock`), `confidence=high`, and `direct_dependency` on
+`.crates2.json` records.
+
+The user-package baseline already walks `~/.cargo`, so the installs file
+is picked up without additional configuration. `Cargo.toml` (the
+manifest) is intentionally not parsed: its version requirements are
+ranges rather than exact pins and would produce ambiguous records.
+
+We do not run `cargo install --list`, `cargo metadata`, or any other
+Cargo subcommand.
+
+Because the user-package baseline walks `~/.cargo` and dispatch on
+`Cargo.lock` is by basename, any `Cargo.lock` under
+`~/.cargo/registry/src/<index>/<crate>-<version>/` (the lockfile the
+crate's author shipped at publish time) is parsed and emitted with
+`source_file` inside that directory. These records reflect "what some
+upstream crate author pinned," not "what the user selected," so they
+overstate exposure on developer hosts and should be filtered downstream
+by `source_file` prefix if that is undesirable. The `.crate` tarballs in
+`~/.cargo/registry/cache/` are not unpacked and contribute no records.
+
+References:
+
+- Cargo `.crates2.json` install record: <https://doc.rust-lang.org/cargo/commands/cargo-install.html>
+- Cargo lockfile reference: <https://doc.rust-lang.org/cargo/guide/cargo-toml-vs-cargo-lock.html>
+
 ## RubyGems / Bundler
 
 Files read:
@@ -650,7 +695,6 @@ strong installed-state correlation tooling today.
 
 ## Not currently covered
 
-- Cargo (`Cargo.lock`).
 - Maven / Gradle (`pom.xml`, lockfiles).
 - NuGet (`packages.lock.json`).
 - Hex (`mix.lock`).
