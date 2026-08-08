@@ -77,7 +77,7 @@ func TestHTTPSink_BearerAuth_BatchAndFlush(t *testing.T) {
 	}
 
 	e := New(sink, io.Discard, "run-1")
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		if _, err := e.Emit(model.Record{
 			Ecosystem:      "npm",
 			NormalizedName: "a",
@@ -187,7 +187,7 @@ func TestHTTPSink_GzipEncodesBody(t *testing.T) {
 		t.Fatal(err)
 	}
 	e := New(sink, io.Discard, "run-1")
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		if _, err := e.Emit(model.Record{
 			Ecosystem:      "npm",
 			NormalizedName: "lodash",

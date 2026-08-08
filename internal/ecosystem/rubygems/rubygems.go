@@ -209,7 +209,7 @@ func looksLikeRubyABI(s string) bool {
 		return false
 	}
 	hasDigit := false
-	for i := 0; i < len(s); i++ {
+	for i := range len(s) {
 		c := s[i]
 		if c >= '0' && c <= '9' {
 			hasDigit = true

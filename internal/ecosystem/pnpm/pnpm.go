@@ -447,8 +447,8 @@ func parsePnpmImporterDirects(data []byte) map[string]struct{} {
 
 		// Indent 6: entry. Either `name:` (v6/v9 nested) or `name: version`.
 		if indent == 6 {
-			if strings.HasSuffix(trim, ":") {
-				curName = strings.Trim(strings.TrimSuffix(trim, ":"), "'\"")
+			if name, ok := strings.CutSuffix(trim, ":"); ok {
+				curName = strings.Trim(name, "'\"")
 				continue
 			}
 			if i := strings.IndexByte(trim, ':'); i > 0 {
@@ -515,7 +515,7 @@ func parseFlowMap(body string) map[string]string {
 	depth := 0
 	inStr := byte(0)
 	start := 0
-	for i := 0; i < len(body); i++ {
+	for i := range len(body) {
 		c := body[i]
 		if inStr != 0 {
 			if c == inStr {
@@ -547,7 +547,7 @@ func parseFlowMap(body string) map[string]string {
 		// a `:` inside a quoted key is not treated as the separator.
 		sep := -1
 		qs := byte(0)
-		for i := 0; i < len(f); i++ {
+		for i := range len(f) {
 			c := f[i]
 			if qs != 0 {
 				if c == qs {
