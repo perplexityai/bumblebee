@@ -35,6 +35,11 @@ archives:
       - README.md
       - threat_intel/**
 
+sboms:
+  - id: archive
+    disable: false
+    artifacts: archive
+
 checksum:
   name_template: checksums.txt
   algorithm: sha256
