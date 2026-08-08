@@ -45,6 +45,7 @@ const (
 	EcosystemBrowserExtension = "browser-extension"
 	EcosystemHomebrew         = "homebrew"
 	EcosystemAgentSkill       = "agent-skill"
+	EcosystemCargo            = "cargo"
 )
 
 var supportedEcosystems = map[string]struct{}{
@@ -58,6 +59,7 @@ var supportedEcosystems = map[string]struct{}{
 	EcosystemBrowserExtension: {},
 	EcosystemHomebrew:         {},
 	EcosystemAgentSkill:       {},
+	EcosystemCargo:            {},
 }
 
 var supportedEcosystemOrder = []string{
@@ -71,6 +73,7 @@ var supportedEcosystemOrder = []string{
 	EcosystemBrowserExtension,
 	EcosystemHomebrew,
 	EcosystemAgentSkill,
+	EcosystemCargo,
 }
 
 // SupportedEcosystems returns the emitted ecosystem values supported by v0.1.
