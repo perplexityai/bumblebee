@@ -391,3 +391,62 @@ func TestRootKindStampedOnRecords(t *testing.T) {
 		t.Fatal("expected at least one record")
 	}
 }
+
+// TestAllowlistedHitEmitsNoFinding verifies that a catalog hit covered by
+// the catalog allow-list produces no finding record, is counted in
+// Result.FindingsSuppressed, and does not affect other hits.
+func TestAllowlistedHitEmitsNoFinding(t *testing.T) {
+	root := t.TempDir()
+	writeFile(t, filepath.Join(root, "proj", "package-lock.json"), `{
+  "lockfileVersion": 3,
+  "packages": {
+    "node_modules/true": {"version":"0.0.4"},
+    "node_modules/evil": {"version":"1.2.3"}
+  }
+}`)
+
+	cat, err := exposure.Parse([]byte(`{"schema_version":"0.2.0","entries":[
+		{"id":"adv-true","ecosystem":"npm","package":"true","versions":["0.0.4"],"severity":"critical"},
+		{"id":"adv-evil","ecosystem":"npm","package":"evil","versions":["1.2.3"],"severity":"critical"}
+	],"allowlist":[
+		{"id":"allow-true","name":"false positive","ecosystem":"npm","package":"true","versions":["0.0.4"]}
+	]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	stdout := &bytes.Buffer{}
+	em := output.New(stdout, &bytes.Buffer{}, "run-allow")
+	res, err := Run(context.Background(), Config{
+		Profile:      model.ProfileDeep,
+		Roots:        []Root{{Path: root, Kind: model.RootKindDeepHome}},
+		MaxFileSize:  1 << 20,
+		Concurrency:  2,
+		Catalog:      cat,
+		FindingsOnly: true,
+		BaseRecord: model.Record{
+			SchemaVersion:  model.SchemaVersion,
+			ScannerName:    model.ScannerName,
+			ScannerVersion: "test",
+			RunID:          "run-allow",
+			ScanTime:       time.Now().UTC().Format(time.RFC3339Nano),
+		},
+		Emitter: em,
+	})
+	if err != nil {
+		t.Fatalf("Run: %v", err)
+	}
+	if res.FindingsEmitted != 1 {
+		t.Fatalf("findings=%d, want 1 (evil only)", res.FindingsEmitted)
+	}
+	if res.FindingsSuppressed != 1 {
+		t.Fatalf("findings_suppressed=%d, want 1", res.FindingsSuppressed)
+	}
+	out := stdout.String()
+	if !strings.Contains(out, `"catalog_id":"adv-evil"`) {
+		t.Fatalf("expected finding for evil on the wire:\n%s", out)
+	}
+	if strings.Contains(out, `"catalog_id":"adv-true"`) || strings.Contains(out, `"package_name":"true"`) {
+		t.Fatalf("allow-listed hit leaked onto the wire:\n%s", out)
+	}
+}

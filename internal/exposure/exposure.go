@@ -13,6 +13,12 @@
 // instead declare versions ["*"], which matches every version of the
 // package (including records with no version). Version ranges, hash
 // matching, and integrity-based matching remain out of scope.
+//
+// A catalog may also carry an operator allow-list (schema v0.2+): the
+// same (ecosystem, name, versions) shape, listing hits that must NOT
+// produce findings (confirmed false positives). The allow-list is
+// applied after matching, so it suppresses hits from every loaded
+// catalog file, not only the file that declares it.
 package exposure
 
 import (
@@ -40,10 +46,15 @@ const AnyVersion = "*"
 type Catalog struct {
 	SchemaVersion string
 	Entries       []Entry
+	// Allowlist holds the operator allow-list entries (schema v0.2+).
+	// A record covered by any allow-list entry never yields a Match.
+	Allowlist []Entry
 
 	// index is (ecosystem|normalized_name) -> slice of entries that
 	// declare that (ecosystem, name). Built once at load time.
 	index map[string][]*Entry
+	// allow is the same index shape, built from Allowlist.
+	allow map[string][]*Entry
 }
 
 // Entry is one exposure catalog item.
@@ -58,6 +69,9 @@ type Catalog struct {
 //
 // Optional Severity is a free-form label echoed onto the finding (e.g.
 // "critical", "high", "info"). It is not interpreted by the scanner.
+//
+// Allow-list items use the same shape. There, Name is the place to
+// record why the package is allow-listed; Severity is ignored.
 type Entry struct {
 	ID        string   `json:"id"`
 	Name      string   `json:"name,omitempty"`
@@ -105,12 +119,35 @@ type Match struct {
 // are realistic; the scanner emits one finding per returned Match so an
 // overlap is never silently masked. Order follows catalog load order
 // (alphabetical-by-filename when loaded from a directory).
+//
+// Records covered by the allow-list never match; use Allowlisted to
+// see the hits the allow-list suppressed.
 func (c *Catalog) MatchAll(r model.Record) []Match {
-	if c == nil || len(c.index) == 0 {
+	if c == nil || c.allowlisted(r) {
 		return nil
 	}
-	key := r.Ecosystem + "\x00" + r.NormalizedName
-	hits, ok := c.index[key]
+	return matchIndex(c.index, r)
+}
+
+// Allowlisted returns the catalog hits for r that the allow-list
+// suppressed. It is empty when r is not allow-listed or would not have
+// matched anyway, so callers can count real suppressions.
+func (c *Catalog) Allowlisted(r model.Record) []Match {
+	if c == nil || !c.allowlisted(r) {
+		return nil
+	}
+	return matchIndex(c.index, r)
+}
+
+func (c *Catalog) allowlisted(r model.Record) bool {
+	return len(matchIndex(c.allow, r)) > 0
+}
+
+func matchIndex(index map[string][]*Entry, r model.Record) []Match {
+	if len(index) == 0 {
+		return nil
+	}
+	hits, ok := index[r.Ecosystem+"\x00"+r.NormalizedName]
 	if !ok {
 		return nil
 	}
@@ -187,7 +224,7 @@ func loadDir(path string, maxSize int64) (*Catalog, error) {
 	}
 	sort.Strings(names)
 
-	var combined []Entry
+	var combined, allow []Entry
 	var schemaVersion string
 	var firstSource string
 	for _, name := range names {
@@ -203,13 +240,14 @@ func loadDir(path string, maxSize int64) (*Catalog, error) {
 			return nil, fmt.Errorf("exposure catalog %s declares schema_version %q which conflicts with %q from %s", sub, c.SchemaVersion, schemaVersion, firstSource)
 		}
 		combined = append(combined, c.Entries...)
+		allow = append(allow, c.Allowlist...)
 	}
 	if schemaVersion == "" {
 		// Empty directory or all-empty files. Return an empty catalog
 		// rather than erroring; matches single-file empty-input semantics.
 		return &Catalog{index: map[string][]*Entry{}}, nil
 	}
-	return build(schemaVersion, combined)
+	return build(schemaVersion, combined, allow)
 }
 
 // LoadFile reads a JSON exposure catalog from disk and returns it. The
@@ -218,7 +256,9 @@ func loadDir(path string, maxSize int64) (*Catalog, error) {
 //	{ "schema_version": "0.1.0", "entries": [ {Entry}, ... ] }
 //
 // Both `schema_version` and `entries` are required to match the published
-// JSON schema. An empty entries array is a valid zero-entry catalog.
+// JSON schema. An empty entries array is a valid zero-entry catalog. An
+// optional `allowlist` array (schema v0.2+) holds entries in the same
+// shape whose hits are suppressed.
 // Completely empty / whitespace-only files are accepted as a no-op for
 // placeholder-before-first-publish workflows.
 //
@@ -286,6 +326,7 @@ func Parse(data []byte) (*Catalog, error) {
 	var wrapped struct {
 		SchemaVersion string  `json:"schema_version"`
 		Entries       []Entry `json:"entries"`
+		Allowlist     []Entry `json:"allowlist"`
 	}
 	if err := json.Unmarshal(data, &wrapped); err != nil {
 		return nil, fmt.Errorf("parse exposure catalog: %w", err)
@@ -293,45 +334,63 @@ func Parse(data []byte) (*Catalog, error) {
 	if err := validateSchemaVersion(wrapped.SchemaVersion); err != nil {
 		return nil, err
 	}
-	return build(wrapped.SchemaVersion, wrapped.Entries)
+	if _, ok := raw["allowlist"]; ok && wrapped.SchemaVersion == "0.1.0" {
+		return nil, fmt.Errorf("parse exposure catalog: 'allowlist' requires schema_version %q", model.SchemaVersion)
+	}
+	return build(wrapped.SchemaVersion, wrapped.Entries, wrapped.Allowlist)
 }
 
-func build(schemaVersion string, in []Entry) (*Catalog, error) {
-	c := &Catalog{SchemaVersion: schemaVersion, index: map[string][]*Entry{}}
+func build(schemaVersion string, in, allow []Entry) (*Catalog, error) {
+	c := &Catalog{SchemaVersion: schemaVersion}
+	var err error
+	if c.Entries, c.index, err = buildIndex(schemaVersion, "catalog entry", in); err != nil {
+		return nil, err
+	}
+	if c.Allowlist, c.allow, err = buildIndex(schemaVersion, "allowlist entry", allow); err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+// buildIndex validates entries and indexes them by (ecosystem, normalized
+// name). kind labels error messages ("catalog entry" / "allowlist entry").
+func buildIndex(schemaVersion, kind string, in []Entry) ([]Entry, map[string][]*Entry, error) {
+	entries := make([]Entry, 0, len(in))
 	for i := range in {
 		e := in[i]
 		if e.ID == "" {
-			return nil, fmt.Errorf("catalog entry %d: missing id", i)
+			return nil, nil, fmt.Errorf("%s %d: missing id", kind, i)
 		}
 		if e.Ecosystem == "" {
-			return nil, fmt.Errorf("catalog entry %q: missing ecosystem", e.ID)
+			return nil, nil, fmt.Errorf("%s %q: missing ecosystem", kind, e.ID)
 		}
 		if e.Package == "" {
-			return nil, fmt.Errorf("catalog entry %q: missing package", e.ID)
+			return nil, nil, fmt.Errorf("%s %q: missing package", kind, e.ID)
 		}
 		if len(e.Versions) == 0 {
-			return nil, fmt.Errorf("catalog entry %q: at least one version is required", e.ID)
+			return nil, nil, fmt.Errorf("%s %q: at least one version is required", kind, e.ID)
 		}
 		for _, v := range e.Versions {
 			if v == AnyVersion {
 				if schemaVersion == "0.1.0" {
-					return nil, fmt.Errorf("catalog entry %q: versions %q requires schema_version %q", e.ID, AnyVersion, model.SchemaVersion)
+					return nil, nil, fmt.Errorf("%s %q: versions %q requires schema_version %q", kind, e.ID, AnyVersion, model.SchemaVersion)
 				}
 				if len(e.Versions) != 1 {
-					return nil, fmt.Errorf("catalog entry %q: %q must be the only element of versions", e.ID, AnyVersion)
+					return nil, nil, fmt.Errorf("%s %q: %q must be the only element of versions", kind, e.ID, AnyVersion)
 				}
 				e.anyVersion = true
 			}
 		}
 		e.normalized = normalizeName(e.Ecosystem, e.Package)
-		c.Entries = append(c.Entries, e)
+		entries = append(entries, e)
 	}
-	for i := range c.Entries {
-		e := &c.Entries[i]
+	index := map[string][]*Entry{}
+	for i := range entries {
+		e := &entries[i]
 		key := e.Ecosystem + "\x00" + e.normalized
-		c.index[key] = append(c.index[key], e)
+		index[key] = append(index[key], e)
 	}
-	return c, nil
+	return entries, index, nil
 }
 
 // supportedSchemaVersions lists catalog schema versions the loader

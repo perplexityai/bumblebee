@@ -52,6 +52,7 @@ Useful columns:
 - `package_records_suppressed`
 - `package_records_emitted`
 - `findings_emitted`
+- `findings_suppressed`
 - `diagnostics_count`
 - `http_batches_attempted`
 - `http_batches_succeeded`

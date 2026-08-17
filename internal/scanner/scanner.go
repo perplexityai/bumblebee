@@ -121,10 +121,13 @@ type Result struct {
 	RecordsEmitted           int
 	PackageRecordsSuppressed int
 	FindingsEmitted          int
-	Duplicates               int
-	Diagnostics              int
-	TimedOut                 bool
-	Duration                 time.Duration
+	// FindingsSuppressed counts catalog hits the catalog allow-list
+	// dropped (no finding was emitted for them).
+	FindingsSuppressed int
+	Duplicates         int
+	Diagnostics        int
+	TimedOut           bool
+	Duration           time.Duration
 }
 
 // Run executes one scan and returns aggregate counters. It blocks until
@@ -146,7 +149,7 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 
 	var findingsEmitted int
 	var findingsMu sync.Mutex
-	var packageRecordsSuppressed int
+	var packageRecordsSuppressed, findingsSuppressed int
 	var suppressedMu sync.Mutex
 	var emitErr error
 	var emitErrMu sync.Mutex
@@ -201,6 +204,11 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 			// same (ecosystem, name, version) are realistic and must not
 			// be silently masked. Finding.StableID includes catalog_id,
 			// so per-entry findings have distinct record_ids.
+			if n := len(cfg.Catalog.Allowlisted(r)); n > 0 {
+				suppressedMu.Lock()
+				findingsSuppressed += n
+				suppressedMu.Unlock()
+			}
 			for _, m := range cfg.Catalog.MatchAll(r) {
 				entry, version := m.Entry, m.Version
 				evidence := "exact name+version match (version=" + version + ")"
@@ -504,6 +512,7 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 	}
 	suppressedMu.Lock()
 	res.PackageRecordsSuppressed = packageRecordsSuppressed
+	res.FindingsSuppressed = findingsSuppressed
 	suppressedMu.Unlock()
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 		res.TimedOut = true

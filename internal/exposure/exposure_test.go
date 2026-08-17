@@ -443,3 +443,81 @@ func TestParseRejectsAnyVersionInOldSchema(t *testing.T) {
 		t.Fatal(`expected error for "*" under schema_version 0.1.0`)
 	}
 }
+
+func TestAllowlistSuppressesMatch(t *testing.T) {
+	c, err := Parse([]byte(`{"schema_version":"0.2.0","entries":[
+		{"id":"mal-1","ecosystem":"npm","package":"true","versions":["0.0.3","0.0.4"]},
+		{"id":"mal-2","ecosystem":"npm","package":"Evil","versions":["*"]}
+	],"allowlist":[
+		{"id":"allow-1","name":"false positive","ecosystem":"npm","package":"true","versions":["0.0.4"]},
+		{"id":"allow-2","ecosystem":"npm","package":"evil","versions":["*"]},
+		{"id":"allow-3","ecosystem":"npm","package":"harmless","versions":["*"]}
+	]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(c.Allowlist) != 3 {
+		t.Fatalf("allowlist len=%d, want 3", len(c.Allowlist))
+	}
+	// Exact-version allow-list item: only that version is suppressed.
+	allowed := model.Record{Ecosystem: "npm", NormalizedName: "true", Version: "0.0.4"}
+	if hits := c.MatchAll(allowed); len(hits) != 0 {
+		t.Fatalf("expected allow-listed record to produce no match, got %+v", hits)
+	}
+	if e, _ := c.Match(allowed); e != nil {
+		t.Fatalf("Match must honour the allow-list, got %v", e)
+	}
+	if sup := c.Allowlisted(allowed); len(sup) != 1 || sup[0].Entry.ID != "mal-1" {
+		t.Fatalf("Allowlisted=%+v, want the suppressed mal-1 hit", sup)
+	}
+	if e, _ := c.Match(model.Record{Ecosystem: "npm", NormalizedName: "true", Version: "0.0.3"}); e == nil || e.ID != "mal-1" {
+		t.Fatalf("sibling version must still match, got %v", e)
+	}
+	// Any-version allow-list item covers an any-version catalog entry.
+	if hits := c.MatchAll(model.Record{Ecosystem: "npm", NormalizedName: "evil", Version: "9.9.9"}); len(hits) != 0 {
+		t.Fatalf("expected any-version allow-list to suppress, got %+v", hits)
+	}
+	// Allow-listed but never a catalog hit: nothing to report as suppressed.
+	if sup := c.Allowlisted(model.Record{Ecosystem: "npm", NormalizedName: "harmless", Version: "1.0.0"}); len(sup) != 0 {
+		t.Fatalf("expected no suppression without a catalog hit, got %+v", sup)
+	}
+	// Allow-list is scoped by ecosystem like the catalog.
+	if sup := c.Allowlisted(model.Record{Ecosystem: "pypi", NormalizedName: "true", Version: "0.0.4"}); len(sup) != 0 {
+		t.Fatalf("expected no suppression for a different ecosystem, got %+v", sup)
+	}
+}
+
+func TestAllowlistAppliesAcrossDirectory(t *testing.T) {
+	dir := t.TempDir()
+	os.WriteFile(filepath.Join(dir, "a-advisory.json"), []byte(`{"schema_version":"0.2.0","entries":[
+		{"id":"mal-1","ecosystem":"npm","package":"true","versions":["0.0.4"]}
+	]}`), 0o644)
+	os.WriteFile(filepath.Join(dir, "z-allowlist.json"), []byte(`{"schema_version":"0.2.0","entries":[],"allowlist":[
+		{"id":"allow-1","ecosystem":"npm","package":"true","versions":["0.0.4"]}
+	]}`), 0o644)
+	c, err := Load(dir, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.Len() != 1 || len(c.Allowlist) != 1 {
+		t.Fatalf("len=%d allowlist=%d", c.Len(), len(c.Allowlist))
+	}
+	if e, _ := c.Match(model.Record{Ecosystem: "npm", NormalizedName: "true", Version: "0.0.4"}); e != nil {
+		t.Fatalf("allow-list in another file must suppress, got %v", e)
+	}
+}
+
+func TestParseRejectsAllowlistInOldSchema(t *testing.T) {
+	if _, err := Parse([]byte(`{"schema_version":"0.1.0","entries":[],"allowlist":[{"id":"a","ecosystem":"npm","package":"x","versions":["1.0.0"]}]}`)); err == nil {
+		t.Fatal("expected error for allowlist under schema_version 0.1.0")
+	}
+}
+
+func TestParseValidatesAllowlistEntries(t *testing.T) {
+	if _, err := Parse([]byte(`{"schema_version":"0.2.0","entries":[],"allowlist":[{"id":"a","ecosystem":"npm","package":"x","versions":[]}]}`)); err == nil {
+		t.Fatal("expected error for allowlist entry without versions")
+	}
+	if _, err := Parse([]byte(`{"schema_version":"0.2.0","entries":[],"allowlist":[{"ecosystem":"npm","package":"x","versions":["1.0.0"]}]}`)); err == nil {
+		t.Fatal("expected error for allowlist entry without id")
+	}
+}

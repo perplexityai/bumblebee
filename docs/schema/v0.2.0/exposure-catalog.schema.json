@@ -9,29 +9,37 @@
     "schema_version": { "const": "0.2.0" },
     "entries": {
       "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": true,
-        "required": ["id", "ecosystem", "package", "versions"],
-        "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "ecosystem": {
-            "enum": ["npm", "pypi", "go", "rubygems", "packagist", "mcp", "editor-extension", "browser-extension", "homebrew"]
-          },
-          "package": { "type": "string" },
-          "versions": {
-            "oneOf": [
-              { "const": ["*"] },
-              {
-                "type": "array",
-                "minItems": 1,
-                "items": { "type": "string", "not": { "const": "*" } }
-              }
-            ]
-          },
-          "severity": { "type": "string" }
-        }
+      "items": { "$ref": "#/$defs/entry" }
+    },
+    "allowlist": {
+      "description": "Optional. Hits covered by any allowlist entry are suppressed (no finding is emitted). Applies to every catalog file loaded together. Use `name` to record the reason.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/entry" }
+    }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "ecosystem", "package", "versions"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "ecosystem": {
+          "enum": ["npm", "pypi", "go", "rubygems", "packagist", "mcp", "editor-extension", "browser-extension", "homebrew"]
+        },
+        "package": { "type": "string" },
+        "versions": {
+          "oneOf": [
+            { "const": ["*"] },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "not": { "const": "*" } }
+            }
+          ]
+        },
+        "severity": { "type": "string" }
       }
     }
   }

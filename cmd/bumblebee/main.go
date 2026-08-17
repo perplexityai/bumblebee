@@ -137,7 +137,7 @@ func registerScanFlags(fs *flag.FlagSet, o *scanOpts) {
 	fs.IntVar(&o.concurrency, "concurrency", 4, "number of concurrent file parsers")
 
 	fs.StringVar(&o.exposureCatalog, "exposure-catalog", "",
-		"path to a JSON exposure catalog file, or a directory containing one or more *.json catalogs (merged non-recursively). Matches emit record_type=finding alongside packages. Matching is by exact (ecosystem, normalized_name, version); an entry with versions [\"*\"] matches any version. The catalog is package-presence criteria only; it is NOT an EDR IOC feed.")
+		"path to a JSON exposure catalog file, or a directory containing one or more *.json catalogs (merged non-recursively). Matches emit record_type=finding alongside packages. Matching is by exact (ecosystem, normalized_name, version); an entry with versions [\"*\"] matches any version. An optional top-level allowlist (same entry shape) suppresses hits that are known false positives. The catalog is package-presence criteria only; it is NOT an EDR IOC feed.")
 	fs.Int64Var(&o.maxCatalogSize, "max-catalog-size", 64*1024*1024,
 		"max bytes to read from any single exposure catalog file (0 = unbounded). Applied per file when --exposure-catalog is a directory.")
 	fs.BoolVar(&o.findingsOnly, "findings-only", false,
@@ -315,6 +315,7 @@ func runScan(args []string) int {
 			PackageRecordsEmitted:    res.RecordsEmitted,
 			PackageRecordsSuppressed: res.PackageRecordsSuppressed,
 			FindingsEmitted:          res.FindingsEmitted,
+			FindingsSuppressed:       res.FindingsSuppressed,
 			Duplicates:               res.Duplicates,
 			DiagnosticsCount:         res.Diagnostics,
 			FilesConsidered:          res.FilesConsidered,
@@ -337,8 +338,8 @@ func runScan(args []string) int {
 	}
 
 	emitter.Diag("info", "", fmt.Sprintf(
-		"scan complete: profile=%s status=%s files_considered=%d records=%d findings=%d suppressed=%d duplicates=%d diagnostics=%d timed_out=%v duration=%s",
-		o.profile, status, res.FilesConsidered, res.RecordsEmitted, res.FindingsEmitted, res.PackageRecordsSuppressed, res.Duplicates, res.Diagnostics, res.TimedOut, res.Duration,
+		"scan complete: profile=%s status=%s files_considered=%d records=%d findings=%d findings_suppressed=%d suppressed=%d duplicates=%d diagnostics=%d timed_out=%v duration=%s",
+		o.profile, status, res.FilesConsidered, res.RecordsEmitted, res.FindingsEmitted, res.FindingsSuppressed, res.PackageRecordsSuppressed, res.Duplicates, res.Diagnostics, res.TimedOut, res.Duration,
 	))
 	return exitCode
 }

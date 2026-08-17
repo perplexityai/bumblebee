@@ -226,6 +226,7 @@ type ScanSummary struct {
 	PackageRecordsEmitted    int            `json:"package_records_emitted"`
 	PackageRecordsSuppressed int            `json:"package_records_suppressed,omitempty"`
 	FindingsEmitted          int            `json:"findings_emitted"`
+	FindingsSuppressed       int            `json:"findings_suppressed,omitempty"`
 	Duplicates               int            `json:"duplicates"`
 	DiagnosticsCount         int            `json:"diagnostics_count"`
 	FilesConsidered          int            `json:"files_considered"`

@@ -55,6 +55,7 @@
     "package_records_emitted": { "type": "integer", "minimum": 0 },
     "package_records_suppressed": { "type": "integer", "minimum": 0 },
     "findings_emitted": { "type": "integer", "minimum": 0 },
+    "findings_suppressed": { "type": "integer", "minimum": 0 },
     "duplicates": { "type": "integer", "minimum": 0 },
     "diagnostics_count": { "type": "integer", "minimum": 0 },
     "files_considered": { "type": "integer", "minimum": 0 },

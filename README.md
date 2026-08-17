@@ -272,10 +272,37 @@ declare `"versions": ["*"]` to match every version of the package:
 
 The catalog must be a JSON object with `schema_version` and `entries`
 keys. Bare top-level arrays are rejected. `schema_version` `0.1.0`
-catalogs are still accepted (they cannot use `"*"`); unsupported future
-values are rejected. Multiple catalog files can be loaded together by
-pointing `--exposure-catalog` at a directory; see the flag description
-above.
+catalogs are still accepted (they cannot use `"*"` or `allowlist`);
+unsupported future values are rejected. Multiple catalog files can be
+loaded together by pointing `--exposure-catalog` at a directory; see the
+flag description above.
+
+### Allow-list (suppress known false positives)
+
+A catalog can carry an optional top-level `allowlist` array. Its items
+have the same shape as `entries`. A package that matches an allow-list
+item never produces a finding, even when a different catalog file in
+the same directory lists it. Use `name` to record the reason:
+
+```json
+{
+  "schema_version": "0.2.0",
+  "entries": [],
+  "allowlist": [
+    {
+      "id": "allow-true-0.0.4",
+      "name": "false positive: benign release, reviewed 2026-08-17",
+      "ecosystem": "npm",
+      "package": "true",
+      "versions": ["0.0.4"]
+    }
+  ]
+}
+```
+
+`versions: ["*"]` allow-lists every version of the package. Suppressed
+hits are counted in `scan_summary.findings_suppressed`, so a run with
+suppressions is still visible to receivers.
 
 ### Sample exposure catalogs
 
