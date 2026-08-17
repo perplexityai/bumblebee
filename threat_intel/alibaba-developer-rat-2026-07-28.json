@@ -1,0 +1,204 @@
+{
+  "schema_version": "0.2.0",
+  "_comment": "Cross-platform RAT campaign targeting Alibaba developers, reported by Socket on July 28, 2026. Covers all 18 npm packages in Socket's malicious-package IOC list. Seventeen entries use an any-version match because their current OSV MAL-2026 records declare every version affected with a SEMVER range introduced at 0; fast-transform-pipeline has no current OSV record and is limited to the campaign's 1.0.1 release. Source: https://socket.dev/blog/npm-rat-targets-alibaba.",
+  "entries": [
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-aone-cloud-cli",
+      "name": "aone-cloud-cli (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "aone-cloud-cli",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-aone-kit",
+      "name": "aone-kit (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "aone-kit",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-aone-kit-cli",
+      "name": "aone-kit-cli (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "aone-kit-cli",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-aone-sandbox",
+      "name": "aone-sandbox (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "aone-sandbox",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-cloud-config-fetcher",
+      "name": "cloud-config-fetcher (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "cloud-config-fetcher",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-colder-cli",
+      "name": "colder-cli (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "colder-cli",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-def-open-client",
+      "name": "def-open-client (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "def-open-client",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-fast-transform-pipeline",
+      "name": "fast-transform-pipeline (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "fast-transform-pipeline",
+      "versions": [
+        "1.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-feedback-ai-sdk",
+      "name": "feedback-ai-sdk (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "feedback-ai-sdk",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-flight-compare-analyzer",
+      "name": "flight-compare-analyzer (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "flight-compare-analyzer",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-lib-mtop",
+      "name": "lib-mtop (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "lib-mtop",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-local-config-parser",
+      "name": "local-config-parser (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "local-config-parser",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-lwp-web-client",
+      "name": "lwp-web-client (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "lwp-web-client",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-lzd-unified-station-sdk",
+      "name": "lzd-unified-station-sdk (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "lzd-unified-station-sdk",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-open-worker-cli",
+      "name": "open-worker-cli (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "open-worker-cli",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-smart-config-manager",
+      "name": "smart-config-manager (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "smart-config-manager",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-test-skill-zip",
+      "name": "test-skill-zip (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "test-skill-zip",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    },
+    {
+      "id": "https-socket-dev-blog-npm-rat-targets-alibaba-npm-uniapi-bridge",
+      "name": "uniapi-bridge (Distributed npm Package Cluster Delivers Cross-Platform RAT Targeting Alibaba Developers)",
+      "ecosystem": "npm",
+      "package": "uniapi-bridge",
+      "versions": [
+        "*"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/npm-rat-targets-alibaba"
+    }
+  ]
+}
