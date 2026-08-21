@@ -1,0 +1,129 @@
+{
+  "schema_version": "0.2.0",
+  "_comment": "August 4, 2026 keyv and Cacheable npm compromise. This catalog intentionally contains the 11 packages corroborated by OSV malicious-package records and removed affected versions in the npm registry: 11 packages / 13 exact versions. Socket's evolving campaign tracker currently reports 4,474 artifacts across 455 packages and is broader than this reviewed subset. Sources: https://socket.dev/blog/popular-npm-packages-in-the-keyv-and-cacheable-namespaces-compromised-in-active-supply-chain, https://socket.dev/supply-chain-attacks/keyv-and-cacheable-compromise, and OSV records MAL-2026-11523, MAL-2026-11524, MAL-2026-11558, MAL-2026-11559, MAL-2026-11560, MAL-2026-11561, MAL-2026-11952, MAL-2026-11963, MAL-2026-11964, MAL-2026-11970, and MAL-2026-11971.",
+  "entries": [
+    {
+      "id": "https-socket-dev-blog-popular-npm-packages-in-the-keyv-and-cacheable-na-cfb10520-npm-cacheable-memory",
+      "name": "@cacheable/memory (keyv and cacheable supply chain attack)",
+      "ecosystem": "npm",
+      "package": "@cacheable/memory",
+      "versions": [
+        "2.2.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/popular-npm-packages-in-the-keyv-and-cacheable-namespaces-compromised-in-active-supply-chain"
+    },
+    {
+      "id": "https-socket-dev-blog-popular-npm-packages-in-the-keyv-and-cacheable-na-cfb10520-npm-cacheable-net",
+      "name": "@cacheable/net (keyv and cacheable supply chain attack)",
+      "ecosystem": "npm",
+      "package": "@cacheable/net",
+      "versions": [
+        "2.1.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/popular-npm-packages-in-the-keyv-and-cacheable-namespaces-compromised-in-active-supply-chain"
+    },
+    {
+      "id": "https-socket-dev-blog-popular-npm-packages-in-the-keyv-and-cacheable-na-cfb10520-npm-cacheable-node-cache",
+      "name": "@cacheable/node-cache (keyv and cacheable supply chain attack)",
+      "ecosystem": "npm",
+      "package": "@cacheable/node-cache",
+      "versions": [
+        "3.1.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/popular-npm-packages-in-the-keyv-and-cacheable-namespaces-compromised-in-active-supply-chain"
+    },
+    {
+      "id": "https-socket-dev-blog-popular-npm-packages-in-the-keyv-and-cacheable-na-cfb10520-npm-cacheable-utils",
+      "name": "@cacheable/utils (keyv and cacheable supply chain attack)",
+      "ecosystem": "npm",
+      "package": "@cacheable/utils",
+      "versions": [
+        "2.5.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/popular-npm-packages-in-the-keyv-and-cacheable-namespaces-compromised-in-active-supply-chain"
+    },
+    {
+      "id": "https-socket-dev-blog-popular-npm-packages-in-the-keyv-and-cacheable-na-cfb10520-npm-thiennq-docs-viewer",
+      "name": "@thiennq/docs-viewer (keyv and cacheable supply chain attack)",
+      "ecosystem": "npm",
+      "package": "@thiennq/docs-viewer",
+      "versions": [
+        "1.6.2",
+        "1.6.3",
+        "1.6.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/popular-npm-packages-in-the-keyv-and-cacheable-namespaces-compromised-in-active-supply-chain"
+    },
+    {
+      "id": "https-socket-dev-blog-popular-npm-packages-in-the-keyv-and-cacheable-na-cfb10520-npm-cache-manager",
+      "name": "cache-manager (keyv and cacheable supply chain attack)",
+      "ecosystem": "npm",
+      "package": "cache-manager",
+      "versions": [
+        "7.2.10"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/popular-npm-packages-in-the-keyv-and-cacheable-namespaces-compromised-in-active-supply-chain"
+    },
+    {
+      "id": "https-socket-dev-blog-popular-npm-packages-in-the-keyv-and-cacheable-na-cfb10520-npm-cacheable",
+      "name": "cacheable (keyv and cacheable supply chain attack)",
+      "ecosystem": "npm",
+      "package": "cacheable",
+      "versions": [
+        "2.5.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/popular-npm-packages-in-the-keyv-and-cacheable-namespaces-compromised-in-active-supply-chain"
+    },
+    {
+      "id": "https-socket-dev-blog-popular-npm-packages-in-the-keyv-and-cacheable-na-cfb10520-npm-cacheable-request",
+      "name": "cacheable-request (keyv and cacheable supply chain attack)",
+      "ecosystem": "npm",
+      "package": "cacheable-request",
+      "versions": [
+        "13.0.20"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/popular-npm-packages-in-the-keyv-and-cacheable-namespaces-compromised-in-active-supply-chain"
+    },
+    {
+      "id": "https-socket-dev-blog-popular-npm-packages-in-the-keyv-and-cacheable-na-cfb10520-npm-file-entry-cache",
+      "name": "file-entry-cache (keyv and cacheable supply chain attack)",
+      "ecosystem": "npm",
+      "package": "file-entry-cache",
+      "versions": [
+        "11.1.6"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/popular-npm-packages-in-the-keyv-and-cacheable-namespaces-compromised-in-active-supply-chain"
+    },
+    {
+      "id": "https-socket-dev-blog-popular-npm-packages-in-the-keyv-and-cacheable-na-cfb10520-npm-flat-cache",
+      "name": "flat-cache (keyv and cacheable supply chain attack)",
+      "ecosystem": "npm",
+      "package": "flat-cache",
+      "versions": [
+        "6.1.24"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/popular-npm-packages-in-the-keyv-and-cacheable-namespaces-compromised-in-active-supply-chain"
+    },
+    {
+      "id": "https-socket-dev-blog-popular-npm-packages-in-the-keyv-and-cacheable-na-cfb10520-npm-keyv",
+      "name": "keyv (keyv and cacheable supply chain attack)",
+      "ecosystem": "npm",
+      "package": "keyv",
+      "versions": [
+        "6.0.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/popular-npm-packages-in-the-keyv-and-cacheable-namespaces-compromised-in-active-supply-chain"
+    }
+  ]
+}
