@@ -1,0 +1,26 @@
+{
+  "schema_version": "0.2.0",
+  "_comment": "Mini Shai-Hulud npm supply-chain compromise of @7nohe/openapi-react-query-codegen, reported by Socket on 2026-08-28 (https://socket.dev/blog/openapi-react-query-codegen-npm-compromise). Ten malicious versions were published in two waves ~20 minutes apart on 2026-08-28, spanning every maintained release line (last known-good per line: 0.5.3, 1.6.2, 2.2.0, 3.0.2). Malicious releases execute an obfuscated bundled loader (3FWCvzduYZg.js) at install time via a node-gyp binding.gyp hook; wave-2 manifests additionally add a preinstall script for the same loader. The second-stage payload targets cloud credentials, package-registry credentials, GitHub Actions secrets, and AI agent configuration, and contains self-propagation functionality. All ten versions carry valid npm provenance attestations issued via a comment-triggered GitHub Actions publishing workflow that gated only on comment text, allowing any account to publish a fork's code under the repo's trusted-publishing identity. Corroborated by npm registry publication timestamps (2026-08-28T20:00Z-20:20Z) and deps.dev; OSV and the GitHub Advisory Database had not yet published entries at the time of cataloging.",
+  "entries": [
+    {
+      "id": "socket-2026-08-28-mini-shai-hulud-npm-7nohe-openapi-react-query-codegen",
+      "name": "@7nohe/openapi-react-query-codegen (Mini Shai-Hulud August 2026 compromise)",
+      "ecosystem": "npm",
+      "package": "@7nohe/openapi-react-query-codegen",
+      "versions": [
+        "0.0.0-365d4eb738d3146583431948d3ba6e27a32556be",
+        "0.0.0-ec7876d6c917dad516ba69bbfafc948b834bf0ab",
+        "0.5.4",
+        "0.5.5",
+        "1.6.3",
+        "1.6.4",
+        "2.2.1",
+        "2.2.2",
+        "3.0.3",
+        "3.0.4"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/openapi-react-query-codegen-npm-compromise"
+    }
+  ]
+}
