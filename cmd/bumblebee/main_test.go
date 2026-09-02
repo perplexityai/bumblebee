@@ -158,6 +158,26 @@ func TestResolveRootsBaselineIncludesUserLocalPython(t *testing.T) {
 	}
 }
 
+func TestResolveRootsBaselineIncludesUVToolEnvironment(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	uvRoot := filepath.Join(home, ".cache", "uv", "environments-v2")
+	if err := os.MkdirAll(uvRoot, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	roots, _, err := resolveRoots(model.ProfileBaseline, nil, rootsOpts{})
+	if err != nil {
+		t.Fatalf("resolveRoots baseline: %v", err)
+	}
+	for _, r := range roots {
+		if r.Path == uvRoot && r.Kind == model.RootKindUserPackage {
+			return
+		}
+	}
+	t.Fatalf("baseline profile did not include uv tool environment %q, got %v", uvRoot, roots)
+}
+
 // TestResolveRootsBaselineIncludesClaudeAndCodexMCPRoots verifies that the
 // cross-platform Claude/Codex/Gemini user-home dotfiles are included in
 // baseline MCP roots when present, and dropped when absent.
@@ -377,6 +397,75 @@ func TestResolveRootsDeepAllowsBroadHome(t *testing.T) {
 	}
 }
 
+func TestResolveRootsDeepIncludesNestedUVToolEnvironment(t *testing.T) {
+	users := t.TempDir()
+	t.Setenv("BUMBLEBEE_USERS_DIR", users)
+	uvRoot := filepath.Join(users, "tester", ".cache", "uv", "environments-v2")
+	if err := os.MkdirAll(uvRoot, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	roots, _, err := resolveRoots(model.ProfileDeep, []string{users}, rootsOpts{})
+	if err != nil {
+		t.Fatalf("resolveRoots deep: %v", err)
+	}
+	for i, r := range roots {
+		if r.Path == uvRoot && r.Kind == model.RootKindUserPackage {
+			if i >= len(roots)-1 || roots[i+1].Path != users {
+				t.Fatalf("uv tool environment must be scanned before broad root %q, got %v", users, roots)
+			}
+			return
+		}
+	}
+	t.Fatalf("deep profile did not include uv tool environment %q, got %v", uvRoot, roots)
+}
+
+func TestResolveRootsDeepDoesNotCrossSymlinkForUVToolEnvironment(t *testing.T) {
+	users := t.TempDir()
+	t.Setenv("BUMBLEBEE_USERS_DIR", users)
+	home := filepath.Join(users, "tester")
+	cache := filepath.Join(home, ".cache")
+	if err := os.MkdirAll(cache, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	outsideUV := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(outsideUV, "environments-v2"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(outsideUV, filepath.Join(cache, "uv")); err != nil {
+		t.Fatal(err)
+	}
+
+	roots, _, err := resolveRoots(model.ProfileDeep, []string{users}, rootsOpts{})
+	if err != nil {
+		t.Fatalf("resolveRoots deep: %v", err)
+	}
+	for _, r := range roots {
+		if strings.Contains(r.Path, filepath.Join(".cache", "uv", "environments-v2")) {
+			t.Fatalf("deep profile crossed a symlink to add uv tool environment %q", r.Path)
+		}
+	}
+}
+
+func TestResolveRootsDeepSkipsNonVersionedUVEnvironmentName(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	invalid := filepath.Join(home, ".cache", "uv", "environments-v-backup")
+	if err := os.MkdirAll(invalid, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	roots, _, err := resolveRoots(model.ProfileDeep, []string{home}, rootsOpts{})
+	if err != nil {
+		t.Fatalf("resolveRoots deep: %v", err)
+	}
+	for _, r := range roots {
+		if r.Path == invalid {
+			t.Fatalf("deep profile included non-versioned uv directory %q", r.Path)
+		}
+	}
+}
+
 func TestResolveRootsDeepRequiresExplicitRoot(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
@@ -421,6 +510,13 @@ func TestClassifyRootHomebrewCellarAndCaskroom(t *testing.T) {
 		if got := classifyRoot(p, model.ProfileBaseline); got != model.RootKindHomebrew {
 			t.Errorf("classifyRoot(%q) = %q, want %q", p, got, model.RootKindHomebrew)
 		}
+	}
+}
+
+func TestClassifyRootUVToolEnvironment(t *testing.T) {
+	path := "/Users/alice/.cache/uv/environments-v2"
+	if got := classifyRoot(path, model.ProfileDeep); got != model.RootKindUserPackage {
+		t.Errorf("classifyRoot(%q) = %q, want %q", path, got, model.RootKindUserPackage)
 	}
 }
 
@@ -733,6 +829,49 @@ func TestRunScanFindingsOnlyRequiresExposureCatalog(t *testing.T) {
 	code := runScan([]string{"--profile", "deep", "--root", t.TempDir(), "--findings-only"})
 	if code != 2 {
 		t.Fatalf("runScan exit code = %d, want 2", code)
+	}
+}
+
+func TestRunScanDeepFindsPackageInUVToolEnvironment(t *testing.T) {
+	users := t.TempDir()
+	t.Setenv("BUMBLEBEE_USERS_DIR", users)
+	metadata := filepath.Join(users, "tester", ".cache", "uv", "environments-v2", "cache-case", "lib", "python3.13", "site-packages", "cache-case-1.2.3.dist-info", "METADATA")
+	otherCacheMetadata := filepath.Join(users, "tester", ".cache", "other", "cache-case", "lib", "python3.13", "site-packages", "cache-case-1.2.3.dist-info", "METADATA")
+	for _, path := range []string{metadata, otherCacheMetadata} {
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, []byte("Metadata-Version: 2.1\nName: cache-case\nVersion: 1.2.3\n\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	artifacts := t.TempDir()
+	catalog := filepath.Join(artifacts, "catalog.json")
+	if err := os.WriteFile(catalog, []byte(`{"schema_version":"0.1.0","entries":[{"id":"uv-cache-test","ecosystem":"pypi","package":"cache-case","versions":["1.2.3"]}]}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	output := filepath.Join(artifacts, "scan.ndjson")
+	code := runScan([]string{
+		"--profile", "deep",
+		"--root", users,
+		"--ecosystem", "pypi",
+		"--exposure-catalog", catalog,
+		"--findings-only",
+		"--output", "file",
+		"--output-file", output,
+		"--max-duration", "5s",
+		"--concurrency", "1",
+	})
+	if code != 0 {
+		t.Fatalf("runScan exit code = %d, want 0", code)
+	}
+	body, err := os.ReadFile(output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Count(string(body), `"record_type":"finding"`) != 1 || !strings.Contains(string(body), `"catalog_id":"uv-cache-test"`) {
+		t.Fatalf("scan did not emit expected finding: %s", body)
 	}
 }
 
