@@ -93,6 +93,9 @@ func resolveRoots(profile string, explicit []string, opts rootsOpts) (roots []sc
 			}
 			roots = append(roots, scanner.Root{Path: p, Kind: kind})
 		}
+		if profile == model.ProfileDeep {
+			roots = append(deepNestedPackageRoots(explicit), roots...)
+		}
 		return roots, notes, nil
 	}
 
@@ -124,6 +127,8 @@ func resolveRoots(profile string, explicit []string, opts rootsOpts) (roots []sc
 func classifyRoot(path, profile string) string {
 	p := filepath.ToSlash(filepath.Clean(path))
 	switch {
+	case isUVToolEnvironmentPath(p):
+		return model.RootKindUserPackage
 	case strings.HasSuffix(p, "/extensions") && containsAny(p, ".vscode", ".cursor", ".windsurf", ".vscodium"):
 		return model.RootKindEditorExtension
 	case (strings.HasSuffix(p, "/Extensions") || strings.HasSuffix(p, "/extensions")) &&
@@ -168,6 +173,22 @@ func containsAny(s string, subs ...string) bool {
 		}
 	}
 	return false
+}
+
+func isUVToolEnvironmentPath(path string) bool {
+	parts := strings.Split(filepath.ToSlash(filepath.Clean(path)), "/")
+	for i := 0; i+2 < len(parts); i++ {
+		if parts[i] == ".cache" && parts[i+1] == "uv" && isUVToolEnvironmentName(parts[i+2]) {
+			return true
+		}
+	}
+	return false
+}
+
+func isUVToolEnvironmentName(name string) bool {
+	const prefix = "environments-v"
+	version := strings.TrimPrefix(name, prefix)
+	return version != name && version != "" && strings.Trim(version, "0123456789") == ""
 }
 
 // isBroadHomeRoot reports whether path resolves to a bare user home or
@@ -227,6 +248,9 @@ func baselineHomeCandidates(home string) []scanner.Root {
 		add(p, model.RootKindUserPackage)
 	}
 	add(filepath.Join(home, ".local", "share", "pipx", "venvs"), model.RootKindUserPackage)
+	for _, r := range uvToolEnvironmentRoots(home) {
+		add(r.Path, r.Kind)
+	}
 
 	// Editor extension trees.
 	for _, seg := range []string{
@@ -284,6 +308,115 @@ func baselineHomeCandidates(home string) []scanner.Root {
 		add(r, model.RootKindBrowserExtension)
 	}
 	return out
+}
+
+// deepNestedPackageRoots returns installed package trees inside directories
+// that DefaultExcludes intentionally skips. These roots are walked before a
+// broad deep root so an exposure scan can inspect them without opening the
+// rest of the excluded directory.
+func deepNestedPackageRoots(explicit []string) []scanner.Root {
+	var out []scanner.Root
+	seen := make(map[string]struct{})
+	for _, root := range explicit {
+		for _, home := range homesCoveredByDeepRoot(root) {
+			for _, candidate := range uvToolEnvironmentRoots(home) {
+				if !plainDirectoryTree(root, candidate.Path) {
+					continue
+				}
+				clean := filepath.Clean(candidate.Path)
+				if _, ok := seen[clean]; ok {
+					continue
+				}
+				seen[clean] = struct{}{}
+				out = append(out, candidate)
+			}
+		}
+	}
+	return out
+}
+
+func homesCoveredByDeepRoot(root string) []string {
+	abs, err := filepath.Abs(root)
+	if err != nil {
+		abs = root
+	}
+	abs = filepath.Clean(abs)
+
+	switch abs {
+	case filepath.Clean(usersDirEffective()):
+		return allUsersHomes(abs)
+	case "/home":
+		return allUsersHomes(abs)
+	case "/":
+		homes := allUsersHomes(usersDirEffective())
+		homes = append(homes, allUsersHomes("/home")...)
+		if info, err := os.Stat("/root"); err == nil && info.IsDir() {
+			homes = append(homes, "/root")
+		}
+		return homes
+	}
+	if isBroadHomeRoot(abs) {
+		return []string{abs}
+	}
+	return nil
+}
+
+// uvToolEnvironmentRoots returns uvx/uv tool run virtual environments. uv
+// stores these executable environments below the otherwise disposable uv
+// cache; wheel, source, and build caches remain excluded.
+func uvToolEnvironmentRoots(home string) []scanner.Root {
+	parent := filepath.Join(home, ".cache", "uv")
+	if !plainDirectoryTree(home, parent) {
+		return nil
+	}
+	entries, err := os.ReadDir(parent)
+	if err != nil {
+		return nil
+	}
+	var out []scanner.Root
+	for _, entry := range entries {
+		if !isUVToolEnvironmentName(entry.Name()) {
+			continue
+		}
+		path := filepath.Join(parent, entry.Name())
+		if !plainDirectoryTree(home, path) {
+			continue
+		}
+		out = append(out, scanner.Root{
+			Path: path,
+			Kind: model.RootKindUserPackage,
+		})
+	}
+	return out
+}
+
+func plainDirectoryTree(root, target string) bool {
+	absRoot, err := filepath.Abs(root)
+	if err != nil {
+		return false
+	}
+	absTarget, err := filepath.Abs(target)
+	if err != nil {
+		return false
+	}
+	rel, err := filepath.Rel(absRoot, absTarget)
+	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return false
+	}
+
+	path := absRoot
+	parts := []string{}
+	if rel != "." {
+		parts = strings.Split(rel, string(filepath.Separator))
+	}
+	for _, part := range append([]string{""}, parts...) {
+		path = filepath.Join(path, part)
+		info, err := os.Lstat(path)
+		if err != nil || !info.IsDir() || info.Mode()&os.ModeSymlink != 0 {
+			return false
+		}
+	}
+	return true
 }
 
 // projectHomeCandidates returns the per-home set of curated project

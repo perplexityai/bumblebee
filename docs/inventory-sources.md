@@ -193,6 +193,10 @@ Files read:
 We read only the RFC-822 header block of METADATA / PKG-INFO and stop at
 the first blank line, so the description payload is never scanned.
 
+Baseline scans and broad deep roots add `~/.cache/uv/environments-v*` as a
+targeted root. These are executable environments reused by `uvx` and
+`uv tool run`. Other uv wheel, source, and build caches remain excluded.
+
 References:
 
 - PEP 566 (METADATA): <https://peps.python.org/pep-0566/>
