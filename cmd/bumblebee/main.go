@@ -50,7 +50,7 @@ type stringList []string
 
 func (s *stringList) String() string { return strings.Join(*s, ",") }
 func (s *stringList) Set(v string) error {
-	for _, x := range strings.Split(v, ",") {
+	for x := range strings.SplitSeq(v, ",") {
 		x = strings.TrimSpace(x)
 		if x != "" {
 			*s = append(*s, x)
@@ -426,7 +426,7 @@ func parseEcosystemFilter(values []string) (map[string]bool, error) {
 	filter := make(map[string]bool, len(values))
 	var invalid []string
 	for _, value := range values {
-		for _, part := range strings.Split(value, ",") {
+		for part := range strings.SplitSeq(value, ",") {
 			ecosystem := strings.TrimSpace(part)
 			if ecosystem == "" {
 				continue

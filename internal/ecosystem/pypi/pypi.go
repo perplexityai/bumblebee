@@ -185,7 +185,7 @@ func parseRFC822NameVersion(data []byte) (name, version string) {
 		// Continuation lines start with whitespace; skip them (we only
 		// care about Name/Version which are single-line in practice).
 		if len(trim) > 0 && (trim[0] == ' ' || trim[0] == '\t') {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			continue
