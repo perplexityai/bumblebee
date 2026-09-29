@@ -41,6 +41,7 @@ know what they are looking for.
 | Bun | `npm` | `bun.lock`; `bun.lockb` presence as diagnostic |
 | PyPI | `pypi` | `*.dist-info/METADATA`, `INSTALLER`, `direct_url.json`, `*.egg-info/PKG-INFO` |
 | Go modules | `go` | `go.sum`, `go.mod` |
+| Cargo (Rust) | `crates.io` | `~/.cargo/.crates2.json` (installed binaries), `Cargo.lock` |
 | RubyGems | `rubygems` | `Gemfile.lock`, installed `*.gemspec` |
 | Composer | `packagist` | `composer.lock`, `vendor/composer/installed.json` |
 | MCP | `mcp` | JSON host configs: `mcp.json`, `.mcp.json`, `claude_desktop_config.json`, `mcp_config.json`, `mcp_settings.json`, `cline_mcp_settings.json`, plus `~/.gemini/settings.json` (Gemini CLI / Code Assist) and `~/.claude.json` (Claude Code user- and project-scoped `mcpServers`). Non-JSON configs (Codex `config.toml`, Continue YAML) are not parsed in v0.1. |
