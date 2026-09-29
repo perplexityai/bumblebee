@@ -262,6 +262,18 @@ func (s *Scanner) emitServers(servers map[string]serverEntry, base model.Record,
 	sort.Strings(ids)
 	for _, id := range ids {
 		srv := servers[id]
+		
+		if s.Diag != nil {
+			for envKey, envVal := range srv.Env {
+				if strVal, ok := envVal.(string); ok && strVal != "" && !looksUnresolvedShellVar(strVal) {
+					uk := strings.ToUpper(envKey)
+					if strings.Contains(uk, "KEY") || strings.Contains(uk, "TOKEN") || strings.Contains(uk, "SECRET") || strings.Contains(uk, "PASSWORD") || strings.Contains(uk, "CRED") {
+						s.Diag("warn", sourcePath, fmt.Sprintf("MCP server %q specifies potential plaintext credential in env var %q", id, envKey))
+					}
+				}
+			}
+		}
+
 		r := base
 		r.Ecosystem = Ecosystem
 		r.PackageManager = "mcp"

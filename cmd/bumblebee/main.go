@@ -124,6 +124,7 @@ type scanOpts struct {
 	httpGzip      bool
 
 	deviceIDEnv string
+	quiet       bool
 }
 
 func registerScanFlags(fs *flag.FlagSet, o *scanOpts) {
@@ -161,6 +162,8 @@ func registerScanFlags(fs *flag.FlagSet, o *scanOpts) {
 
 	fs.StringVar(&o.deviceIDEnv, "device-id-env", "",
 		"env var holding a stable opaque endpoint/device id (e.g. set by MDM, EDR, or a provisioning script); populates endpoint.device_id when set")
+	fs.BoolVar(&o.quiet, "quiet", false, "suppress info and warning level diagnostic output to stderr")
+	fs.BoolVar(&o.quiet, "q", false, "suppress info and warning level diagnostic output to stderr (shorthand)")
 }
 
 // runScan executes the scan subcommand. Returns the process exit code.
@@ -221,6 +224,7 @@ func runScan(args []string) int {
 
 	runID := newRunID()
 	emitter := output.New(recordsW, os.Stderr, runID)
+	emitter.Quiet = o.quiet
 
 	for _, n := range diagNotes {
 		emitter.Diag("info", "", n)
