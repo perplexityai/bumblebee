@@ -283,6 +283,12 @@ func runScan(args []string) int {
 		errMsg = runErr.Error()
 		exitCode = 1
 	}
+	if res.TimedOut && status == model.ScanStatusComplete {
+		// The walk stopped at --max-duration, so the snapshot may be missing
+		// packages. Receivers promote only complete runs.
+		status = model.ScanStatusPartial
+		errMsg = "scan stopped at --max-duration before the walk finished"
+	}
 	if sinkStats.HTTPBatchesFailed > 0 && status == model.ScanStatusComplete {
 		status = model.ScanStatusPartial
 		if errMsg == "" {
