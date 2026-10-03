@@ -751,3 +751,61 @@ func TestRunRootsRejectsUnknownProfile(t *testing.T) {
 		t.Fatalf("runRoots --profile=scheduled exit = %d, want 2 (unknown profile)", code)
 	}
 }
+
+func writeMainTestFile(t *testing.T, path, body string) {
+	t.Helper()
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// TestRunScanSummaryCountsDeterministicOrder is the end-to-end test for
+// issue #52: it runs a real multi-ecosystem scan through runScan and
+// asserts the on-disk scan_summary.counts JSON has package, finding,
+// then ecosystem keys in model.SupportedEcosystemOrder — not Go's
+// randomized native map order.
+func TestRunScanSummaryCountsDeterministicOrder(t *testing.T) {
+	root := t.TempDir()
+	writeMainTestFile(t, filepath.Join(root, "proj", "package-lock.json"),
+		`{"lockfileVersion":3,"packages":{"node_modules/lodash":{"version":"4.17.21"}}}`)
+	writeMainTestFile(t, filepath.Join(root, "gomod", "go.sum"),
+		"github.com/example/foo v1.2.3 h1:abc=\ngithub.com/example/foo v1.2.3/go.mod h1:def=\n")
+	writeMainTestFile(t, filepath.Join(root, "rb", "Gemfile.lock"),
+		"GEM\n  remote: https://rubygems.org/\n  specs:\n    rack (3.0.8)\n\nPLATFORMS\n  ruby\n\nDEPENDENCIES\n  rack\n")
+
+	out := filepath.Join(t.TempDir(), "out.ndjson")
+	code := runScan([]string{"--profile", "project", "--root", root, "--output", "file", "--output-file", out})
+	if code != 0 {
+		t.Fatalf("runScan exit = %d", code)
+	}
+	data, err := os.ReadFile(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var summaryLine string
+	for _, line := range strings.Split(string(data), "\n") {
+		if strings.Contains(line, `"record_type":"scan_summary"`) {
+			summaryLine = line
+			break
+		}
+	}
+	if summaryLine == "" {
+		t.Fatalf("no scan_summary line found in %s", out)
+	}
+
+	wantOrder := []string{`"package"`, `"finding"`, `"npm"`, `"go"`, `"rubygems"`}
+	lastIdx := -1
+	for _, key := range wantOrder {
+		idx := strings.Index(summaryLine, key+":")
+		if idx == -1 {
+			t.Fatalf("key %s not found in scan_summary: %s", key, summaryLine)
+		}
+		if idx < lastIdx {
+			t.Fatalf("key %s out of order (idx=%d, prev=%d) in scan_summary: %s", key, idx, lastIdx, summaryLine)
+		}
+		lastIdx = idx
+	}
+}
