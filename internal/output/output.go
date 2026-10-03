@@ -35,6 +35,7 @@ type Emitter struct {
 	records io.Writer
 	diags   io.Writer
 	runID   string
+	quiet   bool
 
 	mu   sync.Mutex
 	enc  *json.Encoder
@@ -55,6 +56,14 @@ func New(records, diags io.Writer, runID string) *Emitter {
 		denc:    json.NewEncoder(diags),
 		seen:    make(map[string]struct{}),
 	}
+}
+
+// SetQuiet suppresses info-level diagnostics on the diagnostics writer.
+// Warn and error diagnostics are still emitted.
+func (e *Emitter) SetQuiet(quiet bool) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.quiet = quiet
 }
 
 // ObservePackage reserves the package record's dedupe slot and returns the
@@ -132,6 +141,9 @@ func (e *Emitter) Diag(level, path, msg string) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	e.Diagnostics++
+	if e.quiet && level == "info" {
+		return
+	}
 	d := model.Diagnostic{
 		RecordType: model.RecordTypeDiagnostic,
 		RunID:      e.runID,
