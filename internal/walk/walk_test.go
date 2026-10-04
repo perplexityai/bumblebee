@@ -88,6 +88,51 @@ func TestWalkSkipsExcludedLibrarySubtrees(t *testing.T) {
 	}
 }
 
+// TestWalkSkipsXcodeBuildOutputButKeepsSourcePackages verifies that the
+// default excludes prune Xcode DerivedData build output and caches while
+// Swift package checkouts, which carry lockfiles, are still walked.
+func TestWalkSkipsXcodeBuildOutputButKeepsSourcePackages(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("path-separator semantics differ on Windows")
+	}
+	root := t.TempDir()
+	derived := filepath.Join(root, "src", "app", "DerivedData", "App")
+	skipped := []string{
+		filepath.Join(derived, "Build", "Intermediates.noindex", "App.build", "package-lock.json"),
+		filepath.Join(derived, "Build", "Products", "Debug", "App.app", "package-lock.json"),
+		filepath.Join(derived, "Index.noindex", "DataStore", "package-lock.json"),
+		filepath.Join(root, "src", "app", "DerivedData", "ModuleCache.noindex", "package-lock.json"),
+		filepath.Join(root, "Library", "Developer", "CoreSimulator", "Devices", "1", "package-lock.json"),
+	}
+	kept := filepath.Join(derived, "SourcePackages", "checkouts", "dep", "Gemfile.lock")
+	for _, p := range append(skipped, kept) {
+		mustMkdir(t, filepath.Dir(p))
+		mustWrite(t, p, "{}")
+	}
+
+	visited := make(map[string]bool)
+	err := Walk(Options{
+		Roots:    []string{root},
+		Excludes: DefaultExcludes,
+	}, func(path string, d fs.DirEntry) error {
+		if !d.IsDir() {
+			visited[path] = true
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("Walk: %v", err)
+	}
+	for _, p := range skipped {
+		if visited[p] {
+			t.Errorf("excluded path was visited: %s", p)
+		}
+	}
+	if !visited[kept] {
+		t.Errorf("expected to visit %q", kept)
+	}
+}
+
 func mustMkdir(t *testing.T, p string) {
 	t.Helper()
 	if err := os.MkdirAll(p, 0o755); err != nil {

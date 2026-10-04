@@ -140,6 +140,23 @@ var DefaultExcludes = []string{
 	".bazel-cache",
 	".cache/bazel",
 
+	// Xcode build output, module and compilation caches, and simulator
+	// device trees. DerivedData folders hold millions of intermediates and
+	// index records; only their SourcePackages/checkouts subtrees carry
+	// lockfiles, so those stay walkable.
+	"Intermediates.noindex",
+	"Index.noindex",
+	"ModuleCache.noindex",
+	"CompilationCache.noindex",
+	"SDKStatCaches.noindex",
+	"SymbolCache.noindex",
+	"SDKExplicitPrecompiledModules",
+	"Build/Products",
+	"Library/Developer/CoreSimulator",
+	"Library/Developer/XCTestDevices",
+	"Library/Developer/XCPGDevices",
+	"Library/Developer/Xcode/iOS DeviceSupport",
+
 	// Editor remote-server runtime/state/log subtrees are excluded so the
 	// per-user `extensions/` root remains scannable while server runtime
 	// binaries, globalStorage tokens/blobs, logs, and caches are not walked.
