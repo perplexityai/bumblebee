@@ -157,7 +157,11 @@ func parseYarnLock(data []byte) []yarnEntry {
 			continue
 		}
 		line := strings.TrimSpace(raw)
-		if strings.HasPrefix(line, "version ") || strings.HasPrefix(line, "version:") {
+		// First-wins: yarn (Classic and Berry) always emits the entry's own
+		// version as the first field, so any later match is a dependency
+		// literally named "version" inside a dependencies:/peerDependencies:
+		// block, not the entry version.
+		if (strings.HasPrefix(line, "version ") || strings.HasPrefix(line, "version:")) && cur.version == "" {
 			cur.version = unquote(trimField(line, "version"))
 		}
 	}
