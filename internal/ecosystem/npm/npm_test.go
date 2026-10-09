@@ -39,7 +39,12 @@ func TestScanLockfileV3ScopedAndUnscoped(t *testing.T) {
   "version": "1.0.0",
   "lockfileVersion": 3,
   "packages": {
-    "": { "name": "demo", "version": "1.0.0" },
+    "": {
+      "name": "demo",
+      "version": "1.0.0",
+      "dependencies": { "lodash": "^4.17.21" },
+      "devDependencies": { "@tanstack/query-core": "^5.0.0" }
+    },
     "node_modules/lodash": {
       "version": "4.17.21",
       "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz",
@@ -92,6 +97,81 @@ func TestScanLockfileV3ScopedAndUnscoped(t *testing.T) {
 		t.Fatal("missing nested lodash@4.17.20")
 	} else if r.DirectDependency == nil || *r.DirectDependency {
 		t.Errorf("nested lodash should not be direct")
+	}
+}
+
+func TestScanLockfileV3DirectnessUsesRootDeclarations(t *testing.T) {
+	dir := t.TempDir()
+	lock := filepath.Join(dir, "package-lock.json")
+	writeFile(t, lock, `{
+  "name": "demo",
+  "version": "1.0.0",
+  "lockfileVersion": 3,
+  "packages": {
+    "": {
+      "name": "demo",
+      "version": "1.0.0",
+      "dependencies": { "is-odd": "^3.0.1" }
+    },
+    "node_modules/is-number": { "version": "6.0.0" },
+    "node_modules/is-odd": { "version": "3.0.1" }
+  }
+}`)
+
+	s, got, _ := newCollector()
+	if err := s.ScanLockfile(lock, model.Record{}); err != nil {
+		t.Fatalf("ScanLockfile: %v", err)
+	}
+	records := map[string]model.Record{}
+	for _, r := range *got {
+		records[r.PackageName] = r
+	}
+	if r := records["is-odd"]; r.DirectDependency == nil || !*r.DirectDependency {
+		t.Errorf("is-odd should be direct: %+v", r)
+	}
+	if r := records["is-number"]; r.DirectDependency == nil || *r.DirectDependency {
+		t.Errorf("hoisted is-number should be transitive: %+v", r)
+	}
+}
+
+func TestScanHiddenLockfileLeavesDirectnessUnknown(t *testing.T) {
+	dir := t.TempDir()
+	lock := filepath.Join(dir, "node_modules", ".package-lock.json")
+	writeFile(t, lock, `{
+  "lockfileVersion": 3,
+  "packages": {
+    "node_modules/is-number": { "version": "6.0.0" },
+    "node_modules/is-odd": { "version": "3.0.1" }
+  }
+}`)
+
+	s, got, _ := newCollector()
+	if err := s.ScanLockfile(lock, model.Record{}); err != nil {
+		t.Fatalf("ScanLockfile: %v", err)
+	}
+	if len(*got) != 2 {
+		t.Fatalf("got %d records, want 2", len(*got))
+	}
+	for _, r := range *got {
+		if r.DirectDependency != nil {
+			t.Errorf("%s direct_dependency = %v, want unknown", r.PackageName, *r.DirectDependency)
+		}
+	}
+}
+
+func TestIsTopLevelPackageKey(t *testing.T) {
+	tests := map[string]bool{
+		"node_modules/lodash":                           true,
+		"node_modules/@scope/pkg":                       true,
+		"node_modules/a/node_modules/b":                 false,
+		"packages/worker/node_modules/lodash":           false,
+		"packages/worker/node_modules/@scope/pkg":       false,
+		"packages/worker/node_modules/a/node_modules/b": false,
+	}
+	for key, want := range tests {
+		if got := isTopLevelPackageKey(key); got != want {
+			t.Errorf("isTopLevelPackageKey(%q) = %v, want %v", key, got, want)
+		}
 	}
 }
 
