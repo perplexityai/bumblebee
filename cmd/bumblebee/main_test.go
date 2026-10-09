@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 	"testing"
 
@@ -155,6 +156,59 @@ func TestResolveRootsBaselineIncludesUserLocalPython(t *testing.T) {
 	}
 	if !found {
 		t.Fatalf("baseline profile did not include user-local Python root %q, got %v", pyRoot, roots)
+	}
+}
+
+// writeUVToolEnvironment creates the layout uv uses for a uvx environment:
+// a relative symlink in environments-v2/<interpreter>/ that points at
+// archive-v0/<id>, the directory holding the virtual environment.
+func writeUVToolEnvironment(t *testing.T, home, id string) string {
+	t.Helper()
+	cache := filepath.Join(home, ".cache", "uv")
+	archive := filepath.Join(cache, "archive-v0", id)
+	link := filepath.Join(cache, "environments-v2", "interpreter", id)
+	for _, dir := range []string{archive, filepath.Dir(link)} {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := os.Symlink(filepath.Join("..", "..", "archive-v0", id), link); err != nil {
+		t.Fatal(err)
+	}
+	return archive
+}
+
+func TestResolveRootsBaselineIncludesUVToolEnvironments(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	cache := filepath.Join(home, ".cache", "uv")
+	archived := writeUVToolEnvironment(t, home, "linked")
+	for _, dir := range []string{
+		filepath.Join(cache, "environments-v-backup"),
+		filepath.Join(cache, "archive-v0", "unlinked"),
+	} {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	roots, _, err := resolveRoots(model.ProfileBaseline, nil, rootsOpts{})
+	if err != nil {
+		t.Fatalf("resolveRoots baseline: %v", err)
+	}
+	var got []string
+	for _, r := range roots {
+		if !strings.HasPrefix(r.Path, cache+string(filepath.Separator)) {
+			continue
+		}
+		if r.Kind != model.RootKindUserPackage {
+			t.Errorf("root %q kind = %q, want %q", r.Path, r.Kind, model.RootKindUserPackage)
+		}
+		got = append(got, r.Path)
+	}
+	want := []string{filepath.Join(cache, "environments-v2"), archived}
+	if !slices.Equal(got, want) {
+		t.Fatalf("baseline uv roots = %v, want %v", got, want)
 	}
 }
 
@@ -377,6 +431,53 @@ func TestResolveRootsDeepAllowsBroadHome(t *testing.T) {
 	}
 }
 
+func TestResolveRootsDeepScansUVToolEnvironmentsBeforeBroadRoot(t *testing.T) {
+	users := t.TempDir()
+	t.Setenv("BUMBLEBEE_USERS_DIR", users)
+	home := filepath.Join(users, "tester")
+	archived := writeUVToolEnvironment(t, home, "linked")
+
+	roots, _, err := resolveRoots(model.ProfileDeep, []string{users}, rootsOpts{})
+	if err != nil {
+		t.Fatalf("resolveRoots deep: %v", err)
+	}
+	var got []string
+	for _, r := range roots {
+		got = append(got, r.Path)
+	}
+	want := []string{filepath.Join(home, ".cache", "uv", "environments-v2"), archived, users}
+	if !slices.Equal(got, want) {
+		t.Fatalf("deep roots = %v, want %v", got, want)
+	}
+}
+
+func TestResolveRootsDeepDoesNotCrossSymlinkForUVToolEnvironment(t *testing.T) {
+	users := t.TempDir()
+	t.Setenv("BUMBLEBEE_USERS_DIR", users)
+	home := filepath.Join(users, "tester")
+	cache := filepath.Join(home, ".cache")
+	if err := os.MkdirAll(cache, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	outsideUV := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(outsideUV, "environments-v2"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(outsideUV, filepath.Join(cache, "uv")); err != nil {
+		t.Fatal(err)
+	}
+
+	roots, _, err := resolveRoots(model.ProfileDeep, []string{users}, rootsOpts{})
+	if err != nil {
+		t.Fatalf("resolveRoots deep: %v", err)
+	}
+	for _, r := range roots {
+		if strings.Contains(r.Path, filepath.Join(".cache", "uv", "environments-v2")) {
+			t.Fatalf("deep profile crossed a symlink to add uv tool environment %q", r.Path)
+		}
+	}
+}
+
 func TestResolveRootsDeepRequiresExplicitRoot(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
@@ -421,6 +522,13 @@ func TestClassifyRootHomebrewCellarAndCaskroom(t *testing.T) {
 		if got := classifyRoot(p, model.ProfileBaseline); got != model.RootKindHomebrew {
 			t.Errorf("classifyRoot(%q) = %q, want %q", p, got, model.RootKindHomebrew)
 		}
+	}
+}
+
+func TestClassifyRootUVToolEnvironment(t *testing.T) {
+	path := "/Users/alice/.cache/uv/environments-v2"
+	if got := classifyRoot(path, model.ProfileDeep); got != model.RootKindUserPackage {
+		t.Errorf("classifyRoot(%q) = %q, want %q", path, got, model.RootKindUserPackage)
 	}
 }
 
@@ -733,6 +841,73 @@ func TestRunScanFindingsOnlyRequiresExposureCatalog(t *testing.T) {
 	code := runScan([]string{"--profile", "deep", "--root", t.TempDir(), "--findings-only"})
 	if code != 2 {
 		t.Fatalf("runScan exit code = %d, want 2", code)
+	}
+}
+
+func TestRunScanDeepFindsPackageInUVToolEnvironment(t *testing.T) {
+	users := t.TempDir()
+	t.Setenv("BUMBLEBEE_USERS_DIR", users)
+	home := filepath.Join(users, "tester")
+	cache := filepath.Join(home, ".cache", "uv")
+	archived := writeUVToolEnvironment(t, home, "linked")
+	outside := t.TempDir()
+	if err := os.Symlink(outside, filepath.Join(cache, "archive-v1")); err != nil {
+		t.Fatal(err)
+	}
+	for name, target := range map[string]string{
+		"cache":   filepath.Join("..", ".."),
+		"escape":  outside,
+		"swapped": filepath.Join("..", "..", "archive-v1", "linked"),
+	} {
+		if err := os.Symlink(target, filepath.Join(cache, "environments-v2", "interpreter", name)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	sitePackages := filepath.Join("lib", "python3.13", "site-packages")
+	metadata := filepath.Join(archived, sitePackages, "cache-case-1.2.3.dist-info", "METADATA")
+	for _, path := range []string{
+		metadata,
+		filepath.Join(outside, sitePackages, "cache-case-1.2.3.dist-info", "METADATA"),
+		filepath.Join(outside, "linked", sitePackages, "cache-case-1.2.3.dist-info", "METADATA"),
+		filepath.Join(cache, "archive-v0", "unlinked", "cache-case-1.2.3.dist-info", "METADATA"),
+		filepath.Join(home, ".cache", "other", sitePackages, "cache-case-1.2.3.dist-info", "METADATA"),
+	} {
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, []byte("Metadata-Version: 2.1\nName: cache-case\nVersion: 1.2.3\n\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	artifacts := t.TempDir()
+	catalog := filepath.Join(artifacts, "catalog.json")
+	if err := os.WriteFile(catalog, []byte(`{"schema_version":"0.1.0","entries":[{"id":"uv-cache-test","ecosystem":"pypi","package":"cache-case","versions":["1.2.3"]}]}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	output := filepath.Join(artifacts, "scan.ndjson")
+	code := runScan([]string{
+		"--profile", "deep",
+		"--root", users,
+		"--ecosystem", "pypi",
+		"--exposure-catalog", catalog,
+		"--findings-only",
+		"--output", "file",
+		"--output-file", output,
+		"--max-duration", "5s",
+		"--concurrency", "1",
+	})
+	if code != 0 {
+		t.Fatalf("runScan exit code = %d, want 0", code)
+	}
+	body, err := os.ReadFile(output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Count(string(body), `"record_type":"finding"`) != 1 ||
+		!strings.Contains(string(body), `"catalog_id":"uv-cache-test"`) ||
+		!strings.Contains(string(body), `"source_file":"`+metadata+`"`) {
+		t.Fatalf("scan did not emit one finding for %s: %s", metadata, body)
 	}
 }
 

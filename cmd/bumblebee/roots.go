@@ -93,6 +93,9 @@ func resolveRoots(profile string, explicit []string, opts rootsOpts) (roots []sc
 			}
 			roots = append(roots, scanner.Root{Path: p, Kind: kind})
 		}
+		if profile == model.ProfileDeep {
+			roots = append(deepNestedPackageRoots(explicit), roots...)
+		}
 		return roots, notes, nil
 	}
 
@@ -124,6 +127,8 @@ func resolveRoots(profile string, explicit []string, opts rootsOpts) (roots []sc
 func classifyRoot(path, profile string) string {
 	p := filepath.ToSlash(filepath.Clean(path))
 	switch {
+	case isUVToolEnvironmentPath(p):
+		return model.RootKindUserPackage
 	case strings.HasSuffix(p, "/extensions") && containsAny(p, ".vscode", ".cursor", ".windsurf", ".vscodium"):
 		return model.RootKindEditorExtension
 	case (strings.HasSuffix(p, "/Extensions") || strings.HasSuffix(p, "/extensions")) &&
@@ -168,6 +173,23 @@ func containsAny(s string, subs ...string) bool {
 		}
 	}
 	return false
+}
+
+func isUVToolEnvironmentPath(path string) bool {
+	parts := strings.Split(filepath.ToSlash(filepath.Clean(path)), "/")
+	for i := 0; i+2 < len(parts); i++ {
+		if parts[i] == ".cache" && parts[i+1] == "uv" && isUVCacheBucket(parts[i+2], "environments") {
+			return true
+		}
+	}
+	return false
+}
+
+// isUVCacheBucket reports whether name is a versioned uv cache bucket such
+// as environments-v2 or archive-v0.
+func isUVCacheBucket(name, bucket string) bool {
+	version, ok := strings.CutPrefix(name, bucket+"-v")
+	return ok && version != "" && strings.Trim(version, "0123456789") == ""
 }
 
 // isBroadHomeRoot reports whether path resolves to a bare user home or
@@ -227,6 +249,9 @@ func baselineHomeCandidates(home string) []scanner.Root {
 		add(p, model.RootKindUserPackage)
 	}
 	add(filepath.Join(home, ".local", "share", "pipx", "venvs"), model.RootKindUserPackage)
+	for _, r := range uvToolEnvironmentRoots(home) {
+		add(r.Path, r.Kind)
+	}
 
 	// Editor extension trees.
 	for _, seg := range []string{
@@ -284,6 +309,152 @@ func baselineHomeCandidates(home string) []scanner.Root {
 		add(r, model.RootKindBrowserExtension)
 	}
 	return out
+}
+
+// deepNestedPackageRoots returns installed package trees inside directories
+// that DefaultExcludes intentionally skips. These roots are walked before a
+// broad deep root so an exposure scan can inspect them without opening the
+// rest of the excluded directory.
+func deepNestedPackageRoots(explicit []string) []scanner.Root {
+	var out []scanner.Root
+	seen := make(map[string]struct{})
+	for _, root := range explicit {
+		for _, home := range homesCoveredByDeepRoot(root) {
+			for _, candidate := range uvToolEnvironmentRoots(home) {
+				if _, ok := seen[candidate.Path]; ok {
+					continue
+				}
+				seen[candidate.Path] = struct{}{}
+				out = append(out, candidate)
+			}
+		}
+	}
+	return out
+}
+
+func homesCoveredByDeepRoot(root string) []string {
+	abs, err := filepath.Abs(root)
+	if err != nil {
+		abs = root
+	}
+	abs = filepath.Clean(abs)
+
+	switch abs {
+	case filepath.Clean(usersDirEffective()):
+		return allUsersHomes(abs)
+	case "/home":
+		return allUsersHomes(abs)
+	case "/":
+		homes := allUsersHomes(usersDirEffective())
+		homes = append(homes, allUsersHomes("/home")...)
+		if info, err := os.Stat("/root"); err == nil && info.IsDir() {
+			homes = append(homes, "/root")
+		}
+		return homes
+	}
+	if isBroadHomeRoot(abs) {
+		return []string{abs}
+	}
+	return nil
+}
+
+// uvToolEnvironmentRoots returns the virtual environments uv keeps below
+// its otherwise disposable cache: environments-v* itself, plus the
+// archive-v*/<id> environments that uvx, uv tool run, and uv run --with
+// link from environments-v*/<interpreter>/<resolution>. Unlinked archive
+// entries (unpacked wheels) and the wheel, source, and build caches remain
+// excluded.
+func uvToolEnvironmentRoots(home string) []scanner.Root {
+	cache := filepath.Join(home, ".cache", "uv")
+	if !plainDirectoryTree(home, cache) {
+		return nil
+	}
+	buckets, err := os.ReadDir(cache)
+	if err != nil {
+		return nil
+	}
+	var out []scanner.Root
+	for _, bucket := range buckets {
+		if !bucket.IsDir() || !isUVCacheBucket(bucket.Name(), "environments") {
+			continue
+		}
+		environments := filepath.Join(cache, bucket.Name())
+		out = append(out, scanner.Root{Path: environments, Kind: model.RootKindUserPackage})
+		out = append(out, uvLinkedEnvironmentRoots(cache, environments)...)
+	}
+	return out
+}
+
+// uvLinkedEnvironmentRoots resolves uv's environment links lexically from
+// verified directories and keeps only plain directories directly inside the
+// cache's archive-v* bucket, so no other symlink is followed.
+func uvLinkedEnvironmentRoots(cache, environments string) []scanner.Root {
+	interpreters, err := os.ReadDir(environments)
+	if err != nil {
+		return nil
+	}
+	var out []scanner.Root
+	for _, interpreter := range interpreters {
+		if !interpreter.IsDir() {
+			continue
+		}
+		dir := filepath.Join(environments, interpreter.Name())
+		links, err := os.ReadDir(dir)
+		if err != nil {
+			continue
+		}
+		for _, link := range links {
+			if link.Type()&os.ModeSymlink == 0 {
+				continue
+			}
+			target, err := os.Readlink(filepath.Join(dir, link.Name()))
+			if err != nil {
+				continue
+			}
+			if !filepath.IsAbs(target) {
+				target = filepath.Join(dir, target)
+			}
+			target = filepath.Clean(target)
+			archive := filepath.Dir(target)
+			if filepath.Dir(archive) != cache || !isUVCacheBucket(filepath.Base(archive), "archive") ||
+				!plainDirectoryTree(cache, target) {
+				continue
+			}
+			out = append(out, scanner.Root{Path: target, Kind: model.RootKindUserPackage})
+		}
+	}
+	return out
+}
+
+// plainDirectoryTree reports whether target is root or below it and every
+// path component from root to target is a directory, not a symlink.
+func plainDirectoryTree(root, target string) bool {
+	absRoot, err := filepath.Abs(root)
+	if err != nil {
+		return false
+	}
+	absTarget, err := filepath.Abs(target)
+	if err != nil {
+		return false
+	}
+	rel, err := filepath.Rel(absRoot, absTarget)
+	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return false
+	}
+
+	path := absRoot
+	parts := []string{}
+	if rel != "." {
+		parts = strings.Split(rel, string(filepath.Separator))
+	}
+	for _, part := range append([]string{""}, parts...) {
+		path = filepath.Join(path, part)
+		info, err := os.Lstat(path)
+		if err != nil || !info.IsDir() || info.Mode()&os.ModeSymlink != 0 {
+			return false
+		}
+	}
+	return true
 }
 
 // projectHomeCandidates returns the per-home set of curated project
