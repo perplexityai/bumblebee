@@ -1000,6 +1000,128 @@ func TestInferPackageFromArgs_ValueTakingFlags(t *testing.T) {
 	}
 }
 
+// TestInferPackageFromArgs_UVXPipxValueTakingFlags verifies that uvx and
+// pipx consume the value of value-taking flags, so a flag's value (a
+// Python version, an extra requirement, a credential-bearing index URL)
+// is not returned as the package spec.
+func TestInferPackageFromArgs_UVXPipxValueTakingFlags(t *testing.T) {
+	cases := []struct {
+		name         string
+		cmd          string
+		args         []string
+		wantSpec     string
+		wantLauncher string
+	}{
+		// uvx
+		{"uvx plain", "uvx", []string{"mcp-server-time"}, "mcp-server-time", "uv"},
+		{"uvx --python V X", "uvx", []string{"--python", "3.12", "mcp-server-time"}, "mcp-server-time", "uv"},
+		{"uvx -p V X", "uvx", []string{"-p", "3.12", "mcp-server-time"}, "mcp-server-time", "uv"},
+		{"uvx --python=V X", "uvx", []string{"--python=3.12", "mcp-server-time"}, "mcp-server-time", "uv"},
+		{"uvx --with Y X", "uvx", []string{"--with", "extra-pkg", "mcp-server-time"}, "mcp-server-time", "uv"},
+		{"uvx --with-requirements F X", "uvx", []string{"--with-requirements", "reqs.txt", "mcp-server-time"}, "mcp-server-time", "uv"},
+		{"uvx --index-url URL X", "uvx", []string{"--index-url", "https://token@idx.example.com/simple", "mcp-server-time"}, "mcp-server-time", "uv"},
+		{"uvx --extra-index-url URL X", "uvx", []string{"--extra-index-url", "https://token@idx.example.com/simple", "mcp-server-time"}, "mcp-server-time", "uv"},
+		{"uvx --constraint F X", "uvx", []string{"--constraint", "cons.txt", "mcp-server-time"}, "mcp-server-time", "uv"},
+		{"uvx --constraints F X", "uvx", []string{"--constraints", "cons.txt", "mcp-server-time"}, "mcp-server-time", "uv"},
+		{"uvx -c F X", "uvx", []string{"-c", "cons.txt", "mcp-server-time"}, "mcp-server-time", "uv"},
+		{"uvx several value flags", "uvx", []string{"--python", "3.12", "--with", "a", "--index-url", "https://t@i.example.com/s", "mcp-server-time"}, "mcp-server-time", "uv"},
+		// Boolean flags must not swallow the package.
+		{"uvx boolean flags", "uvx", []string{"--isolated", "--no-cache", "-q", "mcp-server-time"}, "mcp-server-time", "uv"},
+		// --from names the package explicitly and wins over the entry point.
+		{"uvx --from P X", "uvx", []string{"--from", "real-pkg", "entry"}, "real-pkg", "uv"},
+		{"uvx --from=P X", "uvx", []string{"--from=real-pkg", "entry"}, "real-pkg", "uv"},
+		{"uvx --python V --from P X", "uvx", []string{"--python", "3.12", "--from", "real-pkg", "entry"}, "real-pkg", "uv"},
+		{"uvx --from P==1.0 X", "uvx", []string{"--from", "real-pkg==1.0", "entry"}, "real-pkg==1.0", "uv"},
+		// Tokens after the entry point belong to the tool, not to uvx.
+		{"uvx X --python V", "uvx", []string{"mcp-server-time", "--python", "3.12"}, "mcp-server-time", "uv"},
+		{"uvx X --from P", "uvx", []string{"mcp-server-time", "--from", "other"}, "mcp-server-time", "uv"},
+		{"uvx X -- --from P", "uvx", []string{"mcp-server-time", "--", "--from", "other"}, "mcp-server-time", "uv"},
+		// No package at all.
+		{"uvx flags only", "uvx", []string{"--python", "3.12"}, "", "uv"},
+
+		// pipx
+		{"pipx run plain", "pipx", []string{"run", "mcp-server-time"}, "mcp-server-time", "pipx"},
+		{"pipx run --python V X", "pipx", []string{"run", "--python", "3.12", "mcp-server-time"}, "mcp-server-time", "pipx"},
+		{"pipx run --with Y X", "pipx", []string{"run", "--with", "extra-pkg", "mcp-server-time"}, "mcp-server-time", "pipx"},
+		{"pipx run --index-url URL X", "pipx", []string{"run", "--index-url", "https://token@idx.example.com/simple", "mcp-server-time"}, "mcp-server-time", "pipx"},
+		{"pipx run -i URL X", "pipx", []string{"run", "-i", "https://token@idx.example.com/simple", "mcp-server-time"}, "mcp-server-time", "pipx"},
+		{"pipx run --pip-args A X", "pipx", []string{"run", "--pip-args", "--extra-index-url https://t@i.example.com/s", "mcp-server-time"}, "mcp-server-time", "pipx"},
+		{"pipx run --python-args A X", "pipx", []string{"run", "--python-args", "-X dev", "mcp-server-time"}, "mcp-server-time", "pipx"},
+		{"pipx run --backend B X", "pipx", []string{"run", "--backend", "uv", "mcp-server-time"}, "mcp-server-time", "pipx"},
+		{"pipx run boolean flags", "pipx", []string{"run", "--no-cache", "--quiet", "mcp-server-time"}, "mcp-server-time", "pipx"},
+		// --spec names the package explicitly and wins over the entry point.
+		{"pipx run --spec P X", "pipx", []string{"run", "--spec", "real-pkg", "entry"}, "real-pkg", "pipx"},
+		{"pipx run --python V --spec P X", "pipx", []string{"run", "--python", "3.12", "--spec", "real-pkg", "entry"}, "real-pkg", "pipx"},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			gotSpec, gotLauncher := inferPackageFromArgs(c.cmd, c.args)
+			if gotSpec != c.wantSpec || gotLauncher != c.wantLauncher {
+				t.Errorf("inferPackageFromArgs(%q,%v) = (%q,%q), want (%q,%q)",
+					c.cmd, c.args, gotSpec, gotLauncher, c.wantSpec, c.wantLauncher)
+			}
+		})
+	}
+}
+
+// TestScanConfig_UVXPipxIndexURLDoesNotLeak is the end-to-end regression
+// for the uvx/pipx value-taking flags: a credential-bearing index URL
+// passed as a flag value must never reach PackageName or RequestedSpec,
+// and the record must carry the real package, not the flag's value.
+func TestScanConfig_UVXPipxIndexURLDoesNotLeak(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "mcp.json")
+	body := `{
+  "mcpServers": {
+    "uvx-index":       {"command":"uvx","args":["--index-url","https://user:token@idx.example.com/simple","mcp-server-time"]},
+    "uvx-extra-index": {"command":"uvx","args":["--extra-index-url","https://user:token@idx.example.com/simple","mcp-server-time@1.2.3"]},
+    "uvx-python":      {"command":"uvx","args":["--python","3.12","mcp-server-time"]},
+    "uvx-from":        {"command":"uvx","args":["--index-url","https://user:token@idx.example.com/simple","--from","real-pkg","entry"]},
+    "pipx-index":      {"command":"pipx","args":["run","--index-url","https://user:token@idx.example.com/simple","mcp-server-time"]},
+    "pipx-pip-args":   {"command":"pipx","args":["run","--pip-args","--extra-index-url https://user:token@idx.example.com/simple","mcp-server-time"]},
+    "pipx-spec":       {"command":"pipx","args":["run","--index-url","https://user:token@idx.example.com/simple","--spec","real-pkg","entry"]}
+  }
+}`
+	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	var out []model.Record
+	s := &Scanner{MaxFileSize: 1 << 20, Emit: func(r model.Record) { out = append(out, r) }}
+	if err := s.ScanConfig(path, model.Record{}); err != nil {
+		t.Fatal(err)
+	}
+	by := map[string]model.Record{}
+	for _, r := range out {
+		by[r.ServerName] = r
+	}
+	want := []struct{ id, name, spec string }{
+		{"uvx-index", "mcp-server-time", ""},
+		{"uvx-extra-index", "mcp-server-time", "mcp-server-time@1.2.3"},
+		{"uvx-python", "mcp-server-time", ""},
+		{"uvx-from", "real-pkg", ""},
+		{"pipx-index", "mcp-server-time", ""},
+		{"pipx-pip-args", "mcp-server-time", ""},
+		{"pipx-spec", "real-pkg", ""},
+	}
+	for _, w := range want {
+		r, ok := by[w.id]
+		if !ok {
+			t.Fatalf("missing record %q: %+v", w.id, out)
+		}
+		if r.PackageName != w.name {
+			t.Errorf("%s: PackageName = %q, want %q", w.id, r.PackageName, w.name)
+		}
+		if r.RequestedSpec != w.spec {
+			t.Errorf("%s: RequestedSpec = %q, want %q", w.id, r.RequestedSpec, w.spec)
+		}
+		for _, sub := range []string{"token", "user:", "://", "idx.example.com", "3.12"} {
+			if strings.Contains(r.PackageName, sub) || strings.Contains(r.RequestedSpec, sub) {
+				t.Errorf("%s: leaked %q in record: %+v", w.id, sub, r)
+			}
+		}
+	}
+}
+
 // TestScanConfig_NonPackageSpecsDoNotRoundTrip is the end-to-end
 // regression that proves raw URLs, paths, git/file refs, tarball
 // references, and credential-bearing values never appear in
