@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -749,5 +751,69 @@ func TestRunRootsRejectsUnknownProfile(t *testing.T) {
 	code := runRoots([]string{"--profile", "scheduled"})
 	if code != 2 {
 		t.Fatalf("runRoots --profile=scheduled exit = %d, want 2 (unknown profile)", code)
+	}
+}
+
+func lastSummary(t *testing.T, path string) map[string]any {
+	t.Helper()
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	lines := strings.Split(strings.TrimSpace(string(data)), "\n")
+	var sum map[string]any
+	for _, l := range lines {
+		var m map[string]any
+		if err := json.Unmarshal([]byte(l), &m); err != nil {
+			t.Fatalf("bad ndjson line %q: %v", l, err)
+		}
+		if m["record_type"] == "scan_summary" {
+			sum = m
+		}
+	}
+	if sum == nil {
+		t.Fatalf("no scan_summary in %s", path)
+	}
+	return sum
+}
+
+func TestRunScanTimedOutIsPartial(t *testing.T) {
+	root := t.TempDir()
+	for i := 0; i < 20; i++ {
+		d := filepath.Join(root, "node_modules", "pkg"+strconv.Itoa(i))
+		if err := os.MkdirAll(d, 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(d, "package.json"), []byte(`{"name":"pkg`+strconv.Itoa(i)+`","version":"1.0.0"}`), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	out := filepath.Join(t.TempDir(), "out.ndjson")
+	runScan([]string{"--root", root, "--output=file", "--output-file", out, "--max-duration", "1ns"})
+	sum := lastSummary(t, out)
+	if sum["timed_out"] != true {
+		t.Fatalf("expected timed_out=true, got %v", sum["timed_out"])
+	}
+	if sum["status"] != model.ScanStatusPartial {
+		t.Fatalf("timed-out run status = %v, want %q", sum["status"], model.ScanStatusPartial)
+	}
+}
+
+func TestRunScanCompleteWhenNotTimedOut(t *testing.T) {
+	root := t.TempDir()
+	d := filepath.Join(root, "node_modules", "pkg")
+	if err := os.MkdirAll(d, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(d, "package.json"), []byte(`{"name":"pkg","version":"1.0.0"}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	out := filepath.Join(t.TempDir(), "out.ndjson")
+	if code := runScan([]string{"--root", root, "--output=file", "--output-file", out}); code != 0 {
+		t.Fatalf("exit code %d", code)
+	}
+	sum := lastSummary(t, out)
+	if sum["timed_out"] != false || sum["status"] != model.ScanStatusComplete {
+		t.Fatalf("got timed_out=%v status=%v", sum["timed_out"], sum["status"])
 	}
 }

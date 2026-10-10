@@ -138,7 +138,8 @@ Interpretation of summary status:
 - `complete`: the run completed and the sender observed no terminal scan or
   sink errors.
 - `partial`: the run emitted some records but also hit a terminal scan error
-  or sink delivery failure.
+  or sink delivery failure, or stopped at `--max-duration` before the walk
+  finished (`timed_out=true`). The exit code stays 0 for a timeout.
 - `error`: the run failed before producing usable package state.
 
 Important sink nuance:
