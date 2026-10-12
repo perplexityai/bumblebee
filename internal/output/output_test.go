@@ -110,6 +110,39 @@ func TestEmitSummaryWritesScanSummaryRecord(t *testing.T) {
 	}
 }
 
+func TestDiagQuietSuppressesInfo(t *testing.T) {
+	var diags bytes.Buffer
+	e := New(io.Discard, &diags, "run-1")
+	e.SetQuiet(true)
+	e.Diag("info", "", "resolved roots")
+	if diags.Len() != 0 {
+		t.Fatalf("quiet mode wrote info diagnostic: %q", diags.String())
+	}
+	if e.Diagnostics != 1 {
+		t.Fatalf("Diagnostics=%d, want 1 (info still counted)", e.Diagnostics)
+	}
+}
+
+func TestDiagQuietStillEmitsWarnAndError(t *testing.T) {
+	var diags bytes.Buffer
+	e := New(io.Discard, &diags, "run-1")
+	e.SetQuiet(true)
+	e.Diag("warn", "", "device id env not set")
+	e.Diag("error", "", "scan failed")
+	if got := strings.Count(diags.String(), "\n"); got != 2 {
+		t.Fatalf("want 2 diagnostic lines, got %d: %q", got, diags.String())
+	}
+}
+
+func TestDiagDefaultEmitsInfo(t *testing.T) {
+	var diags bytes.Buffer
+	e := New(io.Discard, &diags, "run-1")
+	e.Diag("info", "", "scan complete")
+	if diags.Len() == 0 {
+		t.Fatal("default mode should emit info diagnostic")
+	}
+}
+
 func TestObservePackageDedupsWithoutWriting(t *testing.T) {
 	e := New(io.Discard, io.Discard, "run-1")
 	rec := model.Record{
