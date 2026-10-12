@@ -13,6 +13,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 	"syscall"
@@ -530,8 +531,19 @@ func rootPaths(roots []Root) []string {
 // to the RootKind of the longest root that contains it. Paths that are
 // outside any configured root (e.g. when a parser hands us a value
 // the walker did not visit) get RootKindUnknown.
+//
+// The returned closure is called per emitted record, so the per-root
+// "path + separator" strings used for prefix matching are pre-computed
+// once and the roots are sorted longest-first so the first match wins
+// without a linear scan over the rest.
 func newRootKindLookup(roots []Root) func(string) string {
-	cleaned := make([]Root, 0, len(roots))
+	type rootMatch struct {
+		path   string
+		prefix string // path + filepath.Separator
+		kind   string
+	}
+	sep := string(filepath.Separator)
+	cleaned := make([]rootMatch, 0, len(roots))
 	for _, r := range roots {
 		if r.Path == "" {
 			continue
@@ -540,27 +552,31 @@ func newRootKindLookup(roots []Root) func(string) string {
 		if err != nil {
 			p = r.Path
 		}
-		cleaned = append(cleaned, Root{Path: filepath.Clean(p), Kind: r.Kind})
+		p = filepath.Clean(p)
+		cleaned = append(cleaned, rootMatch{path: p, prefix: p + sep, kind: r.Kind})
 	}
+	// Longest path first so the first prefix hit is also the longest.
+	// Stable to preserve input order among equal-length roots, matching
+	// the previous strict-greater-than tie-break.
+	slices.SortStableFunc(cleaned, func(a, b rootMatch) int {
+		return len(b.path) - len(a.path)
+	})
 	return func(path string) string {
 		if path == "" {
 			return model.RootKindUnknown
 		}
-		abs, err := filepath.Abs(path)
-		if err != nil {
-			abs = path
-		}
-		abs = filepath.Clean(abs)
-		bestLen := -1
-		best := model.RootKindUnknown
-		for _, r := range cleaned {
-			if abs == r.Path || strings.HasPrefix(abs, r.Path+string(filepath.Separator)) {
-				if len(r.Path) > bestLen {
-					bestLen = len(r.Path)
-					best = r.Kind
-				}
+		abs := path
+		if !filepath.IsAbs(abs) {
+			if a, err := filepath.Abs(abs); err == nil {
+				abs = a
 			}
 		}
-		return best
+		abs = filepath.Clean(abs)
+		for _, r := range cleaned {
+			if abs == r.path || strings.HasPrefix(abs, r.prefix) {
+				return r.kind
+			}
+		}
+		return model.RootKindUnknown
 	}
 }
