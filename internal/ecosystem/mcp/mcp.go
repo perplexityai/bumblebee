@@ -37,9 +37,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"net/url"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 
@@ -93,7 +95,7 @@ func IsClaudeConfigJSON(path string) bool {
 type serverEntry struct {
 	Command   string                 `json:"command"`
 	Args      []string               `json:"args"`
-	Env       map[string]interface{} `json:"env"`
+	Env       map[string]any         `json:"env"`
 	URL       string                 `json:"url"`
 	ServerURL string                 `json:"serverUrl"`
 	HTTPURL   string                 `json:"httpUrl"`
@@ -167,9 +169,7 @@ func (s *Scanner) ScanConfig(path string, base model.Record) error {
 	servers := map[string]serverEntry{}
 	envErr := json.Unmarshal(data, &env1)
 	if envErr == nil {
-		for k, v := range env1.MCPServers {
-			servers[k] = v
-		}
+		maps.Copy(servers, env1.MCPServers)
 		for k, v := range env1.Servers {
 			if _, ok := servers[k]; !ok {
 				servers[k] = v
@@ -362,7 +362,7 @@ func looksUnresolvedShellVar(s string) bool {
 	}
 	// $VAR — require a leading "$" followed by an identifier char so a
 	// literal "$" elsewhere in a path doesn't trigger.
-	for i := 0; i < len(s)-1; i++ {
+	for i := range len(s) - 1 {
 		if s[i] == '$' {
 			c := s[i+1]
 			if c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') {
@@ -458,14 +458,8 @@ func inferPackageFromArgs(cmd string, args []string) (spec, launcher string) {
 		// spec so the caller falls back to the server id with low
 		// confidence. "uv tool run <pkg>" is a published-tool invocation
 		// and is handled below.
-		hasTool := false
-		for _, a := range args {
-			if a == "tool" {
-				hasTool = true
-				break
-			}
-		}
-		for i := 0; i < len(args); i++ {
+		hasTool := slices.Contains(args, "tool")
+		for i := range len(args) {
 			if args[i] == "--from" && i+1 < len(args) {
 				return args[i+1], "uv"
 			}
@@ -479,7 +473,7 @@ func inferPackageFromArgs(cmd string, args []string) (spec, launcher string) {
 	case "pipx":
 		// pipx is the PyPI-equivalent of npx and uvx. Honor "pipx run --spec <pkg> <entry>"
 		// so an explicit --spec wins over the entry-point name when they differ.
-		for i := 0; i < len(args); i++ {
+		for i := range len(args) {
 			if args[i] == "--spec" && i+1 < len(args) {
 				return args[i+1], "pipx"
 			}
@@ -557,8 +551,8 @@ func scanExplicitPackage(args []string, skip map[string]bool) string {
 		if a == "--" {
 			return ""
 		}
-		if strings.HasPrefix(a, "--package=") {
-			return strings.TrimPrefix(a, "--package=")
+		if pkg, ok := strings.CutPrefix(a, "--package="); ok {
+			return pkg
 		}
 		if a == "--package" && i+1 < len(args) {
 			return args[i+1]
