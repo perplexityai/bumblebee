@@ -1,0 +1,21 @@
+{
+  "schema_version": "0.2.0",
+  "_comment": "LiteLLM PyPI supply-chain compromise reported by Socket on 2026-10-21. Malicious litellm 1.107.0 (all seven wheels, uploaded 2026-10-21 between 11:39 and 11:40 UTC) ships cook.pth, cook.py, and sitecustomize.py under litellm-1.107.0.data/purelib/, which run at every Python interpreter start without importing litellm: a credential stealer (privcollect) targeting cloud, Kubernetes, SSH, Git, npm/PyPI, .env, browser, and AI-tool (Codex, Claude, Gemini, Cursor) credentials, plus a remote Python loader. The release was removed from PyPI: the version JSON and deps.dev both return 404. Corroborated by OSV MAL-2026-2144 (modified 2026-10-21T22:01:01Z) and GHSA-92x9-889m-jgmw (updated 2026-10-22T00:32:04Z), which list 1.107.0 as affected. Container images (ghcr.io/berriai/litellm and related tags) mentioned by Socket are out of scope for package-ecosystem matching.",
+  "entries": [
+    {
+      "id": "socket-2026-10-21-pypi-litellm",
+      "name": "litellm (October 2026 release-pipeline compromise)",
+      "ecosystem": "pypi",
+      "package": "litellm",
+      "versions": [
+        "1.107.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/litellm-compromise",
+      "references": [
+        "https://osv.dev/vulnerability/MAL-2026-2144",
+        "https://github.com/advisories/GHSA-92x9-889m-jgmw"
+      ]
+    }
+  ]
+}
