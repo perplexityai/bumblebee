@@ -911,6 +911,69 @@ func TestRunScanDeepFindsPackageInUVToolEnvironment(t *testing.T) {
 	}
 }
 
+func TestRunScanDeepUVExplicitExcludes(t *testing.T) {
+	users := t.TempDir()
+	t.Setenv("BUMBLEBEE_USERS_DIR", users)
+	metadata := make(map[string]string)
+	archives := make(map[string]string)
+	for _, user := range []string{"alice", "bob"} {
+		archives[user] = writeUVToolEnvironment(t, filepath.Join(users, user), "linked")
+		metadata[user] = filepath.Join(archives[user], "lib", "python3.13", "site-packages", "cache-case-1.2.3.dist-info", "METADATA")
+		if err := os.MkdirAll(filepath.Dir(metadata[user]), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(metadata[user], []byte("Metadata-Version: 2.1\nName: cache-case\nVersion: 1.2.3\n\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	catalog := filepath.Join(t.TempDir(), "catalog.json")
+	if err := os.WriteFile(catalog, []byte(`{"schema_version":"0.1.0","entries":[{"id":"uv-exclude-test","ecosystem":"pypi","package":"cache-case","versions":["1.2.3"]}]}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	for _, tc := range []struct {
+		name    string
+		root    string
+		exclude string
+		alice   int
+		bob     int
+	}{
+		{name: "no_exclude", root: users, alice: 2, bob: 2},
+		{name: "basename", root: users, exclude: "alice", bob: 2},
+		{name: "suffix", root: users, exclude: filepath.Join(filepath.Base(users), "alice"), bob: 2},
+		{name: "explicit_root", root: archives["alice"], exclude: "alice", alice: 2},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			output := filepath.Join(t.TempDir(), "scan.ndjson")
+			args := []string{
+				"--profile", "deep", "--root", tc.root,
+				"--ecosystem", "pypi", "--exposure-catalog", catalog,
+				"--output", "file", "--output-file", output,
+				"--max-duration", "5s", "--concurrency", "1",
+			}
+			if tc.exclude != "" {
+				args = append(args, "--exclude", tc.exclude)
+			}
+			if code := runScan(args); code != 0 {
+				t.Fatalf("runScan exit code = %d, want 0", code)
+			}
+			body, err := os.ReadFile(output)
+			if err != nil {
+				t.Fatal(err)
+			}
+			for user, want := range map[string]int{"alice": tc.alice, "bob": tc.bob} {
+				got := strings.Count(string(body), `"source_file":"`+metadata[user]+`"`)
+				if got != want {
+					t.Errorf("%s record count = %d, want %d; output=%s", user, got, want, body)
+				}
+			}
+			wantFindings := (tc.alice + tc.bob) / 2
+			if got := strings.Count(string(body), `"record_type":"finding"`); got != wantFindings {
+				t.Errorf("finding count = %d, want %d", got, wantFindings)
+			}
+		})
+	}
+}
+
 func TestRunScanRejectsInvalidEcosystem(t *testing.T) {
 	code := runScan([]string{"--profile", "baseline", "--ecosystem", "unknown"})
 	if code != 2 {

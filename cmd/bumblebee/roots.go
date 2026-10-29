@@ -35,6 +35,7 @@ import (
 
 	"github.com/perplexityai/bumblebee/internal/model"
 	"github.com/perplexityai/bumblebee/internal/scanner"
+	"github.com/perplexityai/bumblebee/internal/walk"
 )
 
 // rootsOpts groups the scoping inputs to resolveRoots. Adding a new
@@ -47,6 +48,7 @@ type rootsOpts struct {
 	// included exactly once. Has no effect on Linux, where multi-user
 	// fleet runs are not a supported deployment shape.
 	AllUsers bool
+	Excludes []string
 }
 
 // resolveRoots picks the scan roots for the given profile. When the caller
@@ -94,7 +96,7 @@ func resolveRoots(profile string, explicit []string, opts rootsOpts) (roots []sc
 			roots = append(roots, scanner.Root{Path: p, Kind: kind})
 		}
 		if profile == model.ProfileDeep {
-			roots = append(deepNestedPackageRoots(explicit), roots...)
+			roots = append(deepNestedPackageRoots(explicit, opts.Excludes), roots...)
 		}
 		return roots, notes, nil
 	}
@@ -315,12 +317,15 @@ func baselineHomeCandidates(home string) []scanner.Root {
 // that DefaultExcludes intentionally skips. These roots are walked before a
 // broad deep root so an exposure scan can inspect them without opening the
 // rest of the excluded directory.
-func deepNestedPackageRoots(explicit []string) []scanner.Root {
+func deepNestedPackageRoots(explicit, excludes []string) []scanner.Root {
 	var out []scanner.Root
 	seen := make(map[string]struct{})
 	for _, root := range explicit {
 		for _, home := range homesCoveredByDeepRoot(root) {
 			for _, candidate := range uvToolEnvironmentRoots(home) {
+				if walk.ExcludedBetween(root, candidate.Path, excludes) {
+					continue
+				}
 				if _, ok := seen[candidate.Path]; ok {
 					continue
 				}
