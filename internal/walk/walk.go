@@ -292,3 +292,28 @@ func isExcluded(fullPath, base string, excludes excludeSet) bool {
 	}
 	return false
 }
+
+func ExcludedBetween(root, path string, excludes []string) bool {
+	root, err := filepath.Abs(root)
+	if err != nil {
+		return true
+	}
+	path, err = filepath.Abs(path)
+	if err != nil {
+		return true
+	}
+	excluded := normalizeExcludes(excludes)
+	for {
+		if isExcluded(path, filepath.Base(path), excluded) {
+			return true
+		}
+		if path == root {
+			return false
+		}
+		parent := filepath.Dir(path)
+		if parent == path {
+			return true
+		}
+		path = parent
+	}
+}
