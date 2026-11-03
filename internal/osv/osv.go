@@ -313,16 +313,18 @@ func (r Record) toEntries(opts Options, st *Stats) []CatalogEntry {
 			continue
 		}
 		k := key{eco, name}
-		if len(a.Versions) == 0 {
-			if !a.allVersions() {
-				st.SkippedNoVersions++
-				continue
-			}
+		// OSV's affected set is the union of ranges and versions, so an
+		// all-versions range covers the listed versions too.
+		if a.allVersions() {
 			if _, seen := versions[k]; !seen {
 				versions[k] = map[string]struct{}{}
 				order = append(order, k)
 			}
 			anyVersion[k] = true
+			continue
+		}
+		if len(a.Versions) == 0 {
+			st.SkippedNoVersions++
 			continue
 		}
 		set, seen := versions[k]
