@@ -285,6 +285,24 @@ func TestConvertAllVersionsWinsOverEnumerated(t *testing.T) {
 	}
 }
 
+// TestConvertAllVersionsWithListedVersionsInOneEntry: one affected entry
+// that has both an enumerated versions list and an introduced:"0" range
+// is the union of the two, which is every version, so it emits ["*"].
+func TestConvertAllVersionsWithListedVersionsInOneEntry(t *testing.T) {
+	records := []Record{{ID: "MAL-both", Affected: []Affected{{
+		Package:  Package{Ecosystem: "npm", Name: "p"},
+		Versions: []string{"10.0.0"},
+		Ranges:   []Range{{Type: "SEMVER", Events: []map[string]string{{"introduced": "0"}}}},
+	}}}}
+	entries, st := Convert(records, Options{})
+	if len(entries) != 1 || !reflect.DeepEqual(entries[0].Versions, []string{"*"}) {
+		t.Fatalf("want single [*] entry, got %+v", entries)
+	}
+	if st.AnyVersionEntries != 1 {
+		t.Errorf("AnyVersionEntries = %d, want 1", st.AnyVersionEntries)
+	}
+}
+
 // TestRoundTripAnyVersion: a generated any-version entry survives
 // exposure.LoadFile and matches an arbitrary discovered version.
 func TestRoundTripAnyVersion(t *testing.T) {
