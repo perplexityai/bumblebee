@@ -445,7 +445,7 @@ func inferPackageFromArgs(cmd string, args []string) (spec, launcher string) {
 		}
 		return firstNonFlag(args, subcommands, npmValueTakingFlags), ""
 	case "uvx":
-		return firstNonFlag(args, nil, nil), "uv"
+		return firstNonFlag(args, nil, uvValueTakingFlags), "uv"
 	case "uv":
 		// Recognize "uv tool run <pkg>" and "uv run <pkg>". Honor "--from <pkg>"
 		// when present: uv allows the entry-point name and the package name
@@ -475,7 +475,7 @@ func inferPackageFromArgs(cmd string, args []string) (spec, launcher string) {
 		}
 		return firstNonFlag(args, map[string]bool{
 			"tool": true, "run": true,
-		}, nil), "uv"
+		}, uvValueTakingFlags), "uv"
 	case "pipx":
 		// pipx is the PyPI-equivalent of npx and uvx. Honor "pipx run --spec <pkg> <entry>"
 		// so an explicit --spec wins over the entry-point name when they differ.
@@ -484,7 +484,7 @@ func inferPackageFromArgs(cmd string, args []string) (spec, launcher string) {
 				return args[i+1], "pipx"
 			}
 		}
-		return firstNonFlag(args, map[string]bool{"run": true}, nil), "pipx"
+		return firstNonFlag(args, map[string]bool{"run": true}, uvValueTakingFlags), "pipx"
 	case "docker", "podman":
 		// docker run [opts] <image> [cmd...]. Walk args: skip "run" and any
 		// flags (with or without `=`). The first positional after that is
@@ -644,6 +644,28 @@ var npmValueTakingFlags = map[string]bool{
 	"--lockfile-dir":      true,
 	"--config":            true,
 	"--config-file":       true,
+}
+
+// uvValueTakingFlags lists uv/uvx/pipx flags that consume a separate value
+// argument, so firstNonFlag does not mistake that value for the package spec
+// (e.g. `uvx --python 3.11 <pkg>` or `uvx --with <extra> <pkg>`). --from and
+// --spec are handled explicitly at the call sites and intentionally omitted.
+var uvValueTakingFlags = map[string]bool{
+	"--python":            true,
+	"-p":                  true,
+	"--with":              true,
+	"--with-requirements": true,
+	"--with-editable":     true,
+	"--index":             true,
+	"--index-url":         true,
+	"--extra-index-url":   true,
+	"--default-index":     true,
+	"--find-links":        true,
+	"-f":                  true,
+	"--constraint":        true,
+	"-c":                  true,
+	"--override":          true,
+	"--pip-args":          true,
 }
 
 // looksLikePackageSpec reports whether s is a plausible
