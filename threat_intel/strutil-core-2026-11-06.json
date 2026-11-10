@@ -1,0 +1,45 @@
+{
+  "schema_version": "0.2.0",
+  "_comment": "strutil-core malicious RubyGems package reported by Socket on 2026-11-06, carrying a new build of the testmetest worm (Miasma family, derived from the public Shai-Hulud toolkit). The account jamnajiea published a clean 1.0.0 on 2026-11-01 and the malicious 1.0.1 under two hours later; 1.0.1 declares a native extension whose ext/strutil-core/extconf.rb downloads Bun 1.2.18 and runs the 5.48 MB ext/strutil-core/index.js at gem install time. The payload steals cloud, CI, registry, SSH, AI coding tool and wallet credentials, exfiltrates to paleasbest[.]top, self-propagates via RubyGems/npm/PyPI, installs persistence, poisons AI tool configuration, and includes a home-directory wiper triggered by token revocation. RubyGems removed both versions about five hours after the malicious release (rubygems.org now returns 404 for the gem). strutil-core 1.0.1 is corroborated by OSV MAL-2026-19054 (published 2026-11-01T20:00:00Z, finder Bitbison) and GHSA-gv9w-h836-5f8g (published 2026-11-10T00:32:04Z, references the OSV record). The related PyPI package pystr-codec 0.1.0, 0.1.1 and 0.1.2, which Socket ties to the same collection endpoint, is corroborated by OSV MAL-2026-18432 (published 2026-11-01T00:13:02Z, source kam193) and GHSA-f93h-mc69-274w (published 2026-11-01T03:30:23Z); PyPI returns 404 for all three versions. strutil-core 1.0.0 is omitted: Socket describes it as a clean seed release and neither OSV nor GHSA lists it as affected.",
+  "_indicators": {
+    "strutil_core_1_0_1_gem_sha256": "3b3f6e1bde0b28b015030a81a6d805b5b5306dc3f021e1102123971cfd83acc0",
+    "index_js_sha256": "306c1deec402e8b4a6478e7f0fe02194bcd224d37d8fc6ba61ad1951e8abd7a9",
+    "extconf_rb_sha256": "c5264f3b9cf2f95c83a70b7dd7430aab8abc262b853dbbcd5386c3a8a9c74769",
+    "exfil_domain": "paleasbest.top",
+    "rubygems_account": "jamnajiea"
+  },
+  "entries": [
+    {
+      "id": "socket-2026-11-06-rubygems-strutil-core",
+      "name": "strutil-core (testmetest / Miasma Shai-Hulud descendant RubyGems worm)",
+      "ecosystem": "rubygems",
+      "package": "strutil-core",
+      "versions": [
+        "1.0.1"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/shai-hulud-descendant-malicious-ruby-gem",
+      "references": [
+        "https://osv.dev/vulnerability/MAL-2026-19054",
+        "https://github.com/advisories/GHSA-gv9w-h836-5f8g"
+      ]
+    },
+    {
+      "id": "socket-2026-11-06-pypi-pystr-codec",
+      "name": "pystr-codec (testmetest / Miasma related PyPI package, same collection endpoint)",
+      "ecosystem": "pypi",
+      "package": "pystr-codec",
+      "versions": [
+        "0.1.0",
+        "0.1.1",
+        "0.1.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/shai-hulud-descendant-malicious-ruby-gem",
+      "references": [
+        "https://osv.dev/vulnerability/MAL-2026-18432",
+        "https://github.com/advisories/GHSA-f93h-mc69-274w"
+      ]
+    }
+  ]
+}
