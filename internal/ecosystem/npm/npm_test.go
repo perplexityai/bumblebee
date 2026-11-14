@@ -128,6 +128,96 @@ func TestScanLockfileV1(t *testing.T) {
 	}
 }
 
+// TestScanLockfileHasInstallScript verifies that npm's hasInstallScript
+// marker on a lockfileVersion 2/3 packages entry sets HasLifecycleScripts.
+// The lockfile records only the boolean, never the hook names, so
+// LifecycleScripts must stay empty (same rule as pnpm's requiresBuild).
+func TestScanLockfileHasInstallScript(t *testing.T) {
+	for _, version := range []string{"2", "3"} {
+		t.Run("lockfileVersion"+version, func(t *testing.T) {
+			dir := t.TempDir()
+			lock := filepath.Join(dir, "package-lock.json")
+			body := `{
+  "name": "demo",
+  "version": "1.0.0",
+  "lockfileVersion": ` + version + `,
+  "packages": {
+    "": { "name": "demo", "version": "1.0.0" },
+    "node_modules/with-hook": {
+      "version": "1.0.0",
+      "hasInstallScript": true
+    },
+    "node_modules/explicit-false": {
+      "version": "2.0.0",
+      "hasInstallScript": false
+    },
+    "node_modules/no-flag": {
+      "version": "3.0.0"
+    }
+  }
+}`
+			writeFile(t, lock, body)
+
+			s, got, _ := newCollector()
+			if err := s.ScanLockfile(lock, model.Record{}); err != nil {
+				t.Fatalf("ScanLockfile: %v", err)
+			}
+			byName := map[string]model.Record{}
+			for _, r := range *got {
+				byName[r.NormalizedName] = r
+			}
+			if len(byName) != 3 {
+				t.Fatalf("expected 3 records, got %d", len(byName))
+			}
+			withHook := byName["with-hook"]
+			if !withHook.HasLifecycleScripts {
+				t.Errorf("with-hook: hasInstallScript=true should set HasLifecycleScripts")
+			}
+			if len(withHook.LifecycleScripts) != 0 {
+				t.Errorf("with-hook: LifecycleScripts = %v, want empty", withHook.LifecycleScripts)
+			}
+			for _, name := range []string{"explicit-false", "no-flag"} {
+				if byName[name].HasLifecycleScripts {
+					t.Errorf("%s: HasLifecycleScripts should be false", name)
+				}
+			}
+		})
+	}
+}
+
+// TestScanLockfileV1LifecycleStaysFalse pins the known limit: a
+// lockfileVersion 1 file has no hasInstallScript marker, so records
+// parsed from it cannot report install-time hooks.
+func TestScanLockfileV1LifecycleStaysFalse(t *testing.T) {
+	dir := t.TempDir()
+	lock := filepath.Join(dir, "package-lock.json")
+	writeFile(t, lock, `{
+  "name": "demo",
+  "version": "1.0.0",
+  "lockfileVersion": 1,
+  "dependencies": {
+    "esbuild": {
+      "version": "0.25.0",
+      "dependencies": {
+        "nested": { "version": "1.0.0" }
+      }
+    }
+  }
+}`)
+	s, got, _ := newCollector()
+	if err := s.ScanLockfile(lock, model.Record{}); err != nil {
+		t.Fatalf("ScanLockfile: %v", err)
+	}
+	if len(*got) != 2 {
+		t.Fatalf("expected 2 records, got %d", len(*got))
+	}
+	for _, r := range *got {
+		if r.HasLifecycleScripts || len(r.LifecycleScripts) != 0 {
+			t.Errorf("%s: v1 lockfile record should not report lifecycle scripts", r.PackageName)
+		}
+	}
+}
+
 func TestScanNodeModulesPackageJSONLifecycleScripts(t *testing.T) {
 	dir := t.TempDir()
 	pj := filepath.Join(dir, "node_modules", "evil", "package.json")
