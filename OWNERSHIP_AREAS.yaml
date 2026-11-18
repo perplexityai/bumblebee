@@ -1,0 +1,7 @@
+# Ownership areas map a code area to the team that owns it. Stellar's ownership
+# evaluator derives AI-approval eligibility from these areas and OWNERS.yaml.
+# https://github.com/ppl-ai/agi/blob/main/docs/dev-guide/09-ci-cd.md#code-ownership
+areas:
+  - name: bumblebee
+    team: team-security
+    description: bumblebee scanner, exposure catalogs, schemas, CI and releases.

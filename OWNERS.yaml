@@ -1,0 +1,68 @@
+# Repo-root ownership for Stellar. The first matching entry wins; list narrow
+# patterns before broad fallbacks.
+# https://github.com/ppl-ai/agi/blob/main/docs/dev-guide/09.4-pr-approval-gates.md
+#
+# Approval policies:
+#   ai_or_owner : Stellar may approve, with an owning-team member as fallback.
+#   owner       : Owning-team member only (Stellar cannot approve).
+#
+# This repository is public. Stellar approves only PRs whose author has write
+# or admin on the repository, whose head branch is in this repository and that
+# target the default branch, so outside contributions always need a human
+# approval. Stellar may approve only threat_intel/ catalog entries; any other changed file makes the
+# whole PR need a human. Ownership files, CI, release configuration and
+# security policy also need a second team-security member when a
+# team-security member authors the change.
+owners:
+  - pattern: "threat_intel/*.json"
+    area: bumblebee
+    approval: ai_or_owner
+  - pattern: "threat_intel/README.md"
+    area: bumblebee
+    approval: ai_or_owner
+
+  - pattern: "OWNERS.yaml"
+    area: bumblebee
+    approval: owner
+    member_author_approval: team_member
+  - pattern: "OWNERSHIP_AREAS.yaml"
+    area: bumblebee
+    approval: owner
+    member_author_approval: team_member
+  - pattern: "TEAMS.yaml"
+    area: bumblebee
+    approval: owner
+    member_author_approval: team_member
+  - pattern: "REVIEW_GUIDANCE.md"
+    area: bumblebee
+    approval: owner
+    member_author_approval: team_member
+  - pattern: ".github/**"
+    area: bumblebee
+    approval: owner
+    member_author_approval: team_member
+  - pattern: ".goreleaser.yaml"
+    area: bumblebee
+    approval: owner
+    member_author_approval: team_member
+  - pattern: "SECURITY.md"
+    area: bumblebee
+    approval: owner
+    member_author_approval: team_member
+  - pattern: "LICENSE"
+    area: bumblebee
+    approval: owner
+    member_author_approval: team_member
+  - pattern: "VERSION"
+    area: bumblebee
+    approval: owner
+    member_author_approval: team_member
+  - pattern: "docs/schema/**"
+    area: bumblebee
+    approval: owner
+    member_author_approval: team_member
+
+  # Everything else, including code, dependencies and docs.
+  - pattern: "**"
+    area: bumblebee
+    approval: owner

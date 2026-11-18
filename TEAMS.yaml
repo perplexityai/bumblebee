@@ -1,0 +1,6 @@
+# Deliberately minimal: this is a public repository, so it carries only the
+# fields Stellar's ownership resolution reads for the owning team, not a copy
+# of the internal ppl-ai/agi TEAMS.yaml catalog.
+teams:
+  - name: team-security
+    github_handle: ppl-ai/pplx_security
