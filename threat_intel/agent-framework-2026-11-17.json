@@ -1,0 +1,22 @@
+{
+  "schema_version": "0.2.0",
+  "_comment": "Compromise of the Microsoft agent-framework PyPI package, reported by Socket on 2026-11-17. Malicious versions 1.26.1 (published 2026-11-17 20:35 UTC, wheel only) and 1.26.2 (published 2026-11-17 21:08 UTC) were repackaged from the legitimate 1.26.0 wheel and add a .pth startup hook (agent_framework_meta.pth in 1.26.1, af_runtime_diag.pth in 1.26.2) that runs a credential stealer on every Python interpreter start. The payload harvests credential-bearing environment variables, other processes' /proc/*/environ, local credential files, and Azure managed-identity, Azure DevOps, and (in 1.26.2) GitHub Actions OIDC tokens, then exfiltrates them to webhook.site. Both versions were subsequently removed from PyPI: the PyPI JSON API and deps.dev return 404 for them, and the last clean release is 1.26.0. Corroborated by OSV MAL-2026-20101 (with PYSEC-2026-4388) and GHSA-764m-3ppc-5m73, which enumerate 1.26.1 and 1.26.2 as the affected versions.",
+  "entries": [
+    {
+      "id": "socket-2026-11-17-pypi-agent-framework",
+      "name": "agent-framework (Microsoft Agent Framework PyPI credential-stealer compromise)",
+      "ecosystem": "pypi",
+      "package": "agent-framework",
+      "versions": [
+        "1.26.1",
+        "1.26.2"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/agent-framework-pypi-package-compromised-with-credential-stealer",
+      "references": [
+        "https://osv.dev/vulnerability/MAL-2026-20101",
+        "https://github.com/advisories/GHSA-764m-3ppc-5m73"
+      ]
+    }
+  ]
+}
