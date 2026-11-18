@@ -29,9 +29,9 @@ Each scan profile reads from a different slice of the sources below:
 
 | Profile     | Sources walked                                                                                                                                                                                                |
 |-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `baseline` | Homebrew `Cellar` / `Caskroom` install metadata and lib prefixes; `/Library/Python`; Linux system Python (`/usr/lib/python*`, plus `/usr/local/lib`); user Python (`~/.local/lib/python*`, `~/.local/share/pipx/venvs`, `pyenv`); language version managers (`asdf`, `nvm`, `rbenv`, `rvm`); `~/.cargo`; `~/go`; editor-extension trees; MCP config locations; agent-skill lock locations (`~/.agents`, `$XDG_STATE_HOME/skills`); per-profile browser-extension trees (Chromium-family + Firefox-family, including common snap/flatpak paths). No project trees.   |
+| `baseline` | Homebrew `Cellar` / `Caskroom` install metadata and lib prefixes; `/Library/Python`; Linux system Python (`/usr/lib/python*`, plus `/usr/local/lib`); user Python (`~/.local/lib/python*`, `~/.local/share/pipx/venvs`, `pyenv`, uv environments in `~/.cache/uv`); language version managers (`asdf`, `nvm`, `rbenv`, `rvm`); `~/.cargo`; `~/go`; editor-extension trees; MCP config locations; agent-skill lock locations (`~/.agents`, `$XDG_STATE_HOME/skills`); per-profile browser-extension trees (Chromium-family + Firefox-family, including common snap/flatpak paths). No project trees.   |
 | `project`   | Configured developer/project roots (`~/code`, `~/src`, `~/Developer`, `~/Projects`, `~/workspace`, and any explicit `--root`). All ecosystem parsers below apply within those trees.                            |
-| `deep`      | Operator-supplied roots, typically a bare home directory during a campaign. Same ecosystem parsers; recommended only in combination with `--exposure-catalog` to emit `record_type=finding` records.            |
+| `deep`      | Operator-supplied roots, typically a bare home directory during a campaign, plus the uv environments in `~/.cache/uv` of each home a broad root covers. Same ecosystem parsers; recommended only in combination with `--exposure-catalog` to emit `record_type=finding` records. |
 
 The `source_type` values emitted are the same across profiles. What
 changes is the population of files the walker visits.
@@ -192,6 +192,17 @@ Files read:
 
 We read only the RFC-822 header block of METADATA / PKG-INFO and stop at
 the first blank line, so the description payload is never scanned.
+
+Baseline scans and broad deep roots also walk the uv environments in
+`~/.cache/uv`. These are the `environments-v*` directories and each
+`archive-v*/<id>` environment that `uvx`, `uv tool run`, or
+`uv run --with` links from `environments-v*/<interpreter>/<resolution>`.
+Bumblebee follows a link only when the link names a directory directly
+inside the same cache's `archive-v*`. It follows no other symlink below the
+home. Unlinked archive entries (unpacked wheels) and the wheel, source, and
+build caches remain excluded. Bumblebee does not look for uv caches set by
+`UV_CACHE_DIR`, `--cache-dir`, or `XDG_CACHE_HOME`, or for the legacy macOS
+cache `~/Library/Caches/uv`.
 
 References:
 

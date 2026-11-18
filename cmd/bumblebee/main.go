@@ -188,7 +188,7 @@ func runScan(args []string) int {
 		return 2
 	}
 
-	roots, diagNotes, err := resolveRoots(o.profile, o.roots, rootsOpts{AllUsers: o.allUsers})
+	roots, diagNotes, err := resolveRoots(o.profile, o.roots, rootsOpts{AllUsers: o.allUsers, Excludes: o.excludes})
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		return 2
