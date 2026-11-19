@@ -1,0 +1,32 @@
+{
+  "schema_version": "0.2.0",
+  "_comment": "Compromise of Ethersphere's release pipeline reported by Socket on 2026-11-09. A threat actor used compromised maintainer (nugaon) and release-automation (bee-worker) GitHub accounts to publish malicious @ethersphere/bee-js 13.3.0 to npm through the project's legitimate trusted-publishing workflow (valid SLSA provenance). The release rewrote scripts/generate-version.cjs into a remote-code loader promoted to a postinstall hook that fetches JavaScript from api[.]frameworkmetrics[.]xyz and runs it via new Function with full Node.js privileges; later stages resolve C2 from Ethereum contract 0xf8a900Db50b3331be6B768bA460BB59f3E40C344, shared with the SleepyDuck / EtherDuck Open VSX campaign. A trojanized Swarm Desktop 0.56.2 GitHub release carried the same loader. npm removed 13.3.0 about 75 minutes after publication: the packument retains its 2026-11-09T00:09:50.630Z publication timestamp but no longer exposes version metadata. Corroborated by GHSA-hh7j-5m3j-23pf and OSV MAL-2026-18773 (both published 2026-11-09T01:25:27Z; the OSV record is imported from the GHSA malware advisory), which enumerate 13.3.0 as the affected version. Swarm Desktop 0.56.2 is a GitHub release artifact outside any catalog ecosystem and is listed under _indicators only.",
+  "_indicators": {
+    "bee_js_13_3_0_tgz_sha256": "d01fdf241aa9e0a1ba6ebc19f8f667af1bf652745021c5050126cb7036f7ce58",
+    "generate_version_cjs_sha256": "ee2f762e9ed3fd89f106e0b80c2e923bf1aed9a280277d3d998a5902c4d9ec0f",
+    "swarm_desktop_0_56_2_index_js_sha256": "f81315968e679b48f6bdff1c9b928bb223230d07f44d7948412c2250c2a14deb",
+    "c2_domain": "api.frameworkmetrics.xyz",
+    "ethereum_config_contracts": [
+      "0xf8a900Db50b3331be6B768bA460BB59f3E40C344",
+      "0x6a82595EEea0f4FDFB3aE13A2687BcbBE626e94B"
+    ],
+    "malicious_commit": "de2f74e784b2eafa0d66fbb6d88b42ea11ee34cf"
+  },
+  "entries": [
+    {
+      "id": "socket-2026-11-09-npm-ethersphere-bee-js",
+      "name": "@ethersphere/bee-js (Ethersphere release-pipeline compromise, SleepyDuck C2)",
+      "ecosystem": "npm",
+      "package": "@ethersphere/bee-js",
+      "versions": [
+        "13.3.0"
+      ],
+      "severity": "critical",
+      "source": "https://socket.dev/blog/bee-js-compromise",
+      "references": [
+        "https://github.com/advisories/GHSA-hh7j-5m3j-23pf",
+        "https://osv.dev/vulnerability/MAL-2026-18773"
+      ]
+    }
+  ]
+}
