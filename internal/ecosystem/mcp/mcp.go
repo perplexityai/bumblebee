@@ -445,7 +445,14 @@ func inferPackageFromArgs(cmd string, args []string) (spec, launcher string) {
 		}
 		return firstNonFlag(args, subcommands, npmValueTakingFlags), ""
 	case "uvx":
-		return firstNonFlag(args, nil, nil), "uv"
+		// uvx options precede the tool name and many take a separate value
+		// (--python 3.12, --with pkg, --index-url URL). Consume those values
+		// so they are not returned as the package. --from names the package
+		// explicitly when it differs from the entry-point command.
+		if spec := scanFlagValue(args, "--from", uvValueTakingFlags); spec != "" {
+			return spec, "uv"
+		}
+		return firstNonFlag(args, nil, uvValueTakingFlags), "uv"
 	case "uv":
 		// Recognize "uv tool run <pkg>" and "uv run <pkg>". Honor "--from <pkg>"
 		// when present: uv allows the entry-point name and the package name
@@ -484,7 +491,7 @@ func inferPackageFromArgs(cmd string, args []string) (spec, launcher string) {
 				return args[i+1], "pipx"
 			}
 		}
-		return firstNonFlag(args, map[string]bool{"run": true}, nil), "pipx"
+		return firstNonFlag(args, map[string]bool{"run": true}, pipxValueTakingFlags), "pipx"
 	case "docker", "podman":
 		// docker run [opts] <image> [cmd...]. Walk args: skip "run" and any
 		// flags (with or without `=`). The first positional after that is
@@ -644,6 +651,119 @@ var npmValueTakingFlags = map[string]bool{
 	"--lockfile-dir":      true,
 	"--config":            true,
 	"--config-file":       true,
+}
+
+// uvValueTakingFlags lists uvx options that consume a separate value
+// argument, so a value such as a Python version, an extra requirement, or a
+// credential-bearing index URL is not mistaken for the package spec. Short
+// and long forms are included; the "--flag=value" form is handled by
+// firstNonFlag itself. Boolean flags (--isolated, --no-cache, -q, ...) are
+// deliberately absent.
+//
+// The list follows `uvx --help` as of uv 0.11. Options added by later uv
+// releases are treated as boolean flags until listed here, which is the
+// pre-existing behavior for unknown flags. The "uv" branch below does not
+// use this map.
+var uvValueTakingFlags = map[string]bool{
+	"--allow-insecure-host":        true,
+	"--build-constraint":           true, // alias of --build-constraints
+	"--build-constraints":          true,
+	"--cache-dir":                  true,
+	"--color":                      true,
+	"--config-file":                true,
+	"--config-setting":             true,
+	"--config-settings-package":    true,
+	"--constraint":                 true, // alias of --constraints
+	"--constraints":                true,
+	"--default-index":              true,
+	"--directory":                  true,
+	"--env-file":                   true,
+	"--exclude-newer":              true,
+	"--exclude-newer-package":      true,
+	"--extra-index-url":            true,
+	"--find-links":                 true,
+	"--fork-strategy":              true,
+	"--from":                       true,
+	"--index":                      true,
+	"--index-strategy":             true,
+	"--index-url":                  true,
+	"--keyring-provider":           true,
+	"--link-mode":                  true,
+	"--no-binary-package":          true,
+	"--no-build-isolation-package": true,
+	"--no-build-package":           true,
+	"--no-sources-package":         true,
+	"--override":                   true, // alias of --overrides
+	"--overrides":                  true,
+	"--prerelease":                 true,
+	"--project":                    true,
+	"--python":                     true,
+	"--python-platform":            true,
+	"--refresh-package":            true,
+	"--reinstall-package":          true,
+	"--resolution":                 true,
+	"--torch-backend":              true,
+	"--upgrade-group":              true,
+	"--upgrade-package":            true,
+	"--with":                       true,
+	"--with-editable":              true,
+	"--with-requirements":          true,
+	"-C":                           true,
+	"-P":                           true,
+	"-b":                           true,
+	"-c":                           true,
+	"-f":                           true,
+	"-i":                           true,
+	"-p":                           true,
+	"-w":                           true,
+}
+
+// pipxValueTakingFlags lists `pipx run` options that consume a separate
+// value argument, with the same purpose as uvValueTakingFlags. Boolean flags
+// (--no-cache, --refresh, --path, --quiet, ...) are deliberately absent. The
+// list follows the argparse definitions in pipx's src/pipx/main.py.
+var pipxValueTakingFlags = map[string]bool{
+	"--backend":      true,
+	"--cooldown":     true,
+	"--fetch-python": true,
+	"--index-url":    true,
+	"--pip-args":     true,
+	"--python":       true,
+	"--python-args":  true,
+	"--spec":         true,
+	"--with":         true,
+	"-i":             true,
+}
+
+// scanFlagValue returns the value of the named long flag ("--flag value" or
+// "--flag=value") in the launcher-parsed prefix of args. The scan stops at
+// "--" and at the first positional token, since anything after either is the
+// launched tool's own arguments. Other value-taking flags are consumed so
+// their values are not misread. Returns "" when the flag is absent.
+func scanFlagValue(args []string, flag string, valueTaking map[string]bool) string {
+	for i := 0; i < len(args); i++ {
+		a := args[i]
+		if a == "--" {
+			return ""
+		}
+		if v, ok := strings.CutPrefix(a, flag+"="); ok {
+			return v
+		}
+		if a == flag && i+1 < len(args) {
+			return args[i+1]
+		}
+		if strings.HasPrefix(a, "-") {
+			if strings.Contains(a, "=") {
+				continue
+			}
+			if valueTaking[a] && i+1 < len(args) {
+				i++
+			}
+			continue
+		}
+		return ""
+	}
+	return ""
 }
 
 // looksLikePackageSpec reports whether s is a plausible
