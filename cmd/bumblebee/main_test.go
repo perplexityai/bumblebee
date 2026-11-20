@@ -51,19 +51,41 @@ func TestResolveDeviceIDEmptyEnv(t *testing.T) {
 	}
 }
 
+// setTestHome configures the home-directory environment for the current test.
+// On Unix, HOME is the canonical source for os.UserHomeDir.
+// On Windows, USERPROFILE takes precedence.
+func setTestHome(t *testing.T, home string) {
+	t.Helper()
+	t.Setenv("HOME", home)
+	if runtime.GOOS == "windows" {
+		t.Setenv("USERPROFILE", home)
+	}
+}
+
 func TestIsBroadHomeRoot(t *testing.T) {
 	home := t.TempDir()
-	t.Setenv("HOME", home)
+	setTestHome(t, home)
 
 	broad := []string{
 		home,
-		home + "/",
-		"/",
-		"/Users",
-		"/Users/someone",
-		"/home",
-		"/home/someone",
-		"/root",
+		home + string(filepath.Separator),
+	}
+	if runtime.GOOS == "windows" {
+		// On Windows the drive root is the equivalent of Unix "/".
+		broad = append(broad,
+			filepath.VolumeName(home)+string(filepath.Separator),
+			windowsUsersDir(),
+			filepath.Join(windowsUsersDir(), "someone"),
+		)
+	} else {
+		broad = append(broad,
+			"/",
+			"/Users",
+			"/Users/someone",
+			"/home",
+			"/home/someone",
+			"/root",
+		)
 	}
 	for _, p := range broad {
 		if !isBroadHomeRoot(p) {
@@ -75,10 +97,14 @@ func TestIsBroadHomeRoot(t *testing.T) {
 		filepath.Join(home, "code"),
 		filepath.Join(home, "Developer"),
 		filepath.Join(home, ".vscode", "extensions"),
-		"/usr/local/lib",
-		"/opt/homebrew/lib",
-		"/Users/someone/code",
-		"/home/someone/code",
+	}
+	if runtime.GOOS != "windows" {
+		narrow = append(narrow,
+			"/usr/local/lib",
+			"/opt/homebrew/lib",
+			"/Users/someone/code",
+			"/home/someone/code",
+		)
 	}
 	for _, p := range narrow {
 		if isBroadHomeRoot(p) {
@@ -117,7 +143,7 @@ func TestResolveRootsBaselineExcludesProjectTrees(t *testing.T) {
 
 func TestResolveRootsProjectIncludesCodeDir(t *testing.T) {
 	home := t.TempDir()
-	t.Setenv("HOME", home)
+	setTestHome(t, home)
 	codeDir := filepath.Join(home, "code")
 	if err := os.MkdirAll(codeDir, 0o755); err != nil {
 		t.Fatal(err)
@@ -138,8 +164,11 @@ func TestResolveRootsProjectIncludesCodeDir(t *testing.T) {
 }
 
 func TestResolveRootsBaselineIncludesUserLocalPython(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("~/.local/lib/python* is a Unix-only install path")
+	}
 	home := t.TempDir()
-	t.Setenv("HOME", home)
+	setTestHome(t, home)
 	pyRoot := filepath.Join(home, ".local", "lib", "python3.12")
 	if err := os.MkdirAll(filepath.Join(pyRoot, "site-packages"), 0o755); err != nil {
 		t.Fatal(err)
@@ -397,7 +426,7 @@ func TestClassifyRootClaudeCodexMCP(t *testing.T) {
 
 func TestResolveRootsBaselineRefusesBroadHome(t *testing.T) {
 	home := t.TempDir()
-	t.Setenv("HOME", home)
+	setTestHome(t, home)
 	_, _, err := resolveRoots(model.ProfileBaseline, []string{home}, rootsOpts{})
 	if err == nil {
 		t.Fatalf("expected refusal for baseline+%q", home)
@@ -409,7 +438,7 @@ func TestResolveRootsBaselineRefusesBroadHome(t *testing.T) {
 
 func TestResolveRootsProjectRefusesBroadHome(t *testing.T) {
 	home := t.TempDir()
-	t.Setenv("HOME", home)
+	setTestHome(t, home)
 	_, _, err := resolveRoots(model.ProfileProject, []string{home}, rootsOpts{})
 	if err == nil {
 		t.Fatalf("expected refusal for project+%q", home)
@@ -418,7 +447,7 @@ func TestResolveRootsProjectRefusesBroadHome(t *testing.T) {
 
 func TestResolveRootsDeepAllowsBroadHome(t *testing.T) {
 	home := t.TempDir()
-	t.Setenv("HOME", home)
+	setTestHome(t, home)
 	roots, _, err := resolveRoots(model.ProfileDeep, []string{home}, rootsOpts{})
 	if err != nil {
 		t.Fatalf("deep should accept broad home root: %v", err)
@@ -722,11 +751,11 @@ func TestResolveRootsAllUsersRejectsDeepProfile(t *testing.T) {
 }
 
 func TestResolveRootsAllUsersUnsupportedPlatformsNote(t *testing.T) {
-	if runtime.GOOS == "darwin" {
-		t.Skip("--all-users expands on darwin")
+	if runtime.GOOS == "darwin" || runtime.GOOS == "windows" {
+		t.Skip("--all-users expands on darwin and windows")
 	}
 	home := t.TempDir()
-	t.Setenv("HOME", home)
+	setTestHome(t, home)
 	pyRoot := filepath.Join(home, ".local", "lib", "python3.12")
 	if err := os.MkdirAll(pyRoot, 0o755); err != nil {
 		t.Fatal(err)
