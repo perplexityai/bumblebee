@@ -154,7 +154,10 @@ lists every flag.
 
 Records are NDJSON, one per line. Diagnostics go to stderr as NDJSON. Each
 run ends with a `scan_summary` record; receivers use it to decide whether
-to promote a run to current state. See [docs/transport.md](docs/transport.md)
+to promote a run to current state. `scan_summary.counts` always includes
+`package` and `finding`, and also includes one key for each ecosystem that
+emitted package records (for example `npm`, `pypi`, `go`, etc.). See
+[docs/transport.md](docs/transport.md)
 for HTTPS/file output and [docs/state-model.md](docs/state-model.md) for the
 receiver-side current-state model.
 
