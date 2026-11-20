@@ -95,6 +95,10 @@ and `lifecycle_scripts` (the names of any defined npm lifecycle hooks:
 URL and integrity hash in the lockfile are read for parsing but are
 intentionally not emitted in v0.1's slim schema (see
 [`internal/model/model.go`](../internal/model/model.go)).
+For lockfileVersion 2 and 3 entries, npm's `hasInstallScript` flag sets
+`has_lifecycle_scripts` while `lifecycle_scripts` stays empty, because the
+lockfile records that an install hook exists but not which one
+(lockfileVersion 1 has no such flag).
 
 References:
 

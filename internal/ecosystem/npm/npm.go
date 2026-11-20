@@ -44,6 +44,10 @@ type lockEntry struct {
 	Optional bool              `json:"optional"`
 	Link     bool              `json:"link"`
 	Scripts  map[string]string `json:"scripts"`
+	// HasInstallScript is npm's own marker (lockfileVersion 2/3) that the
+	// package defines a preinstall, install, or postinstall script. The
+	// lockfile records only this boolean, not the scripts themselves.
+	HasInstallScript bool `json:"hasInstallScript"`
 }
 
 type lockDepV1 struct {
@@ -168,7 +172,11 @@ func (s *Scanner) ScanLockfile(path string, base model.Record) error {
 			r.SourceFile = path
 			d := direct
 			r.DirectDependency = &d
-			r.HasLifecycleScripts = len(scripts) > 0
+			// hasInstallScript says an install-time hook exists but not
+			// which one, so it only sets the boolean. LifecycleScripts
+			// stays reserved for real hook names, the same rule the pnpm
+			// scanner applies to requiresBuild.
+			r.HasLifecycleScripts = len(scripts) > 0 || entry.HasInstallScript
 			r.LifecycleScripts = scripts
 			r.InstallScope = installScope(entry.Dev)
 			r.Confidence = "high"
