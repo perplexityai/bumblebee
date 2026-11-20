@@ -80,6 +80,15 @@ func IsGeminiSettingsJSON(path string) bool {
 		filepath.Base(filepath.Dir(path)) == ".gemini"
 }
 
+// IsCodexConfigTOML reports whether path is the Codex CLI user config
+// file (`<home>/.codex/config.toml`). Dispatch is path-aware because
+// `config.toml` is widely used across Rust/Go tooling and must not be
+// fed to the MCP scanner globally.
+func IsCodexConfigTOML(path string) bool {
+	return filepath.Base(path) == "config.toml" &&
+		filepath.Base(filepath.Dir(path)) == ".codex"
+}
+
 // IsClaudeConfigJSON reports whether path is Claude Code's user config
 // file (`<home>/.claude.json`). This file carries MCP servers in two
 // places — top-level `mcpServers` (user scope) and
@@ -850,4 +859,93 @@ func (s *Scanner) readBounded(path string) ([]byte, error) {
 		return nil, fmt.Errorf("file %s exceeds max size %d", path, s.MaxFileSize)
 	}
 	return io.ReadAll(f)
+}
+
+// ScanCodexConfig parses Codex CLI's user config file (`<home>/.codex/config.toml`).
+// Codex keeps its MCP servers in `[mcp_servers.<name>]` tables. This parser
+// extracts those tables into serverEntry structs using standard library parsing.
+func (s *Scanner) ScanCodexConfig(path string, base model.Record) error {
+	data, err := s.readBounded(path)
+	if err != nil {
+		return err
+	}
+
+	servers := parseCodexTOML(string(data))
+	if len(servers) == 0 {
+		if s.Diag != nil {
+			s.Diag("info", path, "no MCP servers parsed from codex config")
+		}
+		return nil
+	}
+
+	s.emitServers(servers, base, path, filepath.Dir(path))
+	return nil
+}
+
+func parseCodexTOML(content string) map[string]serverEntry {
+	servers := make(map[string]serverEntry)
+	lines := strings.Split(content, "\n")
+	var currentServer string
+
+	for _, rawLine := range lines {
+		line := strings.TrimSpace(rawLine)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
+			section := strings.TrimSpace(line[1 : len(line)-1])
+			if strings.HasPrefix(section, "mcp_servers.") {
+				serverName := strings.TrimPrefix(section, "mcp_servers.")
+				serverName = strings.Trim(serverName, "\"'")
+				currentServer = serverName
+				if _, exists := servers[currentServer]; !exists {
+					servers[currentServer] = serverEntry{}
+				}
+			} else {
+				currentServer = ""
+			}
+			continue
+		}
+
+		if currentServer == "" {
+			continue
+		}
+
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		key := strings.TrimSpace(parts[0])
+		val := strings.TrimSpace(parts[1])
+
+		entry := servers[currentServer]
+		switch key {
+		case "command":
+			entry.Command = strings.Trim(val, "\"'")
+		case "url":
+			entry.URL = strings.Trim(val, "\"'")
+		case "serverUrl":
+			entry.ServerURL = strings.Trim(val, "\"'")
+		case "httpUrl":
+			entry.HTTPURL = strings.Trim(val, "\"'")
+		case "type":
+			entry.Type = strings.Trim(val, "\"'")
+		case "args":
+			if strings.HasPrefix(val, "[") && strings.HasSuffix(val, "]") {
+				inner := strings.TrimSpace(val[1 : len(val)-1])
+				if inner != "" {
+					var args []string
+					for _, item := range strings.Split(inner, ",") {
+						item = strings.TrimSpace(item)
+						args = append(args, strings.Trim(item, "\"'"))
+					}
+					entry.Args = args
+				}
+			}
+		}
+		servers[currentServer] = entry
+	}
+
+	return servers
 }

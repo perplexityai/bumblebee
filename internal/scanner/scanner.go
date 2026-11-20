@@ -318,6 +318,8 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 					err = mcpS.ScanConfig(j.path, cfg.BaseRecord)
 				case "mcp-claude-config":
 					err = mcpS.ScanClaudeConfig(j.path, cfg.BaseRecord)
+				case "mcp-codex-config":
+					err = mcpS.ScanCodexConfig(j.path, cfg.BaseRecord)
 				case "skill-lock":
 					err = skillS.ScanLockFile(j.path, cfg.BaseRecord)
 				case "editor-ext":
@@ -436,6 +438,8 @@ func Run(ctx context.Context, cfg Config) (Result, error) {
 			send(job{kind: "mcp-config", path: path})
 		case enabled(model.EcosystemMCP) && base == "settings.json" && mcp.IsGeminiSettingsJSON(path):
 			send(job{kind: "mcp-config", path: path})
+		case enabled(model.EcosystemMCP) && base == "config.toml" && mcp.IsCodexConfigTOML(path):
+			send(job{kind: "mcp-codex-config", path: path})
 		case enabled(model.EcosystemMCP) && mcp.IsClaudeConfigJSON(path):
 			send(job{kind: "mcp-claude-config", path: path})
 		case enabled(model.EcosystemAgentSkill) && skills.IsKnownLockFile(base):

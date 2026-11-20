@@ -1141,3 +1141,60 @@ func TestLooksUnresolvedShellVar(t *testing.T) {
 		}
 	}
 }
+
+
+func TestScanCodexConfig(t *testing.T) {
+	dir := t.TempDir()
+	codexDir := filepath.Join(dir, ".codex")
+	if err := os.MkdirAll(codexDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	tomlContent := `
+[mcp_servers.codex-stdio-demo]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
+
+[mcp_servers."codex-http-demo"]
+url = "https://mcp.example.invalid/mcp"
+`
+	configPath := filepath.Join(codexDir, "config.toml")
+	if err := os.WriteFile(configPath, []byte(tomlContent), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	if !IsCodexConfigTOML(configPath) {
+		t.Errorf("expected IsCodexConfigTOML to be true for %s", configPath)
+	}
+
+	var records []model.Record
+	s := &Scanner{
+		Emit: func(r model.Record) {
+			records = append(records, r)
+		},
+	}
+
+	err := s.ScanCodexConfig(configPath, model.Record{})
+	if err != nil {
+		t.Fatalf("ScanCodexConfig failed: %v", err)
+	}
+
+	if len(records) != 2 {
+		t.Fatalf("expected 2 records, got %d", len(records))
+	}
+
+	foundStdio := false
+	foundHTTP := false
+	for _, r := range records {
+		if r.ServerName == "codex-stdio-demo" {
+			foundStdio = true
+		}
+		if r.ServerName == "codex-http-demo" {
+			foundHTTP = true
+		}
+	}
+
+	if !foundStdio || !foundHTTP {
+		t.Errorf("expected both codex-stdio-demo and codex-http-demo, got %+v", records)
+	}
+}
