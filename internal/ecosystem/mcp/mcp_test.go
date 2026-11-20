@@ -1141,3 +1141,27 @@ func TestLooksUnresolvedShellVar(t *testing.T) {
 		}
 	}
 }
+
+func TestInferPackageFromArgs_UvValueTakingFlags(t *testing.T) {
+	cases := []struct {
+		name         string
+		cmd          string
+		args         []string
+		wantSpec     string
+		wantLauncher string
+	}{
+		{"uvx --with extra pkg", "uvx", []string{"--with", "markitdown", "mcp-server-markitdown"}, "mcp-server-markitdown", "uv"},
+		{"uvx --python ver pkg", "uvx", []string{"--python", "3.11", "mcp-server-time"}, "mcp-server-time", "uv"},
+		{"uv tool run --python ver pkg", "uv", []string{"tool", "run", "--python", "3.11", "mcp-server-time"}, "mcp-server-time", "uv"},
+		{"pipx run --python ver pkg", "pipx", []string{"run", "--python", "3.11", "mcp-server-time"}, "mcp-server-time", "pipx"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			spec, launcher := inferPackageFromArgs(tc.cmd, tc.args)
+			if spec != tc.wantSpec || launcher != tc.wantLauncher {
+				t.Fatalf("inferPackageFromArgs(%q, %v) = (%q, %q), want (%q, %q)",
+					tc.cmd, tc.args, spec, launcher, tc.wantSpec, tc.wantLauncher)
+			}
+		})
+	}
+}
