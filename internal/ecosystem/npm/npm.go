@@ -38,12 +38,16 @@ type lockfile struct {
 }
 
 type lockEntry struct {
-	Version  string            `json:"version"`
-	Name     string            `json:"name"`
-	Dev      bool              `json:"dev"`
-	Optional bool              `json:"optional"`
-	Link     bool              `json:"link"`
-	Scripts  map[string]string `json:"scripts"`
+	Version              string            `json:"version"`
+	Name                 string            `json:"name"`
+	Dev                  bool              `json:"dev"`
+	Optional             bool              `json:"optional"`
+	Link                 bool              `json:"link"`
+	Scripts              map[string]string `json:"scripts"`
+	Dependencies         map[string]string `json:"dependencies"`
+	DevDependencies      map[string]string `json:"devDependencies"`
+	OptionalDependencies map[string]string `json:"optionalDependencies"`
+	PeerDependencies     map[string]string `json:"peerDependencies"`
 }
 
 type lockDepV1 struct {
@@ -136,6 +140,8 @@ func (s *Scanner) ScanLockfile(path string, base model.Record) error {
 
 	switch {
 	case len(lf.Packages) > 0: // lockfileVersion 2 or 3
+		root, hasRoot := lf.Packages[""]
+		directNames := root.directDependencyNames()
 		keys := make([]string, 0, len(lf.Packages))
 		for k := range lf.Packages {
 			keys = append(keys, k)
@@ -155,7 +161,6 @@ func (s *Scanner) ScanLockfile(path string, base model.Record) error {
 			if name == "" || entry.Version == "" {
 				continue
 			}
-			direct := isDirectFromKey(key)
 			scripts := scriptKeys(entry.Scripts)
 			r := base
 			r.Ecosystem = Ecosystem
@@ -166,8 +171,12 @@ func (s *Scanner) ScanLockfile(path string, base model.Record) error {
 			r.PackageManager = pm
 			r.SourceType = "npm-lockfile"
 			r.SourceFile = path
-			d := direct
-			r.DirectDependency = &d
+			if hasRoot {
+				installName := nameFromPackagesKey(key, "")
+				_, declaredAtRoot := directNames[installName]
+				direct := isTopLevelPackageKey(key) && declaredAtRoot
+				r.DirectDependency = &direct
+			}
 			r.HasLifecycleScripts = len(scripts) > 0
 			r.LifecycleScripts = scripts
 			r.InstallScope = installScope(entry.Dev)
@@ -290,9 +299,26 @@ func nameFromPackagesKey(key, explicit string) string {
 	return tail
 }
 
-// isDirectFromKey: a top-level dep has exactly one "node_modules/" segment.
-func isDirectFromKey(key string) bool {
-	return strings.Count(key, "node_modules/") == 1
+// isTopLevelPackageKey reports whether key is physically installed directly
+// under the root node_modules. This is necessary but not sufficient for a
+// direct dependency because npm also hoists transitive packages there.
+func isTopLevelPackageKey(key string) bool {
+	return strings.HasPrefix(key, "node_modules/") && strings.Count(key, "node_modules/") == 1
+}
+
+func (e lockEntry) directDependencyNames() map[string]struct{} {
+	out := make(map[string]struct{})
+	for _, dependencies := range []map[string]string{
+		e.Dependencies,
+		e.DevDependencies,
+		e.OptionalDependencies,
+		e.PeerDependencies,
+	} {
+		for name := range dependencies {
+			out[name] = struct{}{}
+		}
+	}
+	return out
 }
 
 func scriptKeys(m map[string]string) []string {

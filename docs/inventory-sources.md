@@ -96,6 +96,13 @@ URL and integrity hash in the lockfile are read for parsing but are
 intentionally not emitted in v0.1's slim schema (see
 [`internal/model/model.go`](../internal/model/model.go)).
 
+For lockfile versions 2 and 3, `direct_dependency` is derived from the
+root package descriptor at `packages[""]`, not from physical
+`node_modules` depth, because npm may hoist transitive packages to the
+top level. Hidden `node_modules/.package-lock.json` files omit that root
+descriptor, so records sourced only from a hidden lockfile leave
+`direct_dependency` absent rather than guessing.
+
 References:
 
 - npm `package-lock.json` format: <https://docs.npmjs.com/cli/v10/configuring-npm/package-lock-json>
