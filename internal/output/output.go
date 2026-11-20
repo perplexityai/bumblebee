@@ -44,6 +44,8 @@ type Emitter struct {
 	RecordsEmitted int
 	Duplicates     int
 	Diagnostics    int
+
+	Quiet bool
 }
 
 func New(records, diags io.Writer, runID string) *Emitter {
@@ -131,6 +133,11 @@ func (e *Emitter) EmitSummary(s model.ScanSummary) error {
 func (e *Emitter) Diag(level, path, msg string) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
+
+	if e.Quiet && (level == "info" || level == "warn" || level == "warning") {
+		return
+	}
+
 	e.Diagnostics++
 	d := model.Diagnostic{
 		RecordType: model.RecordTypeDiagnostic,
